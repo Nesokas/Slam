@@ -93,4 +93,6 @@ function Update ()
 		down_keyUp = true;
 	
 	decreaseVelocity();
+	
+	Debug.Log(rigidbody.velocity);
 }
