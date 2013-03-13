@@ -1,8 +1,8 @@
 #pragma strict
 
-var speed = 1;
-var decrease_speed = 0.5;
-var player_max_speed = 10;
+var speed = 0.5;
+var decrease_speed = 0.2;
+var player_max_speed = 3;
 
 // Directions Vectors
 var left_direction = Vector3(0.0, 0.0, 1.0);
@@ -26,6 +26,27 @@ function vertical_velocity()
 	return rigidbody.velocity.x;
 }
 
+
+// function to make velocity don't pass the max and to get to 0 if that is the case
+function verify_velocity()
+{
+	if(horizontal_velocity() > player_max_speed)
+		rigidbody.velocity = player_max_speed * left_direction;
+	else if(horizontal_velocity() < -player_max_speed)
+		rigidbody.velocity = player_max_speed * right_direction;
+		
+	if(vertical_velocity() > player_max_speed)
+		rigidbody.velocity = player_max_speed * up_direction;
+	else if(vertical_velocity() < -player_max_speed)
+		rigidbody.velocity = player_max_speed * down_direction;
+	
+	if(horizontal_velocity() < decrease_speed && horizontal_velocity() > -decrease_speed)
+		rigidbody.velocity.z = 0;
+	
+	if(vertical_velocity() < decrease_speed && vertical_velocity() > -decrease_speed)
+		rigidbody.velocity.x = 0;
+}
+
 function increaseSpeed(direction) 
 {
 	switch (direction) {
@@ -34,10 +55,8 @@ function increaseSpeed(direction)
 			rigidbody.velocity += right_direction * speed;
 		break;
 	case "left":
-		if(horizontal_velocity() < player_max_speed) {
+		if(horizontal_velocity() < player_max_speed)
 			rigidbody.velocity += left_direction * speed;
-			Debug.Log(rigidbody.velocity);
-		}
 		break;
 	case "up":
 		if(vertical_velocity() < player_max_speed)
@@ -92,7 +111,6 @@ function Update ()
 	if(Input.GetKeyUp("s"))
 		down_keyUp = true;
 	
-	decreaseVelocity();
-	
-	Debug.Log(rigidbody.velocity);
+	//verify_velocity();
+	//decreaseVelocity();
 }
