@@ -47,7 +47,10 @@ function increaseSpeed(direction)
 	}
 }
 
-function Start () {}
+function Start () {
+	var court_walls = GameObject.FindGameObjectWithTag("court_walls");
+	Physics.IgnoreCollision(court_walls.collider, this.collider);
+}
 
 function Update () 
 {
