@@ -1,6 +1,6 @@
 #pragma strict
 
-var acceleration = 0.2;
+var acceleration = 0.3;
 var player_max_speed = 4;
 var shootVelocity = 5.0;
 
@@ -90,5 +90,7 @@ function Update ()
 		
 	if (Input.GetAxis("Horizontal")!=0)
 		rigidbody.velocity.z = normalized_velocity.z;
+		
+	Debug.Log(rigidbody.velocity);
 
 }
