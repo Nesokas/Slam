@@ -2,6 +2,7 @@
 
 var acceleration = 0.2;
 var player_max_speed = 3.5;
+var shootVelocity = 10.0;
 
 // Directions Vectors
 var left_direction = Vector3(0.0, 0.0, 1.0);
@@ -15,6 +16,28 @@ var up_keyUp = true;
 var down_keyUp = true; 
 var right_keyUp = true;
 var left_keyUp = true;
+
+function OnCollisionEnter(collision : Collision)
+{
+	if(collision.gameObject.name == "Ball"){
+		if(Input.GetKeyDown("space")){
+			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
+			var script : BallBehaviour = collision.gameObject.GetComponent(BallBehaviour);
+			script.shoot();
+		}
+	}
+}
+
+function OnCollisionStay(collision : Collision)
+{
+	if(collision.gameObject.name == "Ball"){
+		if(Input.GetKeyDown("space")){
+			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
+			var script : BallBehaviour = collision.gameObject.GetComponent(BallBehaviour);
+			script.shoot();
+		}
+	}
+}
 
 function horizontal_velocity() 
 {
@@ -45,7 +68,6 @@ function increase_speed(direction)
 		if(vertical_velocity() > -player_max_speed)
 			rigidbody.velocity += down_direction * acceleration;
 	}
-
 }
 
 function normalize_velocity()
