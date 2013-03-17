@@ -2,13 +2,13 @@
 // Upgrade NOTE: replaced 'V2F_POS_FOG' with 'float4 pos : SV_POSITION'
 
 Shader "FX/Forest Force Field" {
-   
+       
 	Properties {
 	   _Color ("Color1", Color) = (1,1,1,1)
 	   _Color2 ("Color2", Color) = (1,1,1,1)
-	   _Rate ("Oscillation Rate", Range (100, 200)) = 150
-	   _Scale ("Scale", Range (0.02, 0.5)) = 0.25
-	   _Distortion ("Distortion", Range (0.1, 20)) = 1
+	   _Rate ("Oscillation Rate", Range (5, 20)) = 10
+	   _Scale ("Scale", Range (0.02, 0.05)) = 0.02
+	   _Distortion ("Distortion", Range (0.1, 5)) = 0.5
 	}
 	 
 	SubShader {
