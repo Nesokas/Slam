@@ -12,8 +12,6 @@ function OnCollisionEnter(collision : Collision)
 	if(collision.gameObject.name == "Ball"){
 		if(Input.GetAxis("Shoot")){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
-			var script : BallBehaviour = collision.gameObject.GetComponent(BallBehaviour);
-			script.shoot();
 		}
 	}
 }
@@ -23,8 +21,6 @@ function OnCollisionStay(collision : Collision)
 	if(collision.gameObject.name == "Ball"){
 		if(Input.GetAxis("Shoot")){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
-			var script : BallBehaviour = collision.gameObject.GetComponent(BallBehaviour);
-			script.shoot();
 		}
 	}
 }
@@ -69,7 +65,11 @@ function normalize_velocity()
 
 function Start () {
 	var court_walls = GameObject.FindGameObjectWithTag("court_walls");
+	var goals = GameObject.FindGameObjectsWithTag("goal");
 	Physics.IgnoreCollision(court_walls.collider, this.collider);
+
+	for(var i = 0; i < goals.Length; i++)
+		Physics.IgnoreCollision(goals[i].collider, this.collider);
 }
 
 function Update () 
