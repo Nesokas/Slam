@@ -2,7 +2,7 @@
 
 var acceleration = 0.2;
 var player_max_speed = 4;
-var shootVelocity = 10.0;
+var shootVelocity = 5.0;
 
 var velocity = Vector3.zero;
 var normalized_velocity = Vector3.zero;
@@ -10,7 +10,7 @@ var normalized_velocity = Vector3.zero;
 function OnCollisionEnter(collision : Collision)
 {
 	if(collision.gameObject.name == "Ball"){
-		if(Input.GetKeyDown("space")){
+		if(Input.GetAxis("Shoot")){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
 			var script : BallBehaviour = collision.gameObject.GetComponent(BallBehaviour);
 			script.shoot();
@@ -21,7 +21,7 @@ function OnCollisionEnter(collision : Collision)
 function OnCollisionStay(collision : Collision)
 {
 	if(collision.gameObject.name == "Ball"){
-		if(Input.GetKeyDown("space")){
+		if(Input.GetAxis("Shoot")){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
 			var script : BallBehaviour = collision.gameObject.GetComponent(BallBehaviour);
 			script.shoot();
