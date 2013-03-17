@@ -1,7 +1,7 @@
 #pragma strict
 
-var acceleration = 0.2;
-var player_max_speed = 3.5;
+var acceleration = 0.5;
+var player_max_speed = 4;
 
 // Directions Vectors
 var left_direction = Vector3(0.0, 0.0, 1.0);
@@ -26,9 +26,26 @@ function vertical_velocity()
 	return rigidbody.velocity.x;
 }
 
-function increase_speed(direction) 
+function increase_speed() 
 {
-	switch (direction) {
+	
+	var vertical_speed : float = Input.GetAxis("Vertical")*acceleration;
+	var horizontal_speed : float = Input.GetAxis("Horizontal")*acceleration;
+	
+	rigidbody.velocity.z -= horizontal_speed;
+	rigidbody.velocity.x += vertical_speed;
+	
+	if(rigidbody.velocity.x < -player_max_speed)
+		rigidbody.velocity.x = -player_max_speed;
+	else if (rigidbody.velocity.x > player_max_speed)
+		rigidbody.velocity.x = player_max_speed;
+		
+	if(rigidbody.velocity.z < -player_max_speed)
+		rigidbody.velocity.z = -player_max_speed;
+	else if (rigidbody.velocity.z > player_max_speed)
+		rigidbody.velocity.z = player_max_speed;
+		
+	/*switch (direction) {
 	case "right":
 		if(horizontal_velocity() > -player_max_speed)
 			rigidbody.velocity += right_direction * acceleration;
@@ -44,7 +61,7 @@ function increase_speed(direction)
 	case "down":
 		if(vertical_velocity() > -player_max_speed)
 			rigidbody.velocity += down_direction * acceleration;
-	}
+	}*/
 
 }
 
@@ -63,22 +80,27 @@ function Start () {
 
 function Update () 
 {
-	if(Input.GetKeyUp("a"))
+	/*if(Input.GetKeyUp("a"))
 		left_keyUp = true;
 	if(Input.GetKeyUp("d"))
 		right_keyUp = true;
 	if(Input.GetKeyUp("w"))
 		up_keyUp = true;
 	if(Input.GetKeyUp("s"))
-		down_keyUp = true;
+		down_keyUp = true;*/
+		
 	
-	if (!up_keyUp || !down_keyUp)
+	
+	
+	if (Input.GetAxis("Vertical")!=0)
 		rigidbody.velocity.x = velocity.x;
 		
-	if (!left_keyUp || !right_keyUp)
+	if (Input.GetAxis("Horizontal")!=0)
 		rigidbody.velocity.z = velocity.z;
 		
-	if(Input.GetKey("a")) {
+	increase_speed();
+	
+	/*if(Input.GetKey("a")) {
 		increase_speed("left");
 		left_keyUp = false;
 	}
@@ -93,15 +115,18 @@ function Update ()
 	if(Input.GetKey("s")) {
 		increase_speed("down");
 		down_keyUp = false;
-	}
+	}*/
 	
 	//if(rigidbody.velocity.magnitude > player_max_speed)
 	
 	normalize_velocity();
 	velocity = rigidbody.velocity;
-	if (!up_keyUp || !down_keyUp)
+	if (Input.GetAxis("Vertical")!=0)
 		rigidbody.velocity.x = normalized_velocity.x;
-	if (!left_keyUp || !right_keyUp)
+		
+	if (Input.GetAxis("Horizontal")!=0)
 		rigidbody.velocity.z = normalized_velocity.z;
+		
+	Debug.Log(rigidbody.velocity);
 
 }
