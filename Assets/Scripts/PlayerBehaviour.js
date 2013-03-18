@@ -2,10 +2,11 @@
 
 var acceleration = 0.3;
 var player_max_speed = 4;
-var shootVelocity = 5.0;
+var shootVelocity = 3.0;
 
 var velocity = Vector3.zero;
 var normalized_velocity = Vector3.zero;
+var gamepad = false;
 
 function OnCollisionEnter(collision : Collision)
 {
@@ -37,9 +38,15 @@ function vertical_velocity()
 
 function increase_speed() 
 {
-	
-	var vertical_speed : float = Input.GetAxis("Vertical")*acceleration;
-	var horizontal_speed : float = Input.GetAxis("Horizontal")*acceleration;
+	var vertical_speed : float;
+	var horizontal_speed : float;
+	if(gamepad){
+		vertical_speed = Input.GetAxis("Vertical_Gamepad")*acceleration;
+		 horizontal_speed = Input.GetAxis("Horizontal_Gamepad")*acceleration;
+	} else {
+		vertical_speed = Input.GetAxis("Vertical")*acceleration;
+		horizontal_speed = Input.GetAxis("Horizontal")*acceleration;
+	}
 	
 	rigidbody.velocity.z -= horizontal_speed;
 	rigidbody.velocity.x += vertical_speed;
@@ -91,6 +98,6 @@ function Update ()
 	if (Input.GetAxis("Horizontal")!=0)
 		rigidbody.velocity.z = normalized_velocity.z;
 		
-	Debug.Log(rigidbody.velocity);
+	//Debug.Log(rigidbody.velocity);
 
 }
