@@ -11,7 +11,10 @@ var gamepad = false;
 function OnCollisionEnter(collision : Collision)
 {
 	if(collision.gameObject.name == "Ball"){
-		if(Input.GetAxis("Shoot")){
+		if(Input.GetAxis("Shoot") && !gamepad){
+			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
+		}
+		else if(Input.GetAxis("Shoot_Gamepad") && gamepad){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
 		}
 	}
@@ -20,7 +23,10 @@ function OnCollisionEnter(collision : Collision)
 function OnCollisionStay(collision : Collision)
 {
 	if(collision.gameObject.name == "Ball"){
-		if(Input.GetAxis("Shoot")){
+		if(Input.GetAxis("Shoot") && !gamepad){
+			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
+		}
+		else if(Input.GetAxis("Shoot_Gamepad") && gamepad){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
 		}
 	}

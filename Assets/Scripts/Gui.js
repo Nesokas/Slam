@@ -11,7 +11,7 @@ function score_team(team:int)
 
 function OnGUI() 
 {
-	var score = score_team2 + " - " + score_team1;
+	var score = score_team1 + " - " + score_team2;
 	
 	GUI.color = Color.black;
 	
