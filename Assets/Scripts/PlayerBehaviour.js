@@ -41,6 +41,7 @@ function increase_speed()
 	if(gamepad){
 		direction.x = Input.GetAxis("Vertical_Gamepad");
 		direction.z = Input.GetAxis("Horizontal_Gamepad");
+		Debug.Log(direction);
 	} else {
 		direction.x = Input.GetAxis("Vertical");
 		direction.z = Input.GetAxis("Horizontal");
@@ -48,7 +49,6 @@ function increase_speed()
 	direction.Normalize();
 		
 	rigidbody.velocity += direction*acceleration;
-	Debug.Log(rigidbody.velocity);
 }
 
 function Start () {
