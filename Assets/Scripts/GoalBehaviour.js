@@ -6,12 +6,10 @@ function OnCollisionEnter(collision : Collision)
 {
 	if(collision.gameObject.name == "Ball"){
 		score++;
-		var gui_object = GameObject.FindWithTag("gui");
-		var gui_component : Gui = gui_object.GetComponent(Gui);
+		var main_game_object = GameObject.FindWithTag("GameController");
+		var main_game_component : GameBehaviour = main_game_object.GetComponent(GameBehaviour);
 		
-		gui_component.score_team(team);
-		
-		Debug.Log("Team " + team + " scored.");
+		main_game_component.score_team(team);
 	}
 }
 

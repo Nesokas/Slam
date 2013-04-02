@@ -7,7 +7,9 @@ var shootVelocity = 5.0;
 var velocity = Vector3.zero;
 var normalized_velocity = Vector3.zero;
 var gamepad = false;
+
 var team = 1;
+var player_name = "Ines";
 
 private var direction = Vector3.zero;
 private var ball_collision = false;
