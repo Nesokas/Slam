@@ -2,7 +2,7 @@
 
 var acceleration = 0.3;
 var player_max_speed = 4;
-var shootVelocity = 5.0;
+var shootVelocity = 8.0;
 
 var velocity = Vector3.zero;
 var normalized_velocity = Vector3.zero;
