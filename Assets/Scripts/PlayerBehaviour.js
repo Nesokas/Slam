@@ -9,27 +9,24 @@ var normalized_velocity = Vector3.zero;
 var gamepad = false;
 
 private var direction = Vector3.zero;
+private var ballCollision = false;
 
 function OnCollisionEnter(collision : Collision)
 {
-	if(collision.gameObject.name == "Ball"){
-		if(Input.GetAxis("Shoot") && !gamepad){
+	if(collision.gameObject.name == "Ball" && !ballCollision){
+		if((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
-		}
-		else if(Input.GetAxis("Shoot_Gamepad") && gamepad){
-			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
+			ballCollision = true;
 		}
 	}
 }
 
 function OnCollisionStay(collision : Collision)
 {
-	if(collision.gameObject.name == "Ball"){
-		if(Input.GetAxis("Shoot") && !gamepad){
+	if(collision.gameObject.name == "Ball" && !ballCollision){
+		if((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
-		}
-		else if(Input.GetAxis("Shoot_Gamepad") && gamepad){
-			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
+			ballCollision = true;
 		}
 	}
 }
@@ -62,5 +59,10 @@ function Start () {
 
 function Update () 
 {
+	if(!((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)) &&
+		(ballCollision)) {
+		ballCollision = false;
+	}
+	
 	increase_speed();
 }
