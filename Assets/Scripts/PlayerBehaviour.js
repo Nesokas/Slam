@@ -7,26 +7,29 @@ var shootVelocity = 5.0;
 var velocity = Vector3.zero;
 var normalized_velocity = Vector3.zero;
 var gamepad = false;
+var team = 1;
 
 private var direction = Vector3.zero;
-private var ballCollision = false;
+private var ball_collision = false;
+private var shoot_material : Material;
+private var normal_material : Material;
 
 function OnCollisionEnter(collision : Collision)
 {
-	if(collision.gameObject.name == "Ball" && !ballCollision){
+	if(collision.gameObject.name == "Ball" && !ball_collision){
 		if((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
-			ballCollision = true;
+			ball_collision = true;
 		}
 	}
 }
 
 function OnCollisionStay(collision : Collision)
 {
-	if(collision.gameObject.name == "Ball" && !ballCollision){
+	if(collision.gameObject.name == "Ball" && !ball_collision){
 		if((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)){
 			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
-			ballCollision = true;
+			ball_collision = true;
 		}
 	}
 }
@@ -55,14 +58,29 @@ function Start () {
 
 	for(var i = 0; i < goals.Length; i++)
 		Physics.IgnoreCollision(goals[i].collider, this.collider);
+		
+	if(team == 1) {
+		normal_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player1.mat", typeof(Material)) as Material;
+		shoot_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player1_shoot.mat", typeof(Material)) as Material;
+	} else {
+		normal_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player2.mat", typeof(Material)) as Material;
+		shoot_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player2_shoot.mat", typeof(Material)) as Material;
+	}
+	
+	renderer.material = normal_material;
 }
 
 function Update () 
 {
 	if(!((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)) &&
-		(ballCollision)) {
-		ballCollision = false;
+		ball_collision) {
+		ball_collision = false;
 	}
+	
+	if(((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)) && !ball_collision)
+		renderer.material = shoot_material;
+	else
+		renderer.material = normal_material;
 	
 	increase_speed();
 }
