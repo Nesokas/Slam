@@ -20,6 +20,7 @@ var gamepad_num : int = 0;
 private var colliding_with_ball = false;
 private var ball_collider : Collision;
 private var base : Transform;
+private var ball : GameObject;
 
 function InitializePlayerInfo(num:int, team_num:int, player_number:int)
 {
@@ -33,7 +34,7 @@ function InitializePlayerInfo(num:int, team_num:int, player_number:int)
 
 function VerifyShoot()
 {
-	if(!ball_collision && colliding_with_ball){
+	if(colliding_with_ball && !ball_collision){
 		if((!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num)))){
 			ball_collider.rigidbody.velocity -= ball_collider.contacts[0].normal * shootVelocity;
 			ball_collision = true;
@@ -65,6 +66,14 @@ function increase_speed()
 	direction.Normalize();
 		
 	rigidbody.velocity += direction*acceleration;
+}
+
+function updateRotation()
+{
+	if(!ball)
+		ball = GameObject.FindGameObjectWithTag("ball");
+	var rotation = Quaternion.LookRotation(ball.transform.position - transform.position);
+    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1000);
 }
 
 function Start() {
@@ -104,8 +113,11 @@ function Update ()
 		base.renderer.material = normal_material;
 	
 	increase_speed();
+
 	VerifyShoot();
 	
 	if(team == 1 && player_num == 2)
 		Debug.Log(rigidbody.velocity);
+		
+	updateRotation();
 }
