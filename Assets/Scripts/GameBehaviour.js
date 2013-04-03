@@ -56,11 +56,11 @@ function destroyAllPlayers()
 	var i : int;
 	
 	for (i = 0; i < players_team_1.length; i++)
-		Destroy(players_team_1[i]);
+		Destroy(players_team_1[i] as Object);
 	players_team_1.clear();
 	
 	for (i = 0; i < players_team_2.length; i++)
-		Destroy(players_team_2[i]);
+		Destroy(players_team_2[i] as Object);
 	players_team_2.clear();
 }
 
