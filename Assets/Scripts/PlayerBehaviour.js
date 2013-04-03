@@ -10,40 +10,52 @@ var gamepad = false;
 
 var team = 1;
 var player_name = "Ines";
+var player_num = 1;
 
 private var direction = Vector3.zero;
 private var ball_collision = false;
 private var shoot_material : Material;
 private var normal_material : Material;
+var gamepad_num : int = 0;
+private var colliding_with_ball = false;
+private var ball_collider : Collision;
 
-function OnCollisionEnter(collision : Collision)
+function AddGamepadNum(num:int)
 {
-	if(collision.gameObject.name == "Ball" && !ball_collision){
-		if((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)){
-			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
+	gamepad_num = num;
+	gamepad = true;
+	Debug.Log("Player " + player_num + " from team " + team + " -> " + gamepad_num);
+}
+
+function VerifyShoot()
+{
+	if(colliding_with_ball && !ball_collision){
+		if((!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num)))){
+			ball_collider.rigidbody.velocity -= ball_collider.contacts[0].normal * shootVelocity;
 			ball_collision = true;
+			colliding_with_ball = false;
 		}
 	}
 }
 
-function OnCollisionStay(collision : Collision)
+function OnCollisionEnter(collision : Collision)
 {
-	if(collision.gameObject.name == "Ball" && !ball_collision){
-		if((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)){
-			collision.rigidbody.velocity -= collision.contacts[0].normal * shootVelocity;
-			ball_collision = true;
-		}
-	}
+	colliding_with_ball = true;
+	ball_collider = collision;
+}
+
+function OnCollisionExit(collision : Collision)
+{
+	colliding_with_ball = false;
 }
 
 function increase_speed() 
 {
-	var vertical_speed : float;
-	var horizontal_speed : float;
 	if(gamepad){
-		direction.x = Input.GetAxis("Vertical_Gamepad");
-		direction.z = Input.GetAxis("Horizontal_Gamepad");
-		Debug.Log(direction);
+		direction.x = Input.GetAxis("Vertical_Gamepad_" + gamepad_num);
+		direction.z = Input.GetAxis("Horizontal_Gamepad_" + gamepad_num);
+		if(direction.x != 0)
+			Debug.Log("Player " + player_num + " from team " + team + " -> " + gamepad_num);
 	} else {
 		direction.x = Input.GetAxis("Vertical");
 		direction.z = Input.GetAxis("Horizontal");
@@ -72,17 +84,19 @@ function Start () {
 	renderer.material = normal_material;
 }
 
-function Update () 
+function Update ()
 {
-	if(!((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)) &&
-		ball_collision) {
+	if(!(!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num))) && ball_collision) {
 		ball_collision = false;
 	}
 	
-	if(((Input.GetAxis("Shoot") && !gamepad) || (Input.GetAxis("Shoot_Gamepad") && gamepad)) && !ball_collision)
+	if((!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num))) && !ball_collision) {
 		renderer.material = shoot_material;
+		Debug.Log("Player " + player_num + " from team " + team + " -> " + Input.GetAxis("Shoot_Gamepad_" + gamepad_num));
+	}
 	else
 		renderer.material = normal_material;
 	
 	increase_speed();
+	VerifyShoot();
 }
