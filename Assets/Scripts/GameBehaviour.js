@@ -71,6 +71,9 @@ function MovePlayersToStartPositions()
 	var player : GameObject;
 	var odd_position : Vector3;
 	
+	gamepad_num = 1;
+	keyboard_selected = false;
+	
 	destroyAllPlayers();
 	
 	Destroy(ball);
