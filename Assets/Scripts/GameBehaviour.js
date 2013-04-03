@@ -10,6 +10,7 @@ var num_team_2_players = 1;
 
 var team_1_prefab : GameObject;
 var team_2_prefab : GameObject;
+var player_prefab : GameObject;
 var ball_prefab : GameObject;
 
 private var players_team_1 = new Array();
@@ -56,11 +57,11 @@ function destroyAllPlayers()
 	var i : int;
 	
 	for (i = 0; i < players_team_1.length; i++)
-		Destroy(players_team_1[i] as Object);
+		Destroy(players_team_1[i]);
 	players_team_1.clear();
 	
 	for (i = 0; i < players_team_2.length; i++)
-		Destroy(players_team_2[i] as Object);
+		Destroy(players_team_2[i]);
 	players_team_2.clear();
 }
 
@@ -89,18 +90,18 @@ function MovePlayersToStartPositions()
 		for(i = 0; i < num_team_1_players; i++) {
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
-				players_team_1.Push(Instantiate(team_1_prefab, odd_position, team_1_prefab.transform.rotation));
+				players_team_1.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
 				if(keyboard_selected) {
 					player = players_team_1[i] as GameObject;
 					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.AddGamepadNum(gamepad_num++);
+					player_component.InitializePlayerInfo(gamepad_num++, 1, i);
 				} else keyboard_selected = true;
 			} else {
-				players_team_1.Push(Instantiate(team_1_prefab, position, team_1_prefab.transform.rotation));
+				players_team_1.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
 				if(keyboard_selected) {
 					player = players_team_1[i] as GameObject;
 					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.AddGamepadNum(gamepad_num++);
+					player_component.InitializePlayerInfo(gamepad_num++, 1, i);
 				} else keyboard_selected = true;
 				position.x += players_distance;
 			}
@@ -112,19 +113,19 @@ function MovePlayersToStartPositions()
 		for(i = 0; i < num_team_2_players; i++) {
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
-				players_team_1.Push(Instantiate(team_1_prefab, odd_position, team_1_prefab.transform.rotation));
+				players_team_1.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
 				if(keyboard_selected) {
 					player = players_team_1[i] as GameObject;
 					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.AddGamepadNum(gamepad_num++);
+					player_component.InitializePlayerInfo(gamepad_num++, 1, i);
 				} else keyboard_selected = true;
 			} else {
 				position.x += players_distance;
-				players_team_1.Push(Instantiate(team_1_prefab, position, team_1_prefab.transform.rotation));
+				players_team_1.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
 				if(keyboard_selected) {
 					player = players_team_1[i] as GameObject;
 					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.AddGamepadNum(gamepad_num++);
+					player_component.InitializePlayerInfo(gamepad_num++, 1, i);
 				} else keyboard_selected = true;
 			}
 		}
@@ -137,18 +138,18 @@ function MovePlayersToStartPositions()
 		for(i = 0; i < num_team_2_players; i++) {
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
-				players_team_2.Push(Instantiate(team_2_prefab, odd_position, team_2_prefab.transform.rotation));
+				players_team_2.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
 				if(keyboard_selected) {
 					player = players_team_2[i] as GameObject;
 					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.AddGamepadNum(gamepad_num++);
+					player_component.InitializePlayerInfo(gamepad_num++, 2, i);
 				} else keyboard_selected = true;
 			} else {
-				players_team_2.Push(Instantiate(team_2_prefab, position, team_2_prefab.transform.rotation));
+				players_team_2.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
 				if(keyboard_selected) {
 					player = players_team_2[i] as GameObject;
 					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.AddGamepadNum(gamepad_num++);
+					player_component.InitializePlayerInfo(gamepad_num++, 2, i);
 				} else keyboard_selected = true;
 				position.x += players_distance;
 			}
@@ -159,19 +160,19 @@ function MovePlayersToStartPositions()
 		for(i = 0; i < num_team_2_players; i++) {
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
-				players_team_2.Push(Instantiate(team_2_prefab, odd_position, team_2_prefab.transform.rotation));
+				players_team_2.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
 				if(keyboard_selected) {
 					player = players_team_2[i] as GameObject;
 					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.AddGamepadNum(gamepad_num++);
+					player_component.InitializePlayerInfo(gamepad_num++, 2, i);
 				} else keyboard_selected = true;
 			} else {
 				position.x += players_distance;
-				players_team_2.Push(Instantiate(team_2_prefab, position, team_2_prefab.transform.rotation));
+				players_team_2.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
 				if(keyboard_selected) {
 					player = players_team_2[i] as GameObject;
 					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.AddGamepadNum(gamepad_num++);
+					player_component.InitializePlayerInfo(gamepad_num++, 2, i);
 				} else keyboard_selected = true;
 			}
 		}

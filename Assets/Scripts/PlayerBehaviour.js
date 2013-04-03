@@ -19,11 +19,16 @@ private var normal_material : Material;
 var gamepad_num : int = 0;
 private var colliding_with_ball = false;
 private var ball_collider : Collision;
+private var base : Transform;
 
-function AddGamepadNum(num:int)
+function InitializePlayerInfo(num:int, team_num:int, player_number:int)
 {
 	gamepad_num = num;
 	gamepad = true;
+	team = team_num;
+	player_num = player_number;
+	
+	Start();
 }
 
 function VerifyShoot()
@@ -62,14 +67,16 @@ function increase_speed()
 	rigidbody.velocity += direction*acceleration;
 }
 
-function Start () {
-
+function Start() {
+	
 	var court_walls = GameObject.FindGameObjectWithTag("court_walls");
 	var goals = GameObject.FindGameObjectsWithTag("goal");
-	Physics.IgnoreCollision(court_walls.collider, this.collider);
+	base = transform.Find("Base");
+	var base_collider = base.Find("Collider");
+	Physics.IgnoreCollision(court_walls.collider, base_collider.collider);
 
 	for(var i = 0; i < goals.Length; i++)
-		Physics.IgnoreCollision(goals[i].collider, this.collider);
+		Physics.IgnoreCollision(goals[i].collider, base_collider.collider);
 		
 	if(team == 1) {
 		normal_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player1.mat", typeof(Material)) as Material;
@@ -78,20 +85,23 @@ function Start () {
 		normal_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player2.mat", typeof(Material)) as Material;
 		shoot_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player2_shoot.mat", typeof(Material)) as Material;
 	}
-	
-	renderer.material = normal_material;
+
+	base.renderer.material = normal_material;
 }
 
 function Update ()
 {
+	if(base == null)
+		base = transform.Find("Base");
+		
 	if(ball_collision && !((!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num))))) {
 		ball_collision = false;
 	}
 	
 	if(!ball_collision && ((!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num)))))
-		renderer.material = shoot_material;
+		base.renderer.material = shoot_material;
 	else
-		renderer.material = normal_material;
+		base.renderer.material = normal_material;
 	
 	increase_speed();
 	VerifyShoot();
