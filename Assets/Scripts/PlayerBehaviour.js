@@ -1,6 +1,6 @@
 #pragma strict
 
-var acceleration = 0.3;
+var acceleration = 0.2;
 var player_max_speed = 4;
 var shootVelocity = 8.0;
 
@@ -95,4 +95,7 @@ function Update ()
 	
 	increase_speed();
 	VerifyShoot();
+	
+	if(team == 1 && player_num == 2)
+		Debug.Log(rigidbody.velocity);
 }
