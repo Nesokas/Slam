@@ -34,7 +34,7 @@ function InitializePlayerInfo(num:int, team_num:int, player_number:int)
 
 function VerifyShoot()
 {
-	if(colliding_with_ball && !ball_collision && ball_collider != null){
+	if(colliding_with_ball && !ball_collision){
 		if((!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num)))){
 			ball_collider.rigidbody.velocity -= ball_collider.contacts[0].normal * shootVelocity;
 			ball_collision = true;
@@ -45,13 +45,17 @@ function VerifyShoot()
 
 function OnCollisionEnter(collision : Collision)
 {
-	colliding_with_ball = true;
-	ball_collider = collision;
+	if(collision.gameObject.name == "Ball" || collision.gameObject.tag == "Player") {
+		colliding_with_ball = true;
+		ball_collider = collision;
+	}
 }
 
 function OnCollisionExit(collision : Collision)
 {
-	colliding_with_ball = false;
+	if(collision.gameObject.name == "Ball" || collision.gameObject.tag == "Player") {
+		colliding_with_ball = false;
+	}
 }
 
 function increase_speed() 
