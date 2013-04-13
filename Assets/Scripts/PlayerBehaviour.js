@@ -1,6 +1,6 @@
 #pragma strict
 
-var acceleration = 0.4;
+var acceleration = 0.2;
 var player_max_speed = 4;
 var shootVelocity = 8.0;
 
