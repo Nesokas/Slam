@@ -48,9 +48,9 @@
      <Compile Include="Assets\Scripts\DontGoThroughThings.js" />
      <Compile Include="Assets\Scripts\GameBehaviour.js" />
      <Compile Include="Assets\Scripts\GoalBehaviour.js" />
+     <Compile Include="Assets\Scripts\Lobby.js" />
      <Compile Include="Assets\Scripts\MenuBehaviour.js" />
      <Compile Include="Assets\Scripts\Menu_Arrow_Behaviour.js" />
-     <Compile Include="Assets\Scripts\Menu_Lobby_Behaviour.js" />
      <Compile Include="Assets\Scripts\PlayerBehaviour.js" />
      <None Include="Assets\Materials\Shaders\ForceField.shader" />
   </ItemGroup>
