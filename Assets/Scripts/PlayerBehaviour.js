@@ -1,8 +1,7 @@
 #pragma strict
 
 var acceleration = 0.2;
-var player_max_speed = 4;
-var shootVelocity = 8.0;
+var shootVelocity = 11.0;
 
 var velocity = Vector3.zero;
 var normalized_velocity = Vector3.zero;
