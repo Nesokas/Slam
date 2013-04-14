@@ -22,7 +22,7 @@ private var shoot_material : Material;
 private var normal_material : Material;
 var gamepad_num : int = 0;
 private var colliding_with_ball = false;
-private var ball_collider : Collision;
+private var ball_collider : Collider;
 private var base : Transform;
 private var ball : GameObject;
 
@@ -46,28 +46,48 @@ function InitializePlayerInfo(num:int, team_num:int, m_camera : Camera)
 function VerifyShoot()
 {
 	if(colliding_with_ball && !ball_collision){
+		var contact_point = ball_collider.ClosestPointOnBounds(transform.position);
+		var direction = contact_point - transform.position;
+		direction = direction.normalized;
 		if((!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num)))){
-			ball_collider.rigidbody.velocity -= ball_collider.contacts[0].normal * shootVelocity;
+			ball_collider.rigidbody.velocity += direction * shootVelocity;
 			ball_collision = true;
 			colliding_with_ball = false;
 		}
 	}
 }
 
-function OnCollisionEnter(collision : Collision)
+/*function OnCollisionEnter(collision : Collision)
 {	
-	if(collision.gameObject.name == "Ball" || collision.collider.tag == "colliderShoot") {
+	if(collision.gameObject.name == "Ball" || collision.gameObject.tag == "colliderShoot") {
 		colliding_with_ball = true;
 		ball_collider = collision;
+		Debug.Log("----------------");
 	}
 }
 
 function OnCollisionExit(collision : Collision)
 {
-	if(collision.gameObject.name == "Ball" || collision.collider.tag == "colliderShoot") {
+	if(collision.gameObject.name == "Ball" || collision.gameObject.tag == "colliderShoot") {
+		colliding_with_ball = false;
+	}
+}*/
+
+function OnTriggerEnter (collider : Collider) {
+    
+    if(collider.gameObject.name == "Ball" || collider.gameObject.tag == "colliderShoot") {
+		colliding_with_ball = true;
+		ball_collider = collider;
+	}
+}
+
+function OnTriggerExit (collider : Collider) {
+    
+    if(collider.gameObject.name == "Ball" || collider.gameObject.tag == "colliderShoot") {
 		colliding_with_ball = false;
 	}
 }
+
 
 function increase_speed() 
 {
@@ -91,11 +111,12 @@ function updateRotation()
     transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1000);
 }
 
+
+
 function Start() {
 	
 	var court_walls = GameObject.FindGameObjectWithTag("court_walls");
 	var goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
-	var posts = GameObject.FindGameObjectsWithTag("post");
 	var players = GameObject.FindGameObjectsWithTag("Player");
 	base = transform.Find("Base");
 	var base_collider = base.Find("Collider");
@@ -104,12 +125,7 @@ function Start() {
 	Physics.IgnoreCollision(court_walls.collider, shoot_collider.collider);
 	for(var i = 0; i < goal_detection.Length; i++) {
 		Physics.IgnoreCollision(goal_detection[i].collider, base_collider.collider);
-		Physics.IgnoreCollision(goal_detection[i].collider, shoot_collider.collider);
 	}
-	for(i = 0; i < posts.Length; i++) {
-		Physics.IgnoreCollision(posts[i].collider, shoot_collider.collider);
-	}
-	Debug.Log(transform.gameObject);
 	
 	for (i=0; i < players.Length; i++) {
 		var player_base = players[i].transform.Find("Base");
