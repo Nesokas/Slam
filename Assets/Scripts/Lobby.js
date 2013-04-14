@@ -4,12 +4,13 @@ var lobby_style : GUIStyle;
 var team1_style : GUIStyle;
 var team2_style : GUIStyle;
 var names_style : GUIStyle;
+var buttons_style : GUIStyle;
 var height_scale = 0.04;
 var scale = 0.0025;
 var names_scale = 0.04;
 
 private var num_controllers = 0;
-private var buttons_scale_width : float;
+private var buttons_scale_width = Screen.height * scale;
 
 private var players_team_1 = new Array();
 private var players_team_2 = new Array();
@@ -25,7 +26,6 @@ function Start()
 
 function AddPlayer(position : Vector2, player_name : String, team : int)
 {
-	buttons_scale_width = Screen.height * scale;
 	names_style.fontSize = Screen.height * names_scale;
 	
 	if(team == 1){
@@ -144,6 +144,14 @@ function OnGUI () {
 			AddPlayer(Vector2(Screen.width/2,Screen.height/6 + 35*buttons_scale_width*(i+1)), player_name, 2);
 		else
 			AddPlayer(Vector2(Screen.width/2,Screen.height/6 + 35*buttons_scale_width*(i+1)), player_name, 0);
+	}
+	
+	buttons_style.fontSize = font_scale;
+	if(GUI.Button(Rect(Screen.width/2 - 35*buttons_scale_width, 6*Screen.height/7, 70*buttons_scale_width, 25*buttons_scale_width), "START", buttons_style)){
+		var game_settings = GameObject.FindGameObjectWithTag("settings");
+		game_settings.GetComponent(Game_Settings).players_team_1 = players_team_1;
+		game_settings.GetComponent(Game_Settings).players_team_2 = players_team_2;
+		Application.LoadLevel(2);
 	}
 	
 }

@@ -81,6 +81,10 @@ function MovePlayersToStartPositions()
 	ball = Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
 	ball.transform.name = "Ball";
 	
+	var game_settings = GameObject.FindGameObjectWithTag("settings").GetComponent(Game_Settings);
+	num_team_1_players = game_settings.players_team_1.length;
+	num_team_2_players = game_settings.players_team_2.length;
+	
 	var player_component : PlayerBehaviour;
 	
 	if (IsOdd(num_team_1_players)) {

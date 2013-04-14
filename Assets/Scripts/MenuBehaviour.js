@@ -1,24 +1,12 @@
-var isQuitButton = false;
+var scale = 0.0025;
 
-function OnMouseEnter()
-{
-	renderer.material.color = Color.yellow;
-}
+private var buttons_scale_width = Screen.height * scale;
 
-function OnMouseExit()
+function OnGUI()
 {
-	renderer.material.color = Color.white;
-}
-
-function OnMouseUp()
-{
-	if (isQuitButton)
-	{
-		Application.Quit();
-	}
-	
-	else
-	{
+	if(GUI.Button(Rect(Screen.width/2 - 35*buttons_scale_width, Screen.height/2 - 20*buttons_scale_width, 70*buttons_scale_width, 25*buttons_scale_width), "Start"))
 		Application.LoadLevel(1);
-	}
+	
+	if(GUI.Button(Rect(Screen.width/2 - 35*buttons_scale_width, Screen.height/2 + 50*buttons_scale_width, 70*buttons_scale_width, 25*buttons_scale_width), "Exit"))
+		Application.Quit();
 }
