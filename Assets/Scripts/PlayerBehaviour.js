@@ -22,12 +22,14 @@ private var base : Transform;
 private var ball : GameObject;
 
 
-function InitializePlayerInfo(num:int, team_num:int, player_number:int)
+function InitializePlayerInfo(num:int, team_num:int)
 {
-	gamepad_num = num;
-	gamepad = true;
+	if(num != 0) {
+		gamepad_num = num;
+		gamepad = true;
+	}
 	team = team_num;
-	player_num = player_number;
+	player_num = num;
 	
 	Start();
 }

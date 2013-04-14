@@ -65,6 +65,11 @@ function destroyAllPlayers()
 	players_team_2.clear();
 }
 
+function GetPlayerNum(player_name : String)
+{
+	return player_name.Replace("Player ", "");
+}
+
 function MovePlayersToStartPositions()
 {
 	var position : Vector3;
@@ -84,8 +89,11 @@ function MovePlayersToStartPositions()
 	var game_settings = GameObject.FindGameObjectWithTag("settings").GetComponent(Game_Settings);
 	num_team_1_players = game_settings.players_team_1.length;
 	num_team_2_players = game_settings.players_team_2.length;
+	var team_1_players = game_settings.players_team_1;
+	var team_2_players = game_settings.players_team_2;
 	
 	var player_component : PlayerBehaviour;
+	var player_num : int;
 	
 	if (IsOdd(num_team_1_players)) {
 	
@@ -95,18 +103,16 @@ function MovePlayersToStartPositions()
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
 				players_team_1.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
-				if(keyboard_selected) {
-					player = players_team_1[i] as GameObject;
-					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.InitializePlayerInfo(gamepad_num++, 1, i);
-				} else keyboard_selected = true;
+				player_num = parseInt(GetPlayerNum(team_1_players[i]));
+				player = players_team_1[i] as GameObject;
+				player_component = player.GetComponent(PlayerBehaviour);
+				player_component.InitializePlayerInfo(player_num, 1);
 			} else {
 				players_team_1.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
-				if(keyboard_selected) {
-					player = players_team_1[i] as GameObject;
-					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.InitializePlayerInfo(gamepad_num++, 1, i);
-				} else keyboard_selected = true;
+				player_num = parseInt(GetPlayerNum(team_1_players[i]));
+				player = players_team_1[i] as GameObject;
+				player_component = player.GetComponent(PlayerBehaviour);
+				player_component.InitializePlayerInfo(player_num, 1);
 				position.x += players_distance;
 			}
 		}
@@ -118,19 +124,17 @@ function MovePlayersToStartPositions()
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
 				players_team_1.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
-				if(keyboard_selected) {
-					player = players_team_1[i] as GameObject;
-					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.InitializePlayerInfo(gamepad_num++, 1, i);
-				} else keyboard_selected = true;
+				player_num = parseInt(GetPlayerNum(team_1_players[i]));
+				player = players_team_1[i] as GameObject;
+				player_component = player.GetComponent(PlayerBehaviour);
+				player_component.InitializePlayerInfo(player_num, 1);
 			} else {
 				position.x += players_distance;
 				players_team_1.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
-				if(keyboard_selected) {
-					player = players_team_1[i] as GameObject;
-					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.InitializePlayerInfo(gamepad_num++, 1, i);
-				} else keyboard_selected = true;
+				player_num = parseInt(GetPlayerNum(team_1_players[i]));
+				player = players_team_1[i] as GameObject;
+				player_component = player.GetComponent(PlayerBehaviour);
+				player_component.InitializePlayerInfo(player_num, 1);
 			}
 		}
 	}
@@ -143,18 +147,16 @@ function MovePlayersToStartPositions()
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
 				players_team_2.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
-				if(keyboard_selected) {
-					player = players_team_2[i] as GameObject;
-					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.InitializePlayerInfo(gamepad_num++, 2, i);
-				} else keyboard_selected = true;
+				player_num = parseInt(GetPlayerNum(team_2_players[i]));
+				player = players_team_2[i] as GameObject;
+				player_component = player.GetComponent(PlayerBehaviour);
+				player_component.InitializePlayerInfo(player_num, 2);
 			} else {
 				players_team_2.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
-				if(keyboard_selected) {
-					player = players_team_2[i] as GameObject;
-					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.InitializePlayerInfo(gamepad_num++, 2, i);
-				} else keyboard_selected = true;
+				player_num = parseInt(GetPlayerNum(team_2_players[i]));
+				player = players_team_2[i] as GameObject;
+				player_component = player.GetComponent(PlayerBehaviour);
+				player_component.InitializePlayerInfo(player_num, 2);
 				position.x += players_distance;
 			}
 		}
@@ -165,19 +167,17 @@ function MovePlayersToStartPositions()
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
 				players_team_2.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
-				if(keyboard_selected) {
-					player = players_team_2[i] as GameObject;
-					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.InitializePlayerInfo(gamepad_num++, 2, i);
-				} else keyboard_selected = true;
+				player_num = parseInt(GetPlayerNum(team_2_players[i]));
+				player = players_team_2[i] as GameObject;
+				player_component = player.GetComponent(PlayerBehaviour);
+				player_component.InitializePlayerInfo(player_num, 2);
 			} else {
 				position.x += players_distance;
 				players_team_2.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
-				if(keyboard_selected) {
-					player = players_team_2[i] as GameObject;
-					player_component = player.GetComponent(PlayerBehaviour);
-					player_component.InitializePlayerInfo(gamepad_num++, 2, i);
-				} else keyboard_selected = true;
+				player_num = parseInt(GetPlayerNum(team_2_players[i]));
+				player = players_team_2[i] as GameObject;
+				player_component = player.GetComponent(PlayerBehaviour);
+				player_component.InitializePlayerInfo(player_num, 2);
 			}
 		}
 	}

@@ -128,7 +128,7 @@ function OnGUI () {
 	
 	if(num_controllers < Input.GetJoystickNames().length)
 		num_controllers = Input.GetJoystickNames().length;
-	
+
 	for(var i = 0; i < num_controllers; i++) {
 		
 		var player_name = "Player " + (i+1);
