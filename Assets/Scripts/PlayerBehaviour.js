@@ -11,6 +11,11 @@ var team = 1;
 var player_name = "Ines";
 var player_num = 1;
 
+var normal_team_1_material : Material;
+var normal_team_2_material : Material;
+var shoot_team_1_material : Material;
+var shoot_team_2_material : Material;
+
 private var direction = Vector3.zero;
 private var ball_collision = false;
 private var shoot_material : Material;
@@ -22,7 +27,7 @@ private var base : Transform;
 private var ball : GameObject;
 
 
-function InitializePlayerInfo(num:int, team_num:int)
+function InitializePlayerInfo(num:int, team_num:int, m_camera : Camera)
 {
 	if(num != 0) {
 		gamepad_num = num;
@@ -30,6 +35,10 @@ function InitializePlayerInfo(num:int, team_num:int)
 	}
 	team = team_num;
 	player_num = num;
+	
+	var name_component = transform.Find("Player_name").transform.GetComponent(Player_Name);
+	name_component.m_camera = m_camera;
+	name_component.ChangeName("P"+num);
 	
 	Start();
 }
@@ -112,11 +121,11 @@ function Start() {
 	}
 	
 	if(team == 1) {
-		normal_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player1.mat", typeof(Material)) as Material;
-		shoot_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player1_shoot.mat", typeof(Material)) as Material;
+		normal_material = normal_team_1_material;
+		shoot_material = shoot_team_1_material;
 	} else {
-		normal_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player2.mat", typeof(Material)) as Material;
-		shoot_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player2_shoot.mat", typeof(Material)) as Material;
+		normal_material = normal_team_2_material;
+		shoot_material = shoot_team_2_material;
 	}
 
 	base.renderer.material = normal_material;
