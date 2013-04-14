@@ -21,6 +21,7 @@ private var ball_collider : Collision;
 private var base : Transform;
 private var ball : GameObject;
 
+
 function InitializePlayerInfo(num:int, team_num:int, player_number:int)
 {
 	gamepad_num = num;
@@ -43,8 +44,8 @@ function VerifyShoot()
 }
 
 function OnCollisionEnter(collision : Collision)
-{
-	if(collision.gameObject.name == "Ball" || collision.gameObject.tag == "Player") {
+{	
+	if(collision.gameObject.name == "Ball" || collision.collider.tag == "colliderShoot") {
 		colliding_with_ball = true;
 		ball_collider = collision;
 	}
@@ -52,7 +53,7 @@ function OnCollisionEnter(collision : Collision)
 
 function OnCollisionExit(collision : Collision)
 {
-	if(collision.gameObject.name == "Ball" || collision.gameObject.tag == "Player") {
+	if(collision.gameObject.name == "Ball" || collision.collider.tag == "colliderShoot") {
 		colliding_with_ball = false;
 	}
 }
@@ -82,14 +83,32 @@ function updateRotation()
 function Start() {
 	
 	var court_walls = GameObject.FindGameObjectWithTag("court_walls");
-	var goals = GameObject.FindGameObjectsWithTag("goal");
+	var goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
+	var posts = GameObject.FindGameObjectsWithTag("post");
+	var players = GameObject.FindGameObjectsWithTag("Player");
 	base = transform.Find("Base");
 	var base_collider = base.Find("Collider");
+	var shoot_collider = base.Find("ColliderShoot");
 	Physics.IgnoreCollision(court_walls.collider, base_collider.collider);
-
-	for(var i = 0; i < goals.Length; i++)
-		Physics.IgnoreCollision(goals[i].collider, base_collider.collider);
-		
+	Physics.IgnoreCollision(court_walls.collider, shoot_collider.collider);
+	for(var i = 0; i < goal_detection.Length; i++) {
+		Physics.IgnoreCollision(goal_detection[i].collider, base_collider.collider);
+		Physics.IgnoreCollision(goal_detection[i].collider, shoot_collider.collider);
+	}
+	for(i = 0; i < posts.Length; i++) {
+		Physics.IgnoreCollision(posts[i].collider, shoot_collider.collider);
+	}
+	Debug.Log(transform.gameObject);
+	
+	for (i=0; i < players.Length; i++) {
+		var player_base = players[i].transform.Find("Base");
+		var player_shoot_collider = player_base.transform.Find("ColliderShoot");
+		if(player_shoot_collider.collider != shoot_collider.collider) {
+			Physics.IgnoreCollision(player_shoot_collider.collider, shoot_collider.collider);
+			Physics.IgnoreCollision(player_shoot_collider.collider, base_collider.collider);
+		}
+	}
+	
 	if(team == 1) {
 		normal_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player1.mat", typeof(Material)) as Material;
 		shoot_material = AssetDatabase.LoadAssetAtPath("Assets/Materials/Player1_shoot.mat", typeof(Material)) as Material;
@@ -119,8 +138,9 @@ function Update ()
 
 	VerifyShoot();
 	
-	if(team == 1 && player_num == 1)
-		Debug.Log(rigidbody.velocity);
+//	if(team == 1 && player_num == 1)
+	//	Debug.Log(rigidbody.velocity);
 		
 	updateRotation();
+	
 }
