@@ -54,9 +54,14 @@ function InitializePlayerInfo(num:int, team_num:int, m_camera : Camera)
 function VerifyShoot()
 {
 	if(colliding_with_ball && !ball_collision){
+	
+		if(!ball)
+			ball = GameObject.FindGameObjectWithTag("ball");
+			
 		var contact_point = ball_collider.ClosestPointOnBounds(transform.position);
-		var direction = contact_point - transform.position;
-		direction = direction.normalized;
+		var direction = ball.transform.position - transform.position;
+		direction.Normalize();
+		
 		if((!gamepad && (Input.GetAxis("Shoot"))) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num)))){
 			ball_collider.rigidbody.velocity += direction * shootVelocity;
 			ball_collision = true;
