@@ -26,6 +26,14 @@ private var ball_collider : Collider;
 private var base : Transform;
 private var ball : GameObject;
 
+private var debug_key_pressed = false;
+private var debug_mode = false;
+private var hit = false;
+private var last_ball_position : Vector3;
+
+var debug_hit_remaining_time = 0;
+var debug_hit_time = 30;
+
 
 function InitializePlayerInfo(num:int, team_num:int, m_camera : Camera)
 {
@@ -53,6 +61,7 @@ function VerifyShoot()
 			ball_collider.rigidbody.velocity += direction * shootVelocity;
 			ball_collision = true;
 			colliding_with_ball = false;
+			debug_hit_remaining_time = debug_hit_time;
 		}
 	}
 }
@@ -147,6 +156,22 @@ function Start() {
 	base.renderer.material = normal_material;
 }
 
+function DebugMode() 
+{
+	if(!ball)
+		ball = GameObject.FindGameObjectWithTag("ball");
+	
+	var direction : Vector3;
+	if(hit)
+		direction = last_ball_position - transform.position;
+	else 
+		direction = ball.transform.position - transform.position;
+		
+	direction.Normalize();
+	
+	Debug.DrawLine(transform.position, transform.position + direction*3, Color.yellow);	
+}
+
 function Update ()
 {
 	if(base == null)
@@ -164,10 +189,29 @@ function Update ()
 	increase_speed();
 
 	VerifyShoot();
-	
-//	if(team == 1 && player_num == 1)
-	//	Debug.Log(rigidbody.velocity);
 		
 	updateRotation();
 	
+	if(Input.GetKeyDown(KeyCode.F1) && !debug_key_pressed) {
+		debug_mode = !debug_mode;
+		debug_key_pressed = true;
+	}
+	
+	if(Input.GetKeyUp(KeyCode.F1) && debug_key_pressed)
+		debug_key_pressed = false;
+		
+	if(debug_hit_remaining_time == 0)
+		hit = false;
+	else {
+		hit = true;
+		if(debug_hit_remaining_time == debug_hit_time) {
+			if(!ball)
+				ball = GameObject.FindGameObjectWithTag("ball");
+			last_ball_position = ball.transform.position;
+		}
+		debug_hit_remaining_time--;
+	}
+	
+	if(debug_mode)
+		DebugMode();
 }

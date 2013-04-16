@@ -14,6 +14,7 @@ var player_prefab : GameObject;
 var ball_prefab : GameObject;
 
 var m_camera : Camera;
+var settings_prefab : GameObject;
 
 private var players_team_1 = new Array();
 private var players_team_2 = new Array();
@@ -72,6 +73,36 @@ function GetPlayerNum(player_name : String)
 	return player_name.Replace("Player ", "");
 }
 
+function AddPlayerToTeam(team : int, player : GameObject) 
+{
+	
+	if(team == 1)
+		players_team_1.Push(player);
+	else
+		players_team_2.Push(player);
+	
+}
+
+function GetPlayer(team : int, position_in_team : int, game_settings : Game_Settings)
+{
+	if(team == 1)
+		return game_settings.players_team_1[position_in_team];
+	else
+		return game_settings.players_team_2[position_in_team];
+}
+
+function InstanciatePlayer(team : int, position : Vector3, team_position : int, game_settings : Game_Settings) {
+	
+	var player : GameObject = Instantiate(player_prefab, position, player_prefab.transform.rotation);
+	AddPlayerToTeam(team, player);
+	
+	var player_name : String = GetPlayer(team, team_position, game_settings);
+	var player_num = parseInt(GetPlayerNum(player_name));
+	var player_component = player.GetComponent(PlayerBehaviour);
+	
+	player_component.InitializePlayerInfo(player_num, team, m_camera);
+}
+
 function MovePlayersToStartPositions()
 {
 	var position : Vector3;
@@ -88,14 +119,18 @@ function MovePlayersToStartPositions()
 	ball = Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
 	ball.transform.name = "Ball";
 	
-	var game_settings = GameObject.FindGameObjectWithTag("settings").GetComponent(Game_Settings);
+	var settings = GameObject.FindGameObjectWithTag("settings");
+	var game_settings : Game_Settings;
+	
+	if(settings == null) {
+		settings = Instantiate(settings_prefab, Vector3(0,0,0), settings_prefab.transform.rotation);
+		game_settings = settings.GetComponent(Game_Settings);
+		game_settings.AddNewPlayer(1, "Player 0");
+	} else {
+		game_settings = settings.GetComponent(Game_Settings);
+	}
 	num_team_1_players = game_settings.players_team_1.length;
 	num_team_2_players = game_settings.players_team_2.length;
-	var team_1_players = game_settings.players_team_1;
-	var team_2_players = game_settings.players_team_2;
-	
-	var player_component : PlayerBehaviour;
-	var player_num : int;
 	
 	if (IsOdd(num_team_1_players)) {
 	
@@ -104,17 +139,9 @@ function MovePlayersToStartPositions()
 		for(i = 0; i < num_team_1_players; i++) {
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
-				players_team_1.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
-				player_num = parseInt(GetPlayerNum(team_1_players[i]));
-				player = players_team_1[i] as GameObject;
-				player_component = player.GetComponent(PlayerBehaviour);
-				player_component.InitializePlayerInfo(player_num, 1, m_camera);
+				InstanciatePlayer(1, odd_position, i, game_settings);
 			} else {
-				players_team_1.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
-				player_num = parseInt(GetPlayerNum(team_1_players[i]));
-				player = players_team_1[i] as GameObject;
-				player_component = player.GetComponent(PlayerBehaviour);
-				player_component.InitializePlayerInfo(player_num, 1, m_camera);
+				InstanciatePlayer(1, position, i, game_settings);
 				position.x += players_distance;
 			}
 		}
@@ -125,18 +152,10 @@ function MovePlayersToStartPositions()
 		for(i = 0; i < num_team_1_players; i++) {
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
-				players_team_1.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
-				player_num = parseInt(GetPlayerNum(team_1_players[i]));
-				player = players_team_1[i] as GameObject;
-				player_component = player.GetComponent(PlayerBehaviour);
-				player_component.InitializePlayerInfo(player_num, 1, m_camera);
+				InstanciatePlayer(1, odd_position, i, game_settings);
 			} else {
 				position.x += players_distance;
-				players_team_1.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
-				player_num = parseInt(GetPlayerNum(team_1_players[i]));
-				player = players_team_1[i] as GameObject;
-				player_component = player.GetComponent(PlayerBehaviour);
-				player_component.InitializePlayerInfo(player_num, 1, m_camera);
+				InstanciatePlayer(1, position, i, game_settings);
 			}
 		}
 	}
@@ -148,17 +167,9 @@ function MovePlayersToStartPositions()
 		for(i = 0; i < num_team_2_players; i++) {
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
-				players_team_2.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
-				player_num = parseInt(GetPlayerNum(team_2_players[i]));
-				player = players_team_2[i] as GameObject;
-				player_component = player.GetComponent(PlayerBehaviour);
-				player_component.InitializePlayerInfo(player_num, 2, m_camera);
+				InstanciatePlayer(2, odd_position, i, game_settings);
 			} else {
-				players_team_2.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
-				player_num = parseInt(GetPlayerNum(team_2_players[i]));
-				player = players_team_2[i] as GameObject;
-				player_component = player.GetComponent(PlayerBehaviour);
-				player_component.InitializePlayerInfo(player_num, 2, m_camera);
+				InstanciatePlayer(2, position, i, game_settings);
 				position.x += players_distance;
 			}
 		}
@@ -168,18 +179,10 @@ function MovePlayersToStartPositions()
 		for(i = 0; i < num_team_2_players; i++) {
 			if(IsOdd(i)) {
 				odd_position = Vector3(-position.x, position.y, position.z);
-				players_team_2.Push(Instantiate(player_prefab, odd_position, player_prefab.transform.rotation));
-				player_num = parseInt(GetPlayerNum(team_2_players[i]));
-				player = players_team_2[i] as GameObject;
-				player_component = player.GetComponent(PlayerBehaviour);
-				player_component.InitializePlayerInfo(player_num, 2, m_camera);
+				InstanciatePlayer(2, odd_position, i, game_settings);
 			} else {
 				position.x += players_distance;
-				players_team_2.Push(Instantiate(player_prefab, position, player_prefab.transform.rotation));
-				player_num = parseInt(GetPlayerNum(team_2_players[i]));
-				player = players_team_2[i] as GameObject;
-				player_component = player.GetComponent(PlayerBehaviour);
-				player_component.InitializePlayerInfo(player_num, 2, m_camera);
+				InstanciatePlayer(2, position, i, game_settings);
 			}
 		}
 	}
