@@ -126,6 +126,7 @@ function MovePlayersToStartPositions()
 		settings = Instantiate(settings_prefab, Vector3(0,0,0), settings_prefab.transform.rotation);
 		game_settings = settings.GetComponent(Game_Settings);
 		game_settings.AddNewPlayer(1, "Player 0");
+		game_settings.AddNewPlayer(1, "Player 1");
 	} else {
 		game_settings = settings.GetComponent(Game_Settings);
 	}
