@@ -53,7 +53,8 @@
      <Compile Include="Assets\Scripts\Menu_Arrow_Behaviour.js" />
      <Compile Include="Assets\Scripts\PlayerBehaviour.js" />
      <Compile Include="Assets\Scripts\Player_Name.js" />
-     <None Include="Assets\Materials\Shaders\ForceField.shader" />
+     <None Include="Assets\Materials\Shaders\Readme.txt" />
+     <None Include="Assets\Materials\Shaders\Forcefield.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

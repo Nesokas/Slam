@@ -135,8 +135,9 @@ function Start() {
 	base = transform.Find("Base");
 	var base_collider = base.Find("Collider");
 	var shoot_collider = base.Find("ColliderShoot");
-	Physics.IgnoreCollision(court_walls.collider, base_collider.collider);
-	Physics.IgnoreCollision(court_walls.collider, shoot_collider.collider);
+	var court_collider = court_walls.transform.Find("Forcefield");
+	Physics.IgnoreCollision(court_collider.collider, base_collider.collider);
+	Physics.IgnoreCollision(court_collider.collider, shoot_collider.collider);
 	for(var i = 0; i < goal_detection.Length; i++) {
 		Physics.IgnoreCollision(goal_detection[i].collider, base_collider.collider);
 	}

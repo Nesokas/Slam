@@ -44,8 +44,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Forcefield.cs" />
      <Compile Include="Assets\ShowSkin.cs" />
-     <None Include="Assets\Materials\Shaders\ForceField.shader" />
+     <None Include="Assets\Materials\Shaders\Readme.txt" />
+     <None Include="Assets\Materials\Shaders\Forcefield.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
