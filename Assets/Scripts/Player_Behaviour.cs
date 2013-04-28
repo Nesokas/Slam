@@ -117,8 +117,9 @@ public class Player_Behaviour : MonoBehaviour {
 		player_base = transform.Find("Base");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
-		Physics.IgnoreCollision(court_walls.collider, base_collider.collider);
-		Physics.IgnoreCollision(court_walls.collider, shoot_collider.collider);
+		Transform court_collider = court_walls.transform.Find("forcefield");
+		Physics.IgnoreCollision(court_collider.collider, base_collider.collider);
+		Physics.IgnoreCollision(court_collider.collider, shoot_collider.collider);
 		for(int i = 0; i < goal_detection.Length; i++) {
 			Physics.IgnoreCollision(goal_detection[i].collider, base_collider.collider);
 		}

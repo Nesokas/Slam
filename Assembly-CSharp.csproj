@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Ball_Behaviour.cs" />
+     <Compile Include="Assets\Scripts\Forcefield.cs" />
      <Compile Include="Assets\Scripts\Game_Behaviour.cs" />
      <Compile Include="Assets\Scripts\Game_Settings.cs" />
      <Compile Include="Assets\Scripts\Goal_Behaviour.cs" />
@@ -55,6 +56,7 @@
      <Compile Include="Assets\Scripts\Read_Actions.cs" />
      <Compile Include="Assets\ShowSkin.cs" />
      <None Include="Assets\Models\Actions\player_actions.txt" />
+     <None Include="Assets\Materials\Shaders\Readme.txt" />
      <None Include="Assets\Materials\Shaders\ForceField.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

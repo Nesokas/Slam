@@ -44,8 +44,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\BallBehaviour.js" />
+     <Compile Include="Assets\Scripts\PlayerBehaviour.js" />
      <None Include="Assets\Models\Actions\player_actions.txt" />
+     <None Include="Assets\Materials\Shaders\Readme.txt" />
      <None Include="Assets\Materials\Shaders\ForceField.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
