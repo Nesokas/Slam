@@ -98,15 +98,15 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 		direction.Normalize();
 			
-		rigidbody.velocity += direction*acceleration;
+		transform.root.rigidbody.velocity += direction*acceleration;
 	}
 	
 	void UpdateRotation()
 	{
 		if(!ball)
 			ball = GameObject.FindGameObjectWithTag("ball");
-		var rotation = Quaternion.LookRotation(ball.transform.position - transform.position);
-	    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1000);
+		var rotation = Quaternion.LookRotation(ball.transform.position - transform.root.transform.position);
+	    transform.root.transform.rotation = Quaternion.Slerp(transform.root.transform.rotation, rotation, Time.deltaTime * 1000);
 	}
 	
 	void Start () 

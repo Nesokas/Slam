@@ -98,7 +98,7 @@ public class Game_Behaviour : MonoBehaviour {
 		
 		string player_name = GetPlayer(team, team_position, game_settings);
 		int player_num = System.Convert.ToInt32(GetPlayerNum(player_name));
-		Player_Behaviour player_component = player.GetComponent<Player_Behaviour>();
+		Player_Behaviour player_component = player.GetComponentInChildren<Player_Behaviour>();
 		
 		player_component.InitializePlayerInfo(player_num, team, m_camera);
 	}

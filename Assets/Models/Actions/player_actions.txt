@@ -1,9 +1,9 @@
-"Normal"
+Normal
 1
 40
-"Celebrate"
+Celebrate
 41
 72
-"Sad"
+Sad
 81
 120
