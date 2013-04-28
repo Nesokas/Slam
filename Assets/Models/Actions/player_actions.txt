@@ -1,0 +1,9 @@
+"Normal"
+1
+40
+"Celebrate"
+41
+72
+"Sad"
+81
+120

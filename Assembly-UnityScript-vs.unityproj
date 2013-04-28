@@ -37,22 +37,15 @@
     <Reference Include="System.XML" />
 	<Reference Include="System.Core" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\BallBehaviour.js" />
-     <Compile Include="Assets\Scripts\GameBehaviour.js" />
-     <Compile Include="Assets\Scripts\Game_Settings.js" />
-     <Compile Include="Assets\Scripts\GoalBehaviour.js" />
-     <Compile Include="Assets\Scripts\Lobby.js" />
-     <Compile Include="Assets\Scripts\MenuBehaviour.js" />
-     <Compile Include="Assets\Scripts\Menu_Arrow_Behaviour.js" />
-     <Compile Include="Assets\Scripts\PlayerBehaviour.js" />
-     <Compile Include="Assets\Scripts\Player_Name.js" />
+     <None Include="Assets\Models\Actions\player_actions.txt" />
      <None Include="Assets\Materials\Shaders\ForceField.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
