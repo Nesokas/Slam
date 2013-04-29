@@ -13,7 +13,9 @@ public class Goal_Behaviour : MonoBehaviour {
 			GameObject main_game_object = GameObject.FindWithTag("GameController");
 			Game_Behaviour main_game_component = main_game_object.GetComponent<Game_Behaviour>();
 			
-			main_game_component.ScoreTeam(team);
+			if(team == 1)
+				main_game_component.ScoreTeam(2);
+			else main_game_component.ScoreTeam(1);
 		}
 	}
 }

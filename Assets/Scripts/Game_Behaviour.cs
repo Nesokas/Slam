@@ -19,6 +19,8 @@ public class Game_Behaviour : MonoBehaviour {
 
 	public Camera m_camera;
 	public GameObject settings_prefab;
+	
+	public float timer = 200;
 
 	private List<GameObject> players_team_1 = new List<GameObject>();
 	private List<GameObject> players_team_2 = new List<GameObject>();
@@ -30,15 +32,46 @@ public class Game_Behaviour : MonoBehaviour {
 	private float players_distance = 1.5f;
 	private int gamepad_num = 1;
 	private bool keyboard_selected = false;
+	
+	private GameObject settings;
+	private Game_Settings game_settings;
+	private bool trigger_timer;
+	public float timer_value;
 
 	public void ScoreTeam(int team)
 	{
-		if(team == 1)
+		if(team == 1) {
 			score_team1++;
-		else
+			TeamReaction(1, "Celebrate");
+			TeamReaction(2, "Sad");
+		} else {
 			score_team2++;
-
+			TeamReaction(2, "Celebrate");
+			TeamReaction(1, "Sad");
+		}	
+		
+		timer_value = 0f;
+		trigger_timer = true;
+	}
+	
+	void StartGameAgain()
+	{
 		MovePlayersToStartPositions();
+		trigger_timer = false;
+	}
+	
+	void TeamReaction(int team, string reaction)
+	{
+		List<GameObject> players_team;
+		if(team == 1)
+			players_team = players_team_1;
+		else
+			players_team = players_team_2;
+		
+		for(int i = 0; i < players_team.Count; i++) {
+			Player_Behaviour player_behaviour = players_team[i].GetComponent<Player_Behaviour>();
+			player_behaviour.ChangeAnimation(reaction);
+		}
 	}
 
 	void OnGUI()
@@ -101,6 +134,7 @@ public class Game_Behaviour : MonoBehaviour {
 		Player_Behaviour player_component = player.GetComponent<Player_Behaviour>();
 
 		player_component.InitializePlayerInfo(player_num, team, m_camera);
+		player_component.ChangeAnimation("Idle");
 	}
 
 	void MovePlayersToStartPositions()
@@ -119,17 +153,6 @@ public class Game_Behaviour : MonoBehaviour {
 		ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
 		ball.transform.name = "Ball";
 
-		GameObject settings = GameObject.FindGameObjectWithTag("settings");
-		Game_Settings game_settings;
-
-		if(settings == null) {
-			settings = (GameObject)Instantiate(settings_prefab, new Vector3(0,0,0), settings_prefab.transform.rotation);
-			game_settings = settings.GetComponent<Game_Settings>();
-			game_settings.AddNewPlayer(1, "Player 0");
-			game_settings.AddNewPlayer(1, "Player 1");
-		} else {
-			game_settings = settings.GetComponent<Game_Settings>();
-		}
 		num_team_1_players = game_settings.players_team_1.Count;
 		num_team_2_players = game_settings.players_team_2.Count;
 
@@ -188,15 +211,44 @@ public class Game_Behaviour : MonoBehaviour {
 			}
 		}
 	}
+	
+	// variable used for testing (so we don't need to go always to the lobby screen)
+	private bool skiped_lobby = false;
+	
+	void AddTestPlayers()
+	{
+		game_settings = settings.GetComponent<Game_Settings>();
+		game_settings.AddNewPlayer(1, "Player 0");
+		game_settings.AddNewPlayer(1, "Player 1");
+	}
 
 	// Use this for initialization
 	void Start () 
 	{
+		settings = GameObject.FindGameObjectWithTag("settings");
+		
+		if(settings == null) {
+			settings = (GameObject)Instantiate(settings_prefab, new Vector3(0,0,0), settings_prefab.transform.rotation);
+			AddTestPlayers();
+			skiped_lobby = true;
+		} else {
+			game_settings = settings.GetComponent<Game_Settings>();
+		}
+		
 		MovePlayersToStartPositions();
 	}
 
 	// Update is called once per frame
 	void Update () {
-
+		if(skiped_lobby) {
+			AddTestPlayers();
+			skiped_lobby = false;
+		}
+		
+		if(trigger_timer){
+			if(timer_value > timer)
+				StartGameAgain();
+			else timer_value++;
+		}
 	}
 }

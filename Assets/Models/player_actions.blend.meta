@@ -85,7 +85,7 @@ ModelImporter:
       takeName: Sad
       firstFrame: -1
       lastFrame: 31
-      wrapMode: 2
+      wrapMode: 1
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0

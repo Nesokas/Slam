@@ -5,6 +5,8 @@ public class Player_Behaviour : MonoBehaviour {
 
 	public float acceleration = 0.2f;
 	public float shootVelocity = 11;
+	public float max_animation_speed = 2f;
+	public float increase_speed = 0.1f;
 
 	public Vector3 velocity = Vector3.zero;
 	public Vector3 normalized_velocity = Vector3.zero;
@@ -36,6 +38,9 @@ public class Player_Behaviour : MonoBehaviour {
 	private bool debug_mode = false;
 	private bool hit = false;
 	private Vector3 last_ball_position;
+	
+	private bool is_adding_speed = false;
+	private float animation_speed = 1f;
 
 	public void InitializePlayerInfo(int num, int team_num, Camera m_camera)
 	{
@@ -74,7 +79,7 @@ public class Player_Behaviour : MonoBehaviour {
 
 	void OnTriggerEnter (Collider collider) 
 	{
-	    if(collider.gameObject.name == "Ball" || collider.gameObject.tag == "colliderShoot") {
+	    if(collider.gameObject.tag == "ball") {
 			colliding_with_ball = true;
 			ball_collider = collider;
 		}
@@ -82,7 +87,7 @@ public class Player_Behaviour : MonoBehaviour {
 
 	void OnTriggerExit (Collider collider)
 	{
-	    if(collider.gameObject.name == "Ball" || collider.gameObject.tag == "colliderShoot") {
+	    if(collider.gameObject.tag == "ball") {
 			colliding_with_ball = false;
 		}
 	}
@@ -97,6 +102,11 @@ public class Player_Behaviour : MonoBehaviour {
 			direction.z = Input.GetAxis("Horizontal");
 		}
 		direction.Normalize();
+		
+		if(direction == Vector3.zero)
+			is_adding_speed = false;
+		else
+			is_adding_speed = true;
 
 		rigidbody.velocity += direction*acceleration;
 	}
@@ -108,7 +118,39 @@ public class Player_Behaviour : MonoBehaviour {
 		var rotation = Quaternion.LookRotation(ball.transform.position - transform.position);
 	    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1000);
 	}
-
+	
+	void UpdateAnimationSpeed()
+	{
+		if(is_adding_speed) {
+			if(animation_speed < max_animation_speed)
+				animation_speed += increase_speed;
+			else if(animation_speed > max_animation_speed)
+				animation_speed = max_animation_speed;
+		} else {
+			if(animation_speed > 1f)
+				animation_speed -= increase_speed;
+			else if (animation_speed < 1f)
+				animation_speed = 1f;
+		}
+		
+		animation["Idle"].speed = animation_speed;
+	}
+	
+	public void ChangeAnimation(string animation_to_play)
+	{
+		switch (animation_to_play){
+			case "Idle":
+				animation.Play("Idle");
+				break;
+			case "Celebrate":
+				animation.Play("Celebrate");
+				break;
+			case "Sad":
+				animation.Play("Sad");
+				break;
+		}
+	}
+	
 	void Start () 
 	{
 		GameObject court_walls = GameObject.FindGameObjectWithTag("court_walls");
@@ -176,10 +218,9 @@ public class Player_Behaviour : MonoBehaviour {
 			player_base.renderer.material = normal_material;
 
 		IncreaseSpeed();
-
 		VerifyShoot();
-
 		UpdateRotation();
+		UpdateAnimationSpeed();
 
 		if(Input.GetKeyDown(KeyCode.F1) && !debug_key_pressed) {
 			debug_mode = !debug_mode;
