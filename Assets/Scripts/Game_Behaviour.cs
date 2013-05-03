@@ -219,7 +219,7 @@ public class Game_Behaviour : MonoBehaviour {
 	{
 		game_settings = settings.GetComponent<Game_Settings>();
 		game_settings.AddNewPlayer(1, "Player 0");
-		game_settings.AddNewPlayer(1, "Player 1");
+		game_settings.AddNewPlayer(2, "Player 1");
 	}
 
 	// Use this for initialization
