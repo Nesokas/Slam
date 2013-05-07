@@ -54,7 +54,7 @@
      <Compile Include="Assets\Scripts\Menu_Behaviour.cs" />
      <Compile Include="Assets\Scripts\Player_Behaviour.cs" />
      <Compile Include="Assets\Scripts\Player_Name.cs" />
-     <Compile Include="Assets\Scripts\Score_Text_Behaviour.cs" />
+     <Compile Include="Assets\Scripts\Screen_Text_Behaviour.cs" />
      <Compile Include="Assets\ShowSkin.cs" />
      <None Include="Assets\Models\Actions\player_actions.txt" />
      <None Include="Assets\Materials\Shaders\Readme.txt" />

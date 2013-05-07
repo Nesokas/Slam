@@ -3,19 +3,12 @@ using System.Collections;
 
 public class Goal_Behaviour : MonoBehaviour {
 	
-	public int score = 0;
 	public int team = 0;
+	public GameObject screen_text;
 	
 	void OnCollisionEnter(Collision collision)
 	{
-		if(collision.gameObject.name == "Ball"){
-			score++;
-			GameObject main_game_object = GameObject.FindWithTag("GameController");
-			Game_Behaviour main_game_component = main_game_object.GetComponent<Game_Behaviour>();
-			
-			if(team == 1)
-				main_game_component.ScoreTeam(2);
-			else main_game_component.ScoreTeam(1);
-		}
+		Screen_Text_Behaviour stb = screen_text.GetComponent<Screen_Text_Behaviour>();
+		stb.team_scored(team);
 	}
 }

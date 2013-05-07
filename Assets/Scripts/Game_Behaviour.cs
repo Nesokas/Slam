@@ -26,9 +26,6 @@ public class Game_Behaviour : MonoBehaviour {
 	private List<GameObject> players_team_2 = new List<GameObject>();
 	private GameObject ball;
 
-	private int score_team1 = 0;
-	private int score_team2 = 0;
-
 	private float players_distance = 1.5f;
 	private int gamepad_num = 1;
 	private bool keyboard_selected = false;
@@ -41,11 +38,9 @@ public class Game_Behaviour : MonoBehaviour {
 	public void ScoreTeam(int team)
 	{
 		if(team == 1) {
-			score_team1++;
 			TeamReaction(1, "Celebrate");
 			TeamReaction(2, "Sad");
 		} else {
-			score_team2++;
 			TeamReaction(2, "Celebrate");
 			TeamReaction(1, "Sad");
 		}	
@@ -72,19 +67,6 @@ public class Game_Behaviour : MonoBehaviour {
 			Player_Behaviour player_behaviour = players_team[i].GetComponent<Player_Behaviour>();
 			player_behaviour.ChangeAnimation(reaction);
 		}
-	}
-
-	void OnGUI()
-	{
-		string score = score_team1 + " - " +score_team2;
-
-		GUI.color = Color.black;
-
-		GUIStyle score_style = GUI.skin.GetStyle("Label");
-		score_style.alignment = TextAnchor.UpperCenter;
-		score_style.fontSize = 30;
-		score_style.fontStyle = FontStyle.Bold;
-		GUI.Label(new Rect(Screen.width/2, 10, 100, 50), score, score_style);
 	}
 
 	bool IsOdd(int num)
