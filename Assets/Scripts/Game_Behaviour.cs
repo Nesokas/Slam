@@ -20,6 +20,9 @@ public class Game_Behaviour : MonoBehaviour {
 	public Camera m_camera;
 	public GameObject settings_prefab;
 	
+	public GameObject screen_text;
+	private Screen_Text_Behaviour screen_text_behaviour;
+	
 	public float timer = 200;
 
 	private List<GameObject> players_team_1 = new List<GameObject>();
@@ -33,6 +36,7 @@ public class Game_Behaviour : MonoBehaviour {
 	private GameObject settings;
 	private Game_Settings game_settings;
 	private bool trigger_timer;
+	private bool finish_game = false;
 	public float timer_value;
 
 	public void ScoreTeam(int team)
@@ -49,10 +53,31 @@ public class Game_Behaviour : MonoBehaviour {
 		trigger_timer = true;
 	}
 	
+	public void FinishGame()
+	{
+		Application.LoadLevel(1);
+	}
+	
 	void StartGameAgain()
 	{
-		MovePlayersToStartPositions();
-		trigger_timer = false;
+		int winning_team = screen_text_behaviour.StopCelebration();
+		if(winning_team == 0) {
+			MovePlayersToStartPositions();
+			trigger_timer = false;
+		} else {
+			
+			finish_game = true;
+			timer_value = 0f;
+			trigger_timer = true;
+			
+			if(winning_team == 1) {
+				TeamReaction(1, "Celebrate");
+				TeamReaction(2, "Sad");
+			} else {
+				TeamReaction(2, "Celebrate");
+				TeamReaction(1, "Sad");
+			}
+		}
 	}
 	
 	void TeamReaction(int team, string reaction)
@@ -208,6 +233,7 @@ public class Game_Behaviour : MonoBehaviour {
 	void Start () 
 	{
 		settings = GameObject.FindGameObjectWithTag("settings");
+		screen_text_behaviour = screen_text.GetComponent<Screen_Text_Behaviour>();
 		
 		if(settings == null) {
 			settings = (GameObject)Instantiate(settings_prefab, new Vector3(0,0,0), settings_prefab.transform.rotation);
@@ -228,8 +254,10 @@ public class Game_Behaviour : MonoBehaviour {
 		}
 		
 		if(trigger_timer){
-			if(timer_value > timer)
+			if(timer_value > timer && !finish_game)
 				StartGameAgain();
+			else if (timer_value > timer && finish_game)
+				FinishGame();
 			else timer_value++;
 		}
 	}

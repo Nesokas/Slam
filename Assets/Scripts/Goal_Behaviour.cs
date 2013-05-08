@@ -9,6 +9,8 @@ public class Goal_Behaviour : MonoBehaviour {
 	void OnCollisionEnter(Collision collision)
 	{
 		Screen_Text_Behaviour stb = screen_text.GetComponent<Screen_Text_Behaviour>();
-		stb.team_scored(team);
+		if(team == 1)
+			stb.TeamScored(2);
+		else stb.TeamScored(1);
 	}
 }
