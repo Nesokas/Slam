@@ -148,7 +148,6 @@ public class Game_Behaviour : MonoBehaviour {
 	{
 		Vector3 position;
 		int i;
-		GameObject player;
 		Vector3 odd_position;
 
 		gamepad_num = 1;
