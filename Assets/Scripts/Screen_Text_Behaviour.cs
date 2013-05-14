@@ -9,6 +9,9 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 	public GameObject team_score_1;
 	public GameObject team_score_2;
 	
+	public Material team1_color;
+	public Material team2_color;
+	
 	private int score_team_1 = 0;
 	private int score_team_2 = 0;
 	
@@ -29,12 +32,12 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 		if(!is_celebrating){
 			if(team == 1) {
 				score_team_1++;
-				ChangeScoreText("Red Team Scored");
+				ChangeScoreText("Red Team Scored", team1_color.color);
 				game_behaviour.ScoreTeam(1);
 				team_celebrating = 1;
 			} else {
 				score_team_2++;
-				ChangeScoreText("Blue Team Scored");
+				ChangeScoreText("Blue Team Scored", team2_color.color);
 				game_behaviour.ScoreTeam(2);
 				team_celebrating = 2;
 			}
@@ -43,13 +46,15 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 		}
 	}
 	
-	void ChangeScoreText(string text)
+	void ChangeScoreText(string text, Color color)
 	{
 		TextMesh scoreText1 = team_score_1.GetComponent<TextMesh>();;
 		TextMesh scoreText2 = team_score_2.GetComponent<TextMesh>();;
 		
 		scoreText1.text = text;
+		scoreText1.renderer.material.color = color;
 		scoreText2.text = text;
+		scoreText2.renderer.material.color = color;
 		
 		text_in = true;
 	}
@@ -58,12 +63,12 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 	{
 		is_celebrating = false;
 		if(score_team_1 == 5) {
-			ChangeScoreText("Red Team WINS");
+			ChangeScoreText("Red Team WINS", team1_color.color);
 			time_to_stop = 0;
 			is_celebrating = true;
 			return 1;
 		} else if(score_team_2 == 5) {
-			ChangeScoreText("Blue Team WINS");
+			ChangeScoreText("Blue Team WINS", team2_color.color);
 			time_to_stop = 0;
 			is_celebrating = true;
 			return 2;
