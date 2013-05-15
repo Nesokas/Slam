@@ -23,6 +23,8 @@ public class Player_Behaviour : MonoBehaviour {
 
 	public double debug_hit_remaining_time = 0;
 	public double debug_hit_time = 30;
+	
+	public AudioClip ball_sound;
 
 	private Vector3 direction = Vector3.zero;
 	private bool ball_collision = false;
@@ -73,6 +75,7 @@ public class Player_Behaviour : MonoBehaviour {
 				ball_collision = true;
 				colliding_with_ball = false;
 				debug_hit_remaining_time = debug_hit_time;
+				AudioSource.PlayClipAtPoint(ball_sound, transform.position, 0.1f);
 			}
 		}
 	}

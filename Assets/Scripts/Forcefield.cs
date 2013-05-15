@@ -3,13 +3,14 @@ using System.Collections;
 
 public class Forcefield : MonoBehaviour {
 
-    private Material[] mats;
-    private MeshFilter mesh;
-
     public GameObject forceField;
-	public GameObject ball;
+	public AudioClip wall_sound;
 	
     public float decayTime = 2.0f;
+	
+	private GameObject ball;
+	private Material[] mats;
+    private MeshFilter mesh;
 	
 	// Use this for initialization
 	void Start ()
@@ -57,6 +58,7 @@ public class Forcefield : MonoBehaviour {
 		if(collision.gameObject.name == "Ball") {
 			ContactPoint contact = collision.contacts[0];
 			UpdateMask(contact.point);
+			AudioSource.PlayClipAtPoint(wall_sound, contact.point, 0.05f);
 		}
 	}
 
