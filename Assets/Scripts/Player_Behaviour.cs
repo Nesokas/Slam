@@ -87,12 +87,21 @@ public class Player_Behaviour : MonoBehaviour {
 			ball_collider = collider;
 		}
 	}
+	
+	void OnTriggerStay (Collider collider)
+	{
+		if(collider.gameObject.tag == "ball") {
+			colliding_with_ball = true;
+			ball_collider = collider;
+		}
+	}
 
 	void OnTriggerExit (Collider collider)
 	{
 	    if(collider.gameObject.tag == "ball") {
 			colliding_with_ball = false;
 		}
+		Debug.Log("exit");
 	}
 
 	void IncreaseSpeed() 
