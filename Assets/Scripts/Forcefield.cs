@@ -58,7 +58,7 @@ public class Forcefield : MonoBehaviour {
 		if(collision.gameObject.name == "Ball") {
 			ContactPoint contact = collision.contacts[0];
 			UpdateMask(contact.point);
-			AudioSource.PlayClipAtPoint(wall_sound, contact.point, 0.05f);
+			AudioSource.PlayClipAtPoint(wall_sound, contact.point, 0.3f);
 		}
 	}
 

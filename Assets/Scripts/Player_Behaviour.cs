@@ -75,7 +75,7 @@ public class Player_Behaviour : MonoBehaviour {
 				ball_collision = true;
 				colliding_with_ball = false;
 				debug_hit_remaining_time = debug_hit_time;
-				AudioSource.PlayClipAtPoint(ball_sound, transform.position, 0.1f);
+				AudioSource.PlayClipAtPoint(ball_sound, transform.position);
 			}
 		}
 	}
