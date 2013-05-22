@@ -15,6 +15,7 @@ public class Player_Behaviour : MonoBehaviour {
 	public int team = 1;
 	public int player_num = 1;
 	public int gamepad_num = 0;
+	public bool move = true;
 
 	public Material normal_team_1_material;
 	public Material normal_team_2_material;
@@ -61,7 +62,7 @@ public class Player_Behaviour : MonoBehaviour {
 
 	void VerifyShoot()
 	{
-		if(colliding_with_ball && !ball_collision){
+		if(colliding_with_ball && !ball_collision && move){
 
 			if(!ball)
 				ball = GameObject.FindGameObjectWithTag("ball");
@@ -106,21 +107,23 @@ public class Player_Behaviour : MonoBehaviour {
 
 	void IncreaseSpeed() 
 	{
-		if(gamepad){
-			direction.x = Input.GetAxis("Vertical_Gamepad_" + gamepad_num);
-			direction.z = Input.GetAxis("Horizontal_Gamepad_" + gamepad_num);
-		} else {
-			direction.x = Input.GetAxis("Vertical");
-			direction.z = Input.GetAxis("Horizontal");
+		if(move) {
+			if(gamepad){
+				direction.x = Input.GetAxis("Vertical_Gamepad_" + gamepad_num);
+				direction.z = Input.GetAxis("Horizontal_Gamepad_" + gamepad_num);
+			} else {
+				direction.x = Input.GetAxis("Vertical");
+				direction.z = Input.GetAxis("Horizontal");
+			}
+			direction.Normalize();
+			
+			if(direction == Vector3.zero)
+				is_adding_speed = false;
+			else
+				is_adding_speed = true;
+	
+			rigidbody.velocity += direction*acceleration;
 		}
-		direction.Normalize();
-		
-		if(direction == Vector3.zero)
-			is_adding_speed = false;
-		else
-			is_adding_speed = true;
-
-		rigidbody.velocity += direction*acceleration;
 	}
 
 	void UpdateRotation()
@@ -196,6 +199,8 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 
 		player_base.renderer.material = normal_material;
+		
+		animation["Idle"].time = Random.Range(0.0f, animation["Idle"].length);
 	}
 
 	void DebugMode() 
@@ -223,11 +228,13 @@ public class Player_Behaviour : MonoBehaviour {
 		if(ball_collision && !((!gamepad && (Input.GetAxis("Shoot") != 0)) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num) != 0)))) {
 			ball_collision = false;
 		}
-
-		if(!ball_collision && ((!gamepad && (Input.GetAxis("Shoot") != 0)) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num) != 0))))
-			player_base.renderer.material = shoot_material;
-		else
-			player_base.renderer.material = normal_material;
+		
+		if(move) {
+			if(!ball_collision && ((!gamepad && (Input.GetAxis("Shoot") != 0)) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num) != 0))))
+				player_base.renderer.material = shoot_material;
+			else
+				player_base.renderer.material = normal_material;
+		}
 
 		IncreaseSpeed();
 		VerifyShoot();

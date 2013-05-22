@@ -20,6 +20,9 @@ public class Game_Behaviour : MonoBehaviour {
 	public Camera m_camera;
 	public GameObject settings_prefab;
 	
+	public GameObject crowd_team_1;
+	public GameObject crowd_team_2;
+	
 	public GameObject screen_text;
 	private Screen_Text_Behaviour screen_text_behaviour;
 	
@@ -41,12 +44,19 @@ public class Game_Behaviour : MonoBehaviour {
 
 	public void ScoreTeam(int team)
 	{
+		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
+		Crowd team_2_crowd = crowd_team_2.GetComponent<Crowd>();
+		
 		if(team == 1) {
 			TeamReaction(1, "Celebrate");
+			team_1_crowd.Celebrate();
 			TeamReaction(2, "Sad");
+			team_2_crowd.Sad();
 		} else {
 			TeamReaction(2, "Celebrate");
+			team_2_crowd.Celebrate();
 			TeamReaction(1, "Sad");
+			team_1_crowd.Sad();
 		}	
 		
 		timer_value = 0f;
@@ -61,9 +71,14 @@ public class Game_Behaviour : MonoBehaviour {
 	void StartGameAgain()
 	{
 		int winning_team = screen_text_behaviour.StopCelebration();
+		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
+		Crowd team_2_crowd = crowd_team_2.GetComponent<Crowd>();
+		
 		if(winning_team == 0) {
 			MovePlayersToStartPositions();
 			trigger_timer = false;
+			team_1_crowd.Idle();
+			team_2_crowd.Idle();
 		} else {
 			
 			finish_game = true;
@@ -72,10 +87,14 @@ public class Game_Behaviour : MonoBehaviour {
 			
 			if(winning_team == 1) {
 				TeamReaction(1, "Celebrate");
+				team_1_crowd.Celebrate();
 				TeamReaction(2, "Sad");
+				team_2_crowd.Sad();
 			} else {
 				TeamReaction(2, "Celebrate");
+				team_2_crowd.Celebrate();
 				TeamReaction(1, "Sad");
+				team_1_crowd.Sad();
 			}
 		}
 	}

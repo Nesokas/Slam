@@ -15,6 +15,8 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 	public GameObject score_red;
 	public GameObject score_blue;
 	
+	public AudioClip winning;
+	
 	private int score_team_1 = 0;
 	private int score_team_2 = 0;
 	
@@ -35,12 +37,12 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 		if(!is_celebrating){
 			if(team == 1) {
 				score_team_1++;
-				ChangeScoreText("Red Team Scored", team1_color.color);
+				ChangeScoreText("Red Team Scores", team1_color.color);
 				game_behaviour.ScoreTeam(1);
 				team_celebrating = 1;
 			} else {
 				score_team_2++;
-				ChangeScoreText("Blue Team Scored", team2_color.color);
+				ChangeScoreText("Blue Team Scores", team2_color.color);
 				game_behaviour.ScoreTeam(2);
 				team_celebrating = 2;
 			}
@@ -69,11 +71,13 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 			ChangeScoreText("Red Team WINS", team1_color.color);
 			time_to_stop = 0;
 			is_celebrating = true;
+			AudioSource.PlayClipAtPoint(winning, Vector3.zero);
 			return 1;
 		} else if(score_team_2 == 5) {
 			ChangeScoreText("Blue Team WINS", team2_color.color);
 			time_to_stop = 0;
 			is_celebrating = true;
+			AudioSource.PlayClipAtPoint(winning, Vector3.zero);
 			return 2;
 		}
 		

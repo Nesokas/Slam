@@ -46,6 +46,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Actions.cs" />
      <Compile Include="Assets\Scripts\Ball_Behaviour.cs" />
+     <Compile Include="Assets\Scripts\Crowd.cs" />
      <Compile Include="Assets\Scripts\Forcefield.cs" />
      <Compile Include="Assets\Scripts\Game_Behaviour.cs" />
      <Compile Include="Assets\Scripts\Game_Settings.cs" />
