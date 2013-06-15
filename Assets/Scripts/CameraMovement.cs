@@ -4,20 +4,16 @@ using System.Collections;
 public class CameraMovement : MonoBehaviour 
 {
 
-	public float smooth = 1.5f;
-	
+	public float smooth = 0.6f;
+
 	private Transform ball;
 	private Vector3 rel_camera_pos;
 	private float rel_camera_pos_mag;
 	private Vector3 new_pos;
-	
+	private Vector3 clamped_pos;
 	void Awake()
 	{
-		//ball = GameObject.FindGameObjectWithTag("ball").transform;
-	//	rel_camera_pos = transform.position - ball.position;
-		//rel_camera_pos_mag = rel_camera_pos.magnitude - 0.5f;
-		rel_camera_pos_mag = -1;
-		
+		rel_camera_pos_mag = -1;	
 	}
 	
 	void Update()
@@ -25,38 +21,16 @@ public class CameraMovement : MonoBehaviour
 		if (!ball) {
 			ball = GameObject.FindGameObjectWithTag("ball").transform;
 			rel_camera_pos = transform.position - ball.position;
-			rel_camera_pos_mag = rel_camera_pos.magnitude - 0.5f;
+			rel_camera_pos_mag = rel_camera_pos.magnitude;
 		}
 		Vector3 standard_pos = ball.position + rel_camera_pos;
 		Vector3 above_pos = ball.position + Vector3.up * rel_camera_pos_mag;
-		Vector3[] checkpoints = new Vector3[5];
-		checkpoints[0] = standard_pos;
-		checkpoints[1] = Vector3.Lerp(standard_pos, above_pos, 0.25f);
-		checkpoints[2] = Vector3.Lerp(standard_pos, above_pos, 0.5f);
-		checkpoints[3] = Vector3.Lerp(standard_pos, above_pos, 0.75f);
-		checkpoints[4] = above_pos;
-		
-		for (int i = 0; i < checkpoints.Length; i++)
-			if (ViewPosCheck(checkpoints[i]))
-				break;
-		
-		transform.position = Vector3.Lerp(transform.position, new_pos, smooth * Time.deltaTime);
-		SmoothLookAt();
-		
+
+		clamped_pos = new Vector3(Mathf.Clamp(standard_pos.x, -9.5f, -7.8f), standard_pos.y, Mathf.Clamp(standard_pos.z, -5f, 5f));
+		Debug.Log(clamped_pos.x);
+		transform.position = Vector3.Lerp(transform.position, clamped_pos, smooth * Time.deltaTime);
 	}
-		
-	bool ViewPosCheck(Vector3 check_pos)
-	{
-		RaycastHit hit;
-	Debug.Log( rel_camera_pos_mag );
-		if (Physics.Raycast(check_pos, ball.position - check_pos, out hit, rel_camera_pos_mag)){
-			
-			if(hit.transform != ball)
-				return false;
-		}
-		new_pos = check_pos;
-		return true;
-	}
+	
 	
 	void SmoothLookAt()
 	{
