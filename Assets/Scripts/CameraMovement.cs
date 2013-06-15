@@ -4,7 +4,7 @@ using System.Collections;
 public class CameraMovement : MonoBehaviour 
 {
 
-	public float smooth = 0.6f;
+	public float smooth = 0.8f;
 
 	private Transform ball;
 	private Vector3 rel_camera_pos;
