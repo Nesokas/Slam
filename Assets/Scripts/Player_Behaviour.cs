@@ -26,6 +26,9 @@ public class Player_Behaviour : MonoBehaviour {
 	public double debug_hit_time = 30;
 	
 	public AudioClip ball_sound;
+	public GameObject center_circle_left;
+	public GameObject center_circle_right;
+	public GameObject[] center_planes;
 
 	private Vector3 direction = Vector3.zero;
 	private bool ball_collision = false;
@@ -44,6 +47,69 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	private bool is_adding_speed = false;
 	private float animation_speed = 1f;
+	
+	public void DisableGotoCenter(int scored_team)
+	{
+		player_base = transform.Find("Base");
+		Transform base_collider = player_base.Find("Collider");
+		Transform shoot_collider = player_base.Find("ColliderShoot");
+		if (scored_team == 0){
+			if(team == 1){
+				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
+				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
+			} else {
+				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
+				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
+			}
+		} else if (team == 1) {
+			if (scored_team == 1) {
+				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
+				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
+			} else {
+				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
+				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
+			}
+		} else {
+			if (scored_team == 1) {
+				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
+				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
+			} else {
+				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
+				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
+			}
+		}
+		for(int i = 0; i < center_planes.Length; i++) {
+			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider, false);
+			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider, false);
+		}
+	}
+	
+	public void EnableGotoCenter()
+	{
+		player_base = transform.Find("Base");
+		Transform base_collider = player_base.Find("Collider");
+		Transform shoot_collider = player_base.Find("ColliderShoot");
+		for (int i = 0; i < center_planes.Length; i++) {
+			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider);
+			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider);
+		}
+		Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
+		Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
+		Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
+		Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
+	}
 
 	public void InitializePlayerInfo(int num, int team_num, Camera m_camera)
 	{
@@ -166,8 +232,12 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 	}
 	
-	void Start () 
+	public void Start () 
 	{
+		center_planes = GameObject.FindGameObjectsWithTag("center-plane");
+		center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
+		center_circle_right = GameObject.FindGameObjectWithTag("center-circle-right");
+		
 		GameObject court_walls = GameObject.FindGameObjectWithTag("court_walls");
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
