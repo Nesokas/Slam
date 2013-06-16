@@ -27,7 +27,7 @@ public class CameraMovement : MonoBehaviour
 		Vector3 above_pos = ball.position + Vector3.up * rel_camera_pos_mag;
 
 		clamped_pos = new Vector3(Mathf.Clamp(standard_pos.x, -9.5f, -7.8f), standard_pos.y, Mathf.Clamp(standard_pos.z, -5f, 5f));
-		Debug.Log(Vector3.Lerp(transform.position, clamped_pos, smooth * Time.deltaTime));
+	//	Debug.Log(Vector3.Lerp(transform.position, clamped_pos, smooth * Time.deltaTime));
 		transform.position = Vector3.Lerp(transform.position, clamped_pos, smooth * Time.deltaTime);
 	}
 	
