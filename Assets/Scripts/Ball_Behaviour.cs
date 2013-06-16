@@ -2,19 +2,35 @@ using UnityEngine;
 using System.Collections;
 
 public class Ball_Behaviour : MonoBehaviour {
+	
+	private bool game_restarted = true;
+	
+	public void GameHasRestarted()
+	{
+		game_restarted = true;
+	}
+	
+	void OnCollisionEnter(Collision collider)
+	{
+		if (game_restarted)
+		{
+			GameObject gbo = GameObject.FindGameObjectWithTag("GameController");
+			Game_Behaviour gb = gbo.GetComponent<Game_Behaviour>();
+			Debug.Log("Release Players");
+			gb.ReleasePlayers();
+			game_restarted = false;
+		}
+	}
 
 	void Start () 
-	{
-		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-	
-		for(int i = 0; i < players.Length; i++) {
-			Transform player_base = players[i].transform.Find("Base");
-			Transform player_shoot_colider = player_base.transform.Find("ColliderShoot");
-			Physics.IgnoreCollision(player_shoot_colider.collider, transform.collider);
-		}
+	{		
+		GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
+		GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
+		GameObject center_circle_rigth = GameObject.FindGameObjectWithTag("center-circle-right");
 		
-		GameObject[] goals = GameObject.FindGameObjectsWithTag("goal_detection");
-		for(int i = 0; i < goals.Length; i++)
-			Physics.IgnoreCollision(goals[i].transform.collider, transform.collider);
+		for(int i = 0; i < center_planes.Length; i++)
+			Physics.IgnoreCollision(center_planes[i].collider, transform.collider);
+		Physics.IgnoreCollision(center_circle_left.collider, transform.collider);
+		Physics.IgnoreCollision(center_circle_rigth.collider, transform.collider);
 	}
 }

@@ -41,6 +41,8 @@ public class Game_Behaviour : MonoBehaviour {
 	private bool trigger_timer;
 	private bool finish_game = false;
 	public float timer_value;
+	
+	private int scored_team = 0;
 
 	public void ScoreTeam(int team)
 	{
@@ -52,11 +54,13 @@ public class Game_Behaviour : MonoBehaviour {
 			team_1_crowd.Celebrate();
 			TeamReaction(2, "Sad");
 			team_2_crowd.Sad();
+			scored_team = 1;
 		} else {
 			TeamReaction(2, "Celebrate");
 			team_2_crowd.Celebrate();
 			TeamReaction(1, "Sad");
 			team_1_crowd.Sad();
+			scored_team = 2;
 		}	
 		
 		timer_value = 0f;
@@ -66,6 +70,20 @@ public class Game_Behaviour : MonoBehaviour {
 	public void FinishGame()
 	{
 		Application.LoadLevel(1);
+	}
+	
+	public void ReleasePlayers()
+	{
+		for(int i = 0; i < players_team_1.Count; i++) {
+			Player_Behaviour pb = players_team_1[i].GetComponent<Player_Behaviour>();
+			pb.EnableGotoCenter();
+		}
+		
+		for(int i = 0; i < players_team_2.Count; i++) {
+			Player_Behaviour pb = players_team_2[i].GetComponent<Player_Behaviour>();
+			pb.EnableGotoCenter();
+		}
+			
 	}
 	
 	void StartGameAgain()
@@ -158,9 +176,13 @@ public class Game_Behaviour : MonoBehaviour {
 		string player_name = GetPlayer(team, team_position, game_settings);
 		int player_num = System.Convert.ToInt32(GetPlayerNum(player_name));
 		Player_Behaviour player_component = player.GetComponent<Player_Behaviour>();
-
+		
+		player_component.Start();
 		player_component.InitializePlayerInfo(player_num, team, m_camera);
 		player_component.ChangeAnimation("Idle");
+		
+		player_component.DisableGotoCenter(scored_team);
+
 	}
 
 	void MovePlayersToStartPositions()
@@ -177,6 +199,10 @@ public class Game_Behaviour : MonoBehaviour {
 		Destroy(ball);
 		ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
 		ball.transform.name = "Ball";
+		if (scored_team != 0) {
+			Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
+			bb.GameHasRestarted();
+		}
 
 		num_team_1_players = game_settings.players_team_1.Count;
 		num_team_2_players = game_settings.players_team_2.Count;
