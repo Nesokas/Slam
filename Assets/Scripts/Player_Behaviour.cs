@@ -143,6 +143,9 @@ public class Player_Behaviour : MonoBehaviour {
 				colliding_with_ball = false;
 				debug_hit_remaining_time = debug_hit_time;
 				AudioSource.PlayClipAtPoint(ball_sound, transform.position);
+				
+				Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
+				bb.ReleasePlayers();
 			}
 		}
 	}

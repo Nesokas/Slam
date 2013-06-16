@@ -12,6 +12,11 @@ public class Ball_Behaviour : MonoBehaviour {
 	
 	void OnCollisionEnter(Collision collider)
 	{
+		ReleasePlayers();
+	}
+	
+	public void ReleasePlayers()
+	{
 		if (game_restarted)
 		{
 			GameObject gbo = GameObject.FindGameObjectWithTag("GameController");
