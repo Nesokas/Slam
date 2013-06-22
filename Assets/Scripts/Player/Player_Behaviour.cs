@@ -12,119 +12,35 @@ public class Player_Behaviour : MonoBehaviour {
 	public Vector3 normalized_velocity = Vector3.zero;
 	public bool gamepad = false;
 
-	public int team = 1;
-	public int player_num = 1;
 	public int gamepad_num = 0;
 	public bool move = true;
-
-	public Material normal_team_1_material;
-	public Material normal_team_2_material;
-	public Material shoot_team_1_material;
-	public Material shoot_team_2_material;
 
 	public double debug_hit_remaining_time = 0;
 	public double debug_hit_time = 30;
 	
 	public AudioClip ball_sound;
-	public GameObject center_circle_left;
-	public GameObject center_circle_right;
-	public GameObject[] center_planes;
-
-	private Vector3 direction = Vector3.zero;
-	private bool ball_collision = false;
-	private Material shoot_material;
-	private Material normal_material;
-
-	private bool colliding_with_ball = false;
-	private Collider ball_collider;
-	private Transform player_base;
-	private GameObject ball;
-
-	private bool debug_key_pressed = false;
-	private bool debug_mode = false;
-	private bool hit = false;
-	private Vector3 last_ball_position;
 	
-	private bool is_adding_speed = false;
-	private float animation_speed = 1f;
+	public Material normal_team_1_material;
+	public Material shoot_team_1_material;
+
+	protected Vector3 direction = Vector3.zero;
+	protected bool ball_collision = false;
+	protected Material shoot_material;
+	protected Material normal_material;
+
+	protected bool colliding_with_ball = false;
+	protected Collider ball_collider;
+	protected Transform player_base;
+	protected GameObject ball;
+
+	protected bool debug_key_pressed = false;
+	protected bool debug_mode = false;
+	protected bool hit = false;
+	protected Vector3 last_ball_position;
 	
-	public void DisableGotoCenter(int scored_team)
-	{
-		player_base = transform.Find("Base");
-		Transform base_collider = player_base.Find("Collider");
-		Transform shoot_collider = player_base.Find("ColliderShoot");
-		if (scored_team == 0){
-			if(team == 1){
-				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
-				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
-			} else {
-				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
-				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
-			}
-		} else if (team == 1) {
-			if (scored_team == 1) {
-				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
-				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
-			} else {
-				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
-				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
-			}
-		} else {
-			if (scored_team == 1) {
-				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
-				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
-			} else {
-				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
-				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
-				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
-			}
-		}
-		for(int i = 0; i < center_planes.Length; i++) {
-			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider, false);
-			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider, false);
-		}
-	}
-	
-	public void EnableGotoCenter()
-	{
-		player_base = transform.Find("Base");
-		Transform base_collider = player_base.Find("Collider");
-		Transform shoot_collider = player_base.Find("ColliderShoot");
-		for (int i = 0; i < center_planes.Length; i++) {
-			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider);
-			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider);
-		}
-		Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
-		Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
-		Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
-		Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
-	}
+	protected bool is_adding_speed = false;
+	protected float animation_speed = 1f;
 
-	public void InitializePlayerInfo(int num, int team_num, Camera m_camera)
-	{
-		if(num != 0) {
-			gamepad_num = num;
-			gamepad = true;
-		}
-
-		team = team_num;
-		player_num = num;
-
-		Player_Name name_component = transform.Find("Player_name").transform.GetComponent<Player_Name>();
-		name_component.m_camera = m_camera;
-		name_component.ChangeName("P" + num);
-	}
 
 	void VerifyShoot()
 	{
@@ -133,7 +49,6 @@ public class Player_Behaviour : MonoBehaviour {
 			if(!ball)
 				ball = GameObject.FindGameObjectWithTag("ball");
 
-//			Vector3 contact_point = ball_collider.ClosestPointOnBounds(transform.position);
 			Vector3 direction = ball.transform.position - transform.position;
 			direction.Normalize();
 
@@ -171,7 +86,6 @@ public class Player_Behaviour : MonoBehaviour {
 	    if(collider.gameObject.tag == "ball") {
 			colliding_with_ball = false;
 		}
-		Debug.Log("exit");
 	}
 
 	void IncreaseSpeed() 
@@ -235,12 +149,8 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 	}
 	
-	public void Start () 
-	{
-		center_planes = GameObject.FindGameObjectsWithTag("center-plane");
-		center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
-		center_circle_right = GameObject.FindGameObjectWithTag("center-circle-right");
-		
+	protected void Start () 
+	{		
 		GameObject court_walls = GameObject.FindGameObjectWithTag("court_walls");
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -262,17 +172,10 @@ public class Player_Behaviour : MonoBehaviour {
 				Physics.IgnoreCollision(other_player_shoot_collider.collider, base_collider.collider);
 			}
 		}
-
-		if(team == 1) {
-			normal_material = normal_team_1_material;
-			shoot_material = shoot_team_1_material;
-		} else {
-			normal_material = normal_team_2_material;
-			shoot_material = shoot_team_2_material;
-		}
-
-		player_base.renderer.material = normal_material;
 		
+		normal_material = normal_team_1_material;
+		shoot_material = normal_team_1_material;
+
 		animation["Idle"].time = Random.Range(0.0f, animation["Idle"].length);
 	}
 
@@ -293,7 +196,7 @@ public class Player_Behaviour : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () 
+	protected void Update () 
 	{
 		if(player_base == null)
 			player_base = transform.Find("Base");

@@ -75,12 +75,12 @@ public class Game_Behaviour : MonoBehaviour {
 	public void ReleasePlayers()
 	{
 		for(int i = 0; i < players_team_1.Count; i++) {
-			Player_Behaviour pb = players_team_1[i].GetComponent<Player_Behaviour>();
+			Kickoff_Player pb = players_team_1[i].GetComponent<Kickoff_Player>();
 			pb.EnableGotoCenter();
 		}
 		
 		for(int i = 0; i < players_team_2.Count; i++) {
-			Player_Behaviour pb = players_team_2[i].GetComponent<Player_Behaviour>();
+			Kickoff_Player pb = players_team_2[i].GetComponent<Kickoff_Player>();
 			pb.EnableGotoCenter();
 		}
 			
@@ -175,7 +175,7 @@ public class Game_Behaviour : MonoBehaviour {
 
 		string player_name = GetPlayer(team, team_position, game_settings);
 		int player_num = System.Convert.ToInt32(GetPlayerNum(player_name));
-		Player_Behaviour player_component = player.GetComponent<Player_Behaviour>();
+		Kickoff_Player player_component = player.GetComponent<Kickoff_Player>();
 		
 		player_component.Start();
 		player_component.InitializePlayerInfo(player_num, team, m_camera);

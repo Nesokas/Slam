@@ -17,7 +17,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	
 	public void ReleasePlayers()
 	{
-		if (game_restarted)
+		if (Application.loadedLevelName == "Main_Game" && game_restarted)
 		{
 			GameObject gbo = GameObject.FindGameObjectWithTag("GameController");
 			Game_Behaviour gb = gbo.GetComponent<Game_Behaviour>();
@@ -28,14 +28,16 @@ public class Ball_Behaviour : MonoBehaviour {
 	}
 
 	void Start () 
-	{		
-		GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
-		GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
-		GameObject center_circle_rigth = GameObject.FindGameObjectWithTag("center-circle-right");
-		
-		for(int i = 0; i < center_planes.Length; i++)
-			Physics.IgnoreCollision(center_planes[i].collider, transform.collider);
-		Physics.IgnoreCollision(center_circle_left.collider, transform.collider);
-		Physics.IgnoreCollision(center_circle_rigth.collider, transform.collider);
+	{	
+		if(Application.loadedLevelName == "Main_Game") {
+			GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
+			GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
+			GameObject center_circle_rigth = GameObject.FindGameObjectWithTag("center-circle-right");
+			
+			for(int i = 0; i < center_planes.Length; i++)
+				Physics.IgnoreCollision(center_planes[i].collider, transform.collider);
+			Physics.IgnoreCollision(center_circle_left.collider, transform.collider);
+			Physics.IgnoreCollision(center_circle_rigth.collider, transform.collider);
+		}
 	}
 }

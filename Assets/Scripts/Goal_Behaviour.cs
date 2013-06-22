@@ -10,12 +10,14 @@ public class Goal_Behaviour : MonoBehaviour {
 	void OnTriggerEnter(Collider collider)
 	{
 		if(collider.gameObject.tag == "ball") {
-			Screen_Text_Behaviour stb = screen_text.GetComponent<Screen_Text_Behaviour>();
-			if(team == 1)
-				stb.TeamScored(2);
-			else stb.TeamScored(1);
-			
-			AudioSource.PlayClipAtPoint(goal_sound, Vector3.zero);
+			if(Application.loadedLevelName == "Main_Game") {
+				Screen_Text_Behaviour stb = screen_text.GetComponent<Screen_Text_Behaviour>();
+				if(team == 1)
+					stb.TeamScored(2);
+				else 
+					stb.TeamScored(1);
+				AudioSource.PlayClipAtPoint(goal_sound, Vector3.zero);
+			}
 		}
 	}
 }
