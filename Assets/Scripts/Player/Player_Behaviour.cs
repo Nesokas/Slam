@@ -65,7 +65,7 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerEnter (Collider collider) 
+	protected void OnTriggerEnter (Collider collider) 
 	{
 	    if(collider.gameObject.tag == "ball") {
 			colliding_with_ball = true;
@@ -73,7 +73,7 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 	}
 	
-	void OnTriggerStay (Collider collider)
+	protected void OnTriggerStay (Collider collider)
 	{
 		if(collider.gameObject.tag == "ball") {
 			colliding_with_ball = true;
@@ -81,7 +81,7 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerExit (Collider collider)
+	protected void OnTriggerExit (Collider collider)
 	{
 	    if(collider.gameObject.tag == "ball") {
 			colliding_with_ball = false;
@@ -174,7 +174,7 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 		
 		normal_material = normal_team_1_material;
-		shoot_material = normal_team_1_material;
+		shoot_material = shoot_team_1_material;
 
 		animation["Idle"].time = Random.Range(0.0f, animation["Idle"].length);
 	}
