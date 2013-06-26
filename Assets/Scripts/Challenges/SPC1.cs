@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class SPC1: MonoBehaviour {
 	
 	public TriggerBox trigger_box;
+	public Font font;
 	
 	private bool is_legal_goal;
 	private bool ball_in_trigger_box;
@@ -58,6 +59,10 @@ public class SPC1: MonoBehaviour {
 			is_legal_goal = false;
 	}
 	
-	
-	
+	void OnGUI()
+	{
+		GUIStyle SPC = new GUIStyle();
+		SPC.font = font;
+		GUI.Label(new Rect(10, 10, 100, 20), "Hello World!", SPC);
+	}
 }
