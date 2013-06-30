@@ -1,0 +1,168 @@
+fileFormatVersion: 2
+guid: 8a91aae0379da4f7fa683d5d4049015d
+ModelImporter:
+  serializedVersion: 15
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Cylinder
+    100004: EyeFocus
+    100006: EyesTracker_001
+    100008: L_EyesTracker
+    100010: Sphere
+    100012: Sphere_001
+    100014: L_Eye
+    100016: L_Eyes_Deform
+    100018: R_Eye
+    100020: R_Eyes_Deform
+    100022: Armature
+    100024: Base
+    100026: Bone
+    100028: Bone_001
+    100030: Bone_002
+    100032: Bone_003
+    100034: Bone_004
+    400000: //RootNode
+    400002: Cylinder
+    400004: EyeFocus
+    400006: EyesTracker_001
+    400008: L_EyesTracker
+    400010: Sphere
+    400012: Sphere_001
+    400014: L_Eye
+    400016: L_Eyes_Deform
+    400018: R_Eye
+    400020: R_Eyes_Deform
+    400022: Armature
+    400024: Base
+    400026: Bone
+    400028: Bone_001
+    400030: Bone_002
+    400032: Bone_003
+    400034: Bone_004
+    2300000: //RootNode
+    2300002: Cylinder
+    2300004: Sphere
+    2300006: Sphere_001
+    2300008: L_Eye
+    2300010: L_Eyes_Deform
+    2300012: R_Eye
+    2300014: R_Eyes_Deform
+    2300016: Base
+    3300000: //RootNode
+    3300002: Cylinder
+    3300004: Sphere
+    3300006: Sphere_001
+    3300008: L_Eye
+    3300010: L_Eyes_Deform
+    3300012: R_Eye
+    3300014: R_Eyes_Deform
+    3300016: Base
+    4300000: Cylinder
+    4300002: Sphere_001
+    4300004: Sphere
+    4300006: L_Eyes_Deform
+    4300008: R_Eyes_Deform
+    4300010: L_Eye
+    4300012: R_Eye
+    4300014: Base
+    7400000: Default Take
+    7400002: Sample
+    7400004: Sample0
+    9500000: //RootNode
+    11100000: //RootNode
+    13700000: Sphere
+    13700002: Sphere_001
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    clipAnimations:
+    - name: Default Take
+      takeName: Default Take
+      firstFrame: 0
+      lastFrame: 19
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      transformMask: []
+    - name: Sample
+      takeName: Sample
+      firstFrame: -1
+      lastFrame: 19
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      transformMask: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    handles: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  additionalBone: 1
+  animationType: 1
+  userData: 
