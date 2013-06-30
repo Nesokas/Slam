@@ -18,6 +18,8 @@ public class Goal_Behaviour : MonoBehaviour {
 					stb.TeamScored(1);
 				AudioSource.PlayClipAtPoint(goal_sound, Vector3.zero);
 			}
+			NotificationCenter.DefaultCenter.PostNotification(this, "OnGoal");
 		}
 	}
+	
 }
