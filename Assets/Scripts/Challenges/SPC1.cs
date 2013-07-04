@@ -5,9 +5,8 @@ using System.Collections.Generic;
 public class SPC1: MonoBehaviour {
 	
 	public TriggerBox trigger_box;
-	public Font font;
-	public Material red;
-	public Material blue;
+	
+	private GUIManager gui_manager;
 	
 	private bool is_legal_goal;
 	private bool ball_in_trigger_box;
@@ -20,6 +19,7 @@ public class SPC1: MonoBehaviour {
 	public void Awake()
 	{
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
+		gui_manager = new GUIManager("SPC1");
 	}
 	
 	public void OnGoal()
@@ -64,35 +64,14 @@ public class SPC1: MonoBehaviour {
 		else
 			is_legal_goal = false;
 	}
+	
 	void Start() 
 	{
 		
-		SPC = new GUIStyle();
-		SPC.font = font;
-		SPC.fontSize = 40;
-		SPC.normal.textColor = Color.white;
-		SPC.alignment = TextAnchor.MiddleCenter;
-	}
-	
-	public void DrawOutlinedText(Rect pos, string str)
-	{
-		SPC.normal.textColor = Color.black;
-		pos.x--;
-		GUI.Label(pos, str, SPC);
-		pos.x += 4;
-		GUI.Label(pos, str, SPC);
-		pos.x -= 2;
-		pos.y -= 2;
-		GUI.Label(pos, str, SPC);
-		pos.y +=4;
-		GUI.Label(pos, str, SPC);
-		pos.y--;
-		SPC.normal.textColor = Color.white;
-		GUI.Label(pos, str, SPC);
 	}
 	
 	void OnGUI()
 	{
-		DrawOutlinedText(new Rect(Screen.width/2 - 10, 30, 10 , 10), "Challenge Nr. 1");
+		gui_manager.DrawChallengeTitle("Challenge 1");
 	}
 }
