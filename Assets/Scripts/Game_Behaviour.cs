@@ -207,9 +207,11 @@ public class Game_Behaviour : MonoBehaviour {
 
 		DestroyAllPlayers();
 
-		Destroy(ball);
-		ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
-		ball.transform.name = "Ball";
+		//Destroy(ball);
+		//ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
+		//ball.transform.name = "Ball";
+		ball.transform.position = ball_position;
+		ball.transform.rigidbody.velocity = Vector3.zero;
 		if (scored_team != 0) {
 			Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 			bb.GameHasRestarted();
@@ -289,6 +291,8 @@ public class Game_Behaviour : MonoBehaviour {
 	void Awake()
 	{
 		gui_manager = new GUIManager("MainGame");
+		ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
+		ball.transform.name = "Ball";
 	}
 	void Start () 
 	{
@@ -345,21 +349,22 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	void OnGoal(NotificationCenter.Notification notification)
 	{
-		//if(!is_celebrating){
-			Debug.Log(notification.data);
+		if(!is_celebrating){
 			if((int)notification.data["team"] == 1) {
 				score_team_2++;
 				ScoreTeam(2);
 				team_celebrating = 2;
+				gui_manager.DrawGoalScored(2);
 			}
 			else {
 				score_team_1++;
 				ScoreTeam(1);
 				team_celebrating = 1;
+				gui_manager.DrawGoalScored(1);
 			}
-		//	is_celebrating = true;
+			is_celebrating = true;
 		}
-	//}
+	}
 	
 	void OnGUI()
 	{

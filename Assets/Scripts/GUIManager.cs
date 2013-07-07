@@ -12,6 +12,8 @@ public class GUIManager {
 	private float native_horizontal_resolution = 1296f;
 	private float native_vertical_resolution = 729f;
 	
+	private float goal_scored = 0.0f;
+	
 	public GUIManager(string type)
 	{
 		style_title = new GUIStyle();
@@ -44,6 +46,12 @@ public class GUIManager {
 		DrawOutline(pos, "-", Color.white, Color.black);
 		pos.x += 50;
 		DrawOutline(pos, score_team2.ToString(), blue.color, Color.black);
+	}
+	
+	public void DrawGoalScored(int team)
+	{
+		style_title.fontSize = 75;
+		Rect pos = new Rect(goal_scored, native_vertical_resolution/2 -20, 10 , 50);
 	}
 	
 	private void DrawOutline(Rect pos, string str, Color color, Color outline)
@@ -84,4 +92,9 @@ public class GUIManager {
 		style_title.normal.textColor = Color.white;
 		GUI.Label(pos, str, style_title);
 	}
+	
+//	void Update()
+//	{
+//		goal_scored += (Time.deltaTime * 10.0);
+//	}
 }
