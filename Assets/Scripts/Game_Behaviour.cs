@@ -43,9 +43,20 @@ public class Game_Behaviour : MonoBehaviour {
 	public float timer_value;
 	
 	private int scored_team = 0;
-
+	
+	private int score_team_1 = 0;
+	private int score_team_2 = 0;
+	
+	private GUIManager gui_manager;
+	public GUIStyle main_game_manager;
+	private bool is_celebrating = false;
+	
+	private int team_celebrating;
+	public AudioClip winning;
+	
 	public void ScoreTeam(int team)
 	{
+		Debug.Log("score team");
 		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
 		Crowd team_2_crowd = crowd_team_2.GetComponent<Crowd>();
 		
@@ -88,7 +99,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	void StartGameAgain()
 	{
-		int winning_team = screen_text_behaviour.StopCelebration();
+		int winning_team = StopCelebration();
 		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
 		Crowd team_2_crowd = crowd_team_2.GetComponent<Crowd>();
 		
@@ -275,12 +286,16 @@ public class Game_Behaviour : MonoBehaviour {
 		game_settings.AddNewPlayer(2, "Player 3");
 	}
 
-	// Use this for initialization
+	void Awake()
+	{
+		gui_manager = new GUIManager("MainGame");
+	}
 	void Start () 
 	{
 		settings = GameObject.FindGameObjectWithTag("settings");
 		screen_text_behaviour = screen_text.GetComponent<Screen_Text_Behaviour>();
-		
+		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
+
 		if(settings == null) {
 			settings = (GameObject)Instantiate(settings_prefab, new Vector3(0,0,0), settings_prefab.transform.rotation);
 			AddTestPlayers();
@@ -306,5 +321,48 @@ public class Game_Behaviour : MonoBehaviour {
 				FinishGame();
 			else timer_value++;
 		}
+	}
+	
+	public int StopCelebration()
+	{
+		is_celebrating = false;
+		if(score_team_1 == 5) {
+		//	ChangeScoreText("Red Team WINS", team1_color.color);
+		//	time_to_stop = 0;
+			is_celebrating = true;
+			AudioSource.PlayClipAtPoint(winning, Vector3.zero);
+			return 1;
+		} else if(score_team_2 == 5) {
+		//	ChangeScoreText("Blue Team WINS", team2_color.color);
+			//time_to_stop = 0;
+			is_celebrating = true;
+			AudioSource.PlayClipAtPoint(winning, Vector3.zero);
+			return 2;
+		}
+		
+		return 0;
+	}
+	
+	void OnGoal(NotificationCenter.Notification notification)
+	{
+		//if(!is_celebrating){
+			Debug.Log(notification.data);
+			if((int)notification.data["team"] == 1) {
+				score_team_2++;
+				ScoreTeam(2);
+				team_celebrating = 2;
+			}
+			else {
+				score_team_1++;
+				ScoreTeam(1);
+				team_celebrating = 1;
+			}
+		//	is_celebrating = true;
+		}
+	//}
+	
+	void OnGUI()
+	{
+		gui_manager.DrawScore(score_team_1, score_team_2);
 	}
 }
