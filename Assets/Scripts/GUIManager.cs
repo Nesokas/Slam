@@ -7,11 +7,15 @@ public class GUIManager {
 	public Material red;
 	public Material blue;
 	
+	private int RED_TEAM = 1;
+	private int BLUE_TEAM = 2;
+	
 	private GUIStyle style_title;
 	
 	private float native_horizontal_resolution = 1296f;
 	private float native_vertical_resolution = 729f;
-	
+	private string GOAL_STR = "GOAL!";
+	private int GOAL_STR_CHAR_WIDTH = 60;
 	private float goal_scored = 0.0f;
 	
 	public GUIManager(string type)
@@ -50,8 +54,21 @@ public class GUIManager {
 	
 	public void DrawGoalScored(int team)
 	{
-		style_title.fontSize = 75;
-		Rect pos = new Rect(goal_scored, native_vertical_resolution/2 -20, 10 , 50);
+		style_title.fontSize = 100;
+		Rect pos = new Rect(native_horizontal_resolution/2 - GOAL_STR_CHAR_WIDTH*1/2*(GOAL_STR.Length-1), 90 , 10 , 50);
+		Rect temp = pos;
+		Color color;
+	//	Debug.Log(team);
+		if (team == RED_TEAM)
+			color = red.color;
+		else
+			color = blue.color;
+		foreach(char ch in GOAL_STR) {
+			temp.x = pos.x + Random.Range(-6, 6);
+			temp.y = pos.y + Random.Range(-6, 6);
+			DrawOutline(temp, ch.ToString() , color, Color.black);
+			pos.x += GOAL_STR_CHAR_WIDTH;
+		}
 	}
 	
 	private void DrawOutline(Rect pos, string str, Color color, Color outline)

@@ -24,7 +24,6 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_2;
 	
 	public GameObject screen_text;
-	private Screen_Text_Behaviour screen_text_behaviour;
 	
 	public float timer = 200;
 
@@ -52,11 +51,16 @@ public class Game_Behaviour : MonoBehaviour {
 	private bool is_celebrating = false;
 	
 	private int team_celebrating;
-	public AudioClip winning;
+	public AudioClip goal_cheer;
+	
+	private bool is_goal = false;
+	private int team_scored = 0;
+	private float DEFAULT_TEAM_SCORED_MESSAGE_XPOS = -400f;
+	private float TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER = 400f;
+	private float team_scored_message_xpos;
 	
 	public void ScoreTeam(int team)
 	{
-		Debug.Log("score team");
 		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
 		Crowd team_2_crowd = crowd_team_2.GetComponent<Crowd>();
 		
@@ -293,11 +297,12 @@ public class Game_Behaviour : MonoBehaviour {
 		gui_manager = new GUIManager("MainGame");
 		ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
 		ball.transform.name = "Ball";
+		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
 	}
 	void Start () 
 	{
 		settings = GameObject.FindGameObjectWithTag("settings");
-		screen_text_behaviour = screen_text.GetComponent<Screen_Text_Behaviour>();
+		//screen_text_behaviour = screen_text.GetComponent<Screen_Text_Behaviour>();
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
 
 		if(settings == null) {
@@ -325,22 +330,22 @@ public class Game_Behaviour : MonoBehaviour {
 				FinishGame();
 			else timer_value++;
 		}
+		if(is_celebrating) {
+			team_scored_message_xpos += (Time.deltaTime * TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER);
+		}
 	}
 	
 	public int StopCelebration()
 	{
 		is_celebrating = false;
+		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
 		if(score_team_1 == 5) {
-		//	ChangeScoreText("Red Team WINS", team1_color.color);
-		//	time_to_stop = 0;
 			is_celebrating = true;
-			AudioSource.PlayClipAtPoint(winning, Vector3.zero);
+			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			return 1;
 		} else if(score_team_2 == 5) {
-		//	ChangeScoreText("Blue Team WINS", team2_color.color);
-			//time_to_stop = 0;
 			is_celebrating = true;
-			AudioSource.PlayClipAtPoint(winning, Vector3.zero);
+			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			return 2;
 		}
 		
@@ -351,23 +356,28 @@ public class Game_Behaviour : MonoBehaviour {
 	{
 		if(!is_celebrating){
 			if((int)notification.data["team"] == 1) {
+				team_scored = 2;
 				score_team_2++;
 				ScoreTeam(2);
 				team_celebrating = 2;
-				gui_manager.DrawGoalScored(2);
+				AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			}
 			else {
+				team_scored = 1;
 				score_team_1++;
 				ScoreTeam(1);
 				team_celebrating = 1;
-				gui_manager.DrawGoalScored(1);
 			}
 			is_celebrating = true;
 		}
 	}
 	
 	void OnGUI()
-	{
-		gui_manager.DrawScore(score_team_1, score_team_2);
+	{	
+		if(is_celebrating)
+			gui_manager.DrawGoalScored(team_scored);
+		 else
+			gui_manager.DrawScore(score_team_1, score_team_2);
+			
 	}
 }
