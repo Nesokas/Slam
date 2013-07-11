@@ -1,77 +1,53 @@
 fileFormatVersion: 2
-guid: 8a91aae0379da4f7fa683d5d4049015d
+guid: a2a8d4d2ebae44024b7fc5c814ddc7dd
 ModelImporter:
   serializedVersion: 15
   fileIDToRecycleName:
-    100000: //RootNode
-    100002: Cylinder
-    100004: EyeFocus
-    100006: EyesTracker_001
-    100008: L_EyesTracker
-    100010: Sphere
-    100012: Sphere_001
-    100014: L_Eye
-    100016: L_Eyes_Deform
-    100018: R_Eye
-    100020: R_Eyes_Deform
-    100022: Armature
-    100024: Base
-    100026: Bone
-    100028: Bone_001
-    100030: Bone_002
-    100032: Bone_003
-    100034: Bone_004
-    400000: //RootNode
-    400002: Cylinder
-    400004: EyeFocus
-    400006: EyesTracker_001
-    400008: L_EyesTracker
-    400010: Sphere
-    400012: Sphere_001
-    400014: L_Eye
-    400016: L_Eyes_Deform
-    400018: R_Eye
-    400020: R_Eyes_Deform
-    400022: Armature
-    400024: Base
-    400026: Bone
-    400028: Bone_001
-    400030: Bone_002
-    400032: Bone_003
-    400034: Bone_004
-    2300000: //RootNode
-    2300002: Cylinder
-    2300004: Sphere
-    2300006: Sphere_001
-    2300008: L_Eye
-    2300010: L_Eyes_Deform
-    2300012: R_Eye
-    2300014: R_Eyes_Deform
-    2300016: Base
-    3300000: //RootNode
-    3300002: Cylinder
-    3300004: Sphere
-    3300006: Sphere_001
-    3300008: L_Eye
-    3300010: L_Eyes_Deform
-    3300012: R_Eye
-    3300014: R_Eyes_Deform
-    3300016: Base
+    100000: Armature
+    100002: Armature_001
+    100004: //RootNode
+    100006: Bone
+    100008: Bone_0
+    100010: Bone_001
+    100012: Bone_002
+    100014: Bone_003
+    100016: Bone_004
+    100018: Bone_2
+    100020: Cylinder
+    100022: Sphere
+    100024: Sphere_001
+    100026: Sphere_002
+    100028: Sphere_003
+    400000: Armature
+    400002: Armature_001
+    400004: //RootNode
+    400006: Bone
+    400008: Bone_0
+    400010: Bone_001
+    400012: Bone_002
+    400014: Bone_003
+    400016: Bone_004
+    400018: Bone_2
+    400020: Cylinder
+    400022: Sphere
+    400024: Sphere_001
+    400026: Sphere_002
+    400028: Sphere_003
+    2300000: Cylinder
+    3300000: Cylinder
     4300000: Cylinder
     4300002: Sphere_001
-    4300004: Sphere
-    4300006: L_Eyes_Deform
-    4300008: R_Eyes_Deform
-    4300010: L_Eye
-    4300012: R_Eye
-    4300014: Base
+    4300004: Sphere_002
+    4300006: Sphere
+    4300008: Sphere_003
     7400000: Default Take
-    7400002: Sample
-    7400004: Sample0
+    7400002: Blink
     9500000: //RootNode
     11100000: //RootNode
     13700000: Sphere
     13700002: Sphere_001
+    13700004: Sphere_002
+    13700006: Sphere_003
   materials:
     importMaterials: 1
     materialName: 0
@@ -106,9 +82,9 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       transformMask: []
-    - name: Sample
-      takeName: Sample
-      firstFrame: -1
+    - name: Blink
+      takeName: Blink
+      firstFrame: 0
       lastFrame: 19
       wrapMode: 0
       orientationOffsetY: 0
