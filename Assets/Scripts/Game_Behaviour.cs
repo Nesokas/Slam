@@ -24,7 +24,6 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_2;
 	
 	public GameObject screen_text;
-	private Screen_Text_Behaviour screen_text_behaviour;
 	
 	public float timer = 200;
 
@@ -43,7 +42,23 @@ public class Game_Behaviour : MonoBehaviour {
 	public float timer_value;
 	
 	private int scored_team = 0;
-
+	
+	private int score_team_1 = 0;
+	private int score_team_2 = 0;
+	
+	private GUIManager gui_manager;
+	public GUIStyle main_game_manager;
+	private bool is_celebrating = false;
+	
+	private int team_celebrating;
+	public AudioClip goal_cheer;
+	
+	private bool is_goal = false;
+	private int team_scored = 0;
+	private float DEFAULT_TEAM_SCORED_MESSAGE_XPOS = -400f;
+	private float TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER = 400f;
+	private float team_scored_message_xpos;
+	
 	public void ScoreTeam(int team)
 	{
 		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
@@ -88,7 +103,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	void StartGameAgain()
 	{
-		int winning_team = screen_text_behaviour.StopCelebration();
+		int winning_team = StopCelebration();
 		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
 		Crowd team_2_crowd = crowd_team_2.GetComponent<Crowd>();
 		
@@ -196,9 +211,11 @@ public class Game_Behaviour : MonoBehaviour {
 
 		DestroyAllPlayers();
 
-		Destroy(ball);
-		ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
-		ball.transform.name = "Ball";
+		//Destroy(ball);
+		//ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
+		//ball.transform.name = "Ball";
+		ball.transform.position = ball_position;
+		ball.transform.rigidbody.velocity = Vector3.zero;
 		if (scored_team != 0) {
 			Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 			bb.GameHasRestarted();
@@ -275,12 +292,19 @@ public class Game_Behaviour : MonoBehaviour {
 		game_settings.AddNewPlayer(2, "Player 3");
 	}
 
-	// Use this for initialization
+	void Awake()
+	{
+		gui_manager = new GUIManager("MainGame");
+		ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
+		ball.transform.name = "Ball";
+		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
+	}
 	void Start () 
 	{
 		settings = GameObject.FindGameObjectWithTag("settings");
-		screen_text_behaviour = screen_text.GetComponent<Screen_Text_Behaviour>();
-		
+		//screen_text_behaviour = screen_text.GetComponent<Screen_Text_Behaviour>();
+		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
+
 		if(settings == null) {
 			settings = (GameObject)Instantiate(settings_prefab, new Vector3(0,0,0), settings_prefab.transform.rotation);
 			AddTestPlayers();
@@ -306,5 +330,54 @@ public class Game_Behaviour : MonoBehaviour {
 				FinishGame();
 			else timer_value++;
 		}
+		if(is_celebrating) {
+			team_scored_message_xpos += (Time.deltaTime * TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER);
+		}
+	}
+	
+	public int StopCelebration()
+	{
+		is_celebrating = false;
+		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
+		if(score_team_1 == 5) {
+			is_celebrating = true;
+			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
+			return 1;
+		} else if(score_team_2 == 5) {
+			is_celebrating = true;
+			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
+			return 2;
+		}
+		
+		return 0;
+	}
+	
+	void OnGoal(NotificationCenter.Notification notification)
+	{
+		if(!is_celebrating){
+			if((int)notification.data["team"] == 1) {
+				team_scored = 2;
+				score_team_2++;
+				ScoreTeam(2);
+				team_celebrating = 2;
+				AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
+			}
+			else {
+				team_scored = 1;
+				score_team_1++;
+				ScoreTeam(1);
+				team_celebrating = 1;
+			}
+			is_celebrating = true;
+		}
+	}
+	
+	void OnGUI()
+	{	
+		if(is_celebrating)
+			gui_manager.DrawGoalScored(team_scored);
+		 else
+			gui_manager.DrawScore(score_team_1, score_team_2);
+			
 	}
 }

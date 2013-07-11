@@ -11,6 +11,7 @@ public class CameraMovement : MonoBehaviour
 	private float rel_camera_pos_mag;
 	private Vector3 new_pos;
 	private Vector3 clamped_pos;
+	
 	void Awake()
 	{
 		rel_camera_pos_mag = -1;	
