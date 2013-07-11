@@ -12,8 +12,6 @@ public class Game_Behaviour : MonoBehaviour {
 	public int num_team_1_players = 1;
 	public int num_team_2_players = 1;
 
-	public GameObject team_1_prefab;
-	public GameObject team_2_prefab;
 	public GameObject player_prefab;
 	public GameObject ball_prefab;
 
@@ -23,7 +21,7 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_1;
 	public GameObject crowd_team_2;
 	
-	public GameObject screen_text;
+//	public GameObject screen_text;
 	
 	public float timer = 200;
 
