@@ -358,7 +358,6 @@ public class Game_Behaviour : MonoBehaviour {
 				score_team_2++;
 				ScoreTeam(2);
 				team_celebrating = 2;
-				AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			}
 			else {
 				team_scored = 1;
@@ -366,6 +365,7 @@ public class Game_Behaviour : MonoBehaviour {
 				ScoreTeam(1);
 				team_celebrating = 1;
 			}
+			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			is_celebrating = true;
 		}
 	}
