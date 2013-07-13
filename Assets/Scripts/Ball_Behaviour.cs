@@ -5,14 +5,26 @@ public class Ball_Behaviour : MonoBehaviour {
 	
 	private bool game_restarted = true;
 	
+	private GameObject last_player_touched;
+	
 	public void GameHasRestarted()
 	{
 		game_restarted = true;
 	}
 	
+	public void OnCollisionExit(Collision collider)
+	{
+		last_player_touched = collider.gameObject;
+	}
+	
 	void OnCollisionEnter(Collision collider)
 	{
 		ReleasePlayers();
+	}
+	
+	public GameObject GetLastPlayerTouched()
+	{
+		return last_player_touched;
 	}
 	
 	public void ReleasePlayers()
@@ -38,6 +50,14 @@ public class Ball_Behaviour : MonoBehaviour {
 				Physics.IgnoreCollision(center_planes[i].collider, transform.collider);
 			Physics.IgnoreCollision(center_circle_left.collider, transform.collider);
 			Physics.IgnoreCollision(center_circle_rigth.collider, transform.collider);
+		}
+		transform.animation.Stop();
+	}
+	
+	void Update()
+	{
+		if(!transform.animation.IsPlaying("Blink") && Random.Range(0,100) == 0){
+			transform.animation.Play("Blink");
 		}
 	}
 }
