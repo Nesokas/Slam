@@ -42,7 +42,7 @@ ModelImporter:
     - name: Celebrate
       takeName: Celebrate
       firstFrame: -1
-      lastFrame: 31
+      lastFrame: 36
       wrapMode: 2
       orientationOffsetY: 0
       level: 0
