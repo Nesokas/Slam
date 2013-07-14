@@ -12,7 +12,10 @@ public class Goal_Behaviour : MonoBehaviour {
 		if(collider.gameObject.tag == "ball") {
 			if(Application.loadedLevelName == "Main_Game") {
 				Hashtable data = new Hashtable();
-				data["team"] = team;
+				if(team == 1)
+					data["team"] = 2;
+				else
+					data["team"] = 1;
 				//Game_Behaviour game_manager = game_behaviour.GetComponent<Game_Behaviour>();
 				NotificationCenter.DefaultCenter.PostNotification(this, "OnGoal", data);
 			}

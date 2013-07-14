@@ -56,8 +56,12 @@ public class Ball_Behaviour : MonoBehaviour {
 	
 	void Update()
 	{
-		if(!transform.animation.IsPlaying("Blink") && Random.Range(0,100) == 0){
-			transform.animation.Play("Blink");
+		if(!transform.animation.isPlaying && Random.Range(0,100) == 0){
+			int random = Random.Range(0,100);
+			if(random <= 75)
+				transform.animation.Play("Blink");
+			else
+				transform.animation.Play("Tired");
 		}
 	}
 }

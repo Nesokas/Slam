@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class GUIManager {
+public class GUIManager : MonoBehaviour {
 	
 	public Font slam_font ;
 	public Material red;
@@ -18,11 +18,11 @@ public class GUIManager {
 	private int GOAL_STR_CHAR_WIDTH = 60;
 	private float goal_scored = 0.0f;
 	
-	public GUIManager(string type)
+	public void Awake()
 	{
 		style_title = new GUIStyle();
 		
-		red = Resources.LoadAssetAtPath("Assets/Materials/Player1.mat", typeof (Material)) as Material;
+		/*red = Resources.LoadAssetAtPath("Assets/Materials/Player1.mat", typeof (Material)) as Material;
 		blue = Resources.LoadAssetAtPath("Assets/Materials/Player2.mat", typeof (Material)) as Material;
 		
 		if (type == "SPC1") {
@@ -35,9 +35,11 @@ public class GUIManager {
 		
 		if (type == "MainGame") {
 		
-			style_title.font = Resources.LoadAssetAtPath("Assets/Graphics/Fonts/EraserRegular.ttf", typeof (Font)) as Font;
+			style_title.font = Resources.LoadAssetAtPath("Assets/Graphics/Fonts/EraserRegular.ttf", typeof (Font)) as Font; */
 			style_title.alignment = TextAnchor.MiddleCenter;
-		}
+		//}
+		
+	 	style_title.font = slam_font;
 	}
 	
 	public void DrawScore(int score_team1, int score_team2)

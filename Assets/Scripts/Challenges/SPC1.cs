@@ -19,7 +19,7 @@ public class SPC1: MonoBehaviour {
 	public void Awake()
 	{
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
-		gui_manager = new GUIManager("SPC1");
+//		gui_manager = new GUIManager("SPC1");
 	}
 	
 	public void OnGoal()

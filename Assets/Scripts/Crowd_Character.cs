@@ -3,7 +3,30 @@ using System.Collections;
 
 public class Crowd_Character : MonoBehaviour {
 	
+	public int team;
 	private GameObject ball;
+	private bool celebration_period = false;
+	private int team_scored;
+	private bool was_sad;
+	
+	void Awake()
+	{
+		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
+		NotificationCenter.DefaultCenter.AddObserver(this, "StopCelebration");
+		transform.animation.Stop();
+	}
+	
+	void StopCelebration()
+	{
+		celebration_period = false;
+	}
+	
+	void OnGoal(NotificationCenter.Notification notification)
+	{
+		team_scored = (int)notification.data["team"];
+		celebration_period = true;
+		was_sad = false;
+	}
 	
 	void UpdateRotation()
 	{
@@ -18,5 +41,26 @@ public class Crowd_Character : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		UpdateRotation();
+		if(celebration_period){
+			if(team == team_scored){
+				if(!transform.animation.IsPlaying("Celebrate")){
+					int random = Random.Range(0, 30);
+					if (random == 0){
+						transform.animation.CrossFade("Celebrate", 0.2f);
+					}
+				}
+			} else {
+				if(!transform.animation.IsPlaying("Sad") && !was_sad){
+					int random = Random.Range(0, 10);
+					if (random == 0){
+						was_sad = true;
+						transform.animation.CrossFade("Sad", 0.2f);
+					}
+				}
+			}
+		} else if(!transform.animation.IsPlaying("Idle")) {
+			transform.animation.CrossFade("Idle",0.5f);
+		}
+		
 	}
 }
