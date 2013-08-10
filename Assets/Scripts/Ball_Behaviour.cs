@@ -20,6 +20,23 @@ public class Ball_Behaviour : MonoBehaviour {
 	void OnCollisionEnter(Collision collider)
 	{
 		ReleasePlayers();
+		Debug.Log(collider.transform.tag);
+		if (collider.transform.tag == "court_walls") {
+			
+			int random = Random.Range(0,100);
+			if(random <= 10) {
+				transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
+				StartCoroutine(LoopAnimation("Rolling_Eyes", 1));
+			}
+		}
+	}
+	
+	IEnumerator LoopAnimation(string str, int repeatNumber)
+	{
+		transform.animation.CrossFade(str, 0.3f);
+		Debug.Log(animation[str].length*repeatNumber);
+		yield return new WaitForSeconds(animation[str].length*0.35f);
+		animation.CrossFade("Tired", 1.5f);
 	}
 	
 	public GameObject GetLastPlayerTouched()
@@ -52,13 +69,14 @@ public class Ball_Behaviour : MonoBehaviour {
 			Physics.IgnoreCollision(center_circle_rigth.collider, transform.collider);
 		}
 		transform.animation.Stop();
+		transform.animation["Rolling_Eyes"].speed = 7.5f;
 	}
 	
 	void Update()
 	{
-		if(!transform.animation.isPlaying && Random.Range(0,100) == 0){
+		if(!transform.animation.isPlaying && Random.Range(0,100) == 0) {
 			int random = Random.Range(0,100);
-			if(random <= 75)
+			if(random <= 85)
 				transform.animation.Play("Blink");
 			else
 				transform.animation.Play("Tired");
