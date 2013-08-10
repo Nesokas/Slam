@@ -95,6 +95,10 @@ public class Kickoff_Player : Player_Behaviour {
 	public void Start () {
 		base.Start();
 		
+		if (!networkView.isMine) {	
+			enabled = false;
+		}
+		
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		center_planes = GameObject.FindGameObjectsWithTag("center-plane");

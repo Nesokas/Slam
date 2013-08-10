@@ -21,8 +21,6 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_1;
 	public GameObject crowd_team_2;
 	
-//	public GameObject screen_text;
-	
 	public float timer = 200;
 
 	private List<GameObject> players_team_1 = new List<GameObject>();
@@ -58,6 +56,12 @@ public class Game_Behaviour : MonoBehaviour {
 	private float TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER = 400f;
 	private float team_scored_message_xpos;
 	
+	
+	public GameObject spawn_team_1;
+	public GameObject spawn_team_2;
+	
+	private int spawn_team = 0;
+	
 	public void ScoreTeam(int team)
 	{
 		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
@@ -65,15 +69,11 @@ public class Game_Behaviour : MonoBehaviour {
 		
 		if(team == 1) {
 			TeamReaction(1, "Celebrate");
-			//team_1_crowd.Celebrate();
 			TeamReaction(2, "Sad");
-			//team_2_crowd.Sad();
 			scored_team = 1;
 		} else {
 			TeamReaction(2, "Celebrate");
-			//team_2_crowd.Celebrate();
 			TeamReaction(1, "Sad");
-			//team_1_crowd.Sad();
 			scored_team = 2;
 		}	
 		
@@ -110,8 +110,7 @@ public class Game_Behaviour : MonoBehaviour {
 		if(winning_team == 0) {
 			MovePlayersToStartPositions();
 			trigger_timer = false;
-			//team_1_crowd.Idle();
-			//team_2_crowd.Idle();
+
 		} else {
 			
 			finish_game = true;
@@ -183,7 +182,7 @@ public class Game_Behaviour : MonoBehaviour {
 			return game_settings.players_team_2[position_in_team];
 	}
 
-	void InstanciatePlayer(int team, Vector3 position, int team_position, Game_Settings game_settings) 
+	void InstantiatePlayer(int team, Vector3 position, int team_position, Game_Settings game_settings) 
 	{
 		GameObject player = (GameObject)Instantiate(player_prefab, position, player_prefab.transform.rotation);
 		AddPlayerToTeam(team, player);
@@ -199,7 +198,59 @@ public class Game_Behaviour : MonoBehaviour {
 		player_component.DisableGotoCenter(scored_team);
 
 	}
+	
+	void SpawnPlayer(int team, Vector3 pos)
+	{
+		GameObject player = (GameObject)Network.Instantiate(player_prefab, pos, player_prefab.transform.rotation, 0);
+		AddPlayerToTeam(team, player);
 
+		string player_name = "Player";
+		
+		Kickoff_Player player_component = player.GetComponent<Kickoff_Player>();
+		
+		player_component.Start();
+		player_component.InitializePlayerInfo(0, team, m_camera);
+		player_component.ChangeAnimation("Idle");
+		
+		player_component.DisableGotoCenter(scored_team);
+	}
+	
+	void OnServerInitialized()
+	{
+		Debug.Log("Server intitialized and ready");
+		if (spawn_team + 1 == 1)
+			SpawnPlayer(1, spawn_team_1.transform.position);
+		
+		else {
+			SpawnPlayer(2, spawn_team_2.transform.position);
+		}
+		
+	}
+
+	void OnConnectedToServer()
+	{
+		Debug.Log("Server intitialized and ready");
+		if (spawn_team + 1 == 1)
+			SpawnPlayer(1, spawn_team_1.transform.position);
+		
+		else {
+			SpawnPlayer(2, spawn_team_2.transform.position);
+		}
+		
+	}
+	
+	void OnPlayerDisconnected(NetworkPlayer player) 
+	{
+		Network.RemoveRPCs(player);
+		Network.DestroyPlayerObjects(player);
+	}
+	
+	void OnDisconnectedFromServer(NetworkDisconnection info)
+	{
+		Network.RemoveRPCs(Network.player);
+		Network.DestroyPlayerObjects(Network.player);
+	}
+		
 	void MovePlayersToStartPositions()
 	{
 		Vector3 position;
@@ -211,9 +262,6 @@ public class Game_Behaviour : MonoBehaviour {
 
 		DestroyAllPlayers();
 
-		//Destroy(ball);
-		//ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
-		//ball.transform.name = "Ball";
 		ball.transform.position = ball_position;
 		ball.transform.rigidbody.velocity = Vector3.zero;
 		if (scored_team != 0) {
@@ -224,60 +272,60 @@ public class Game_Behaviour : MonoBehaviour {
 		num_team_1_players = game_settings.players_team_1.Count;
 		num_team_2_players = game_settings.players_team_2.Count;
 
-		if (IsOdd(num_team_1_players)) {
-
-			position = new Vector3(0, 0.1012379f, team_1_inicial_z_position);
-
-			for(i = 0; i < num_team_1_players; i++) {
-				if(IsOdd(i)) {
-					odd_position = new Vector3(-position.x, position.y, position.z);
-					InstanciatePlayer(1, odd_position, i, game_settings);
-				} else {
-					InstanciatePlayer(1, position, i, game_settings);
-					position.x += players_distance;
-				}
-			}
-		} else {
-
-			position = new Vector3(0, 0.1012379f, team_1_inicial_z_position);
-
-			for(i = 0; i < num_team_1_players; i++) {
-				if(IsOdd(i)) {
-					odd_position = new Vector3(-position.x, position.y, position.z);
-					InstanciatePlayer(1, odd_position, i, game_settings);
-				} else {
-					position.x += players_distance;
-					InstanciatePlayer(1, position, i, game_settings);
-				}
-			}
-		}
-
-		if (IsOdd(num_team_2_players)) {
-
-			position = new Vector3(0, 0.1012379f, team_2_inicial_z_position);
-
-			for(i = 0; i < num_team_2_players; i++) {
-				if(IsOdd(i)) {
-					odd_position = new Vector3(-position.x, position.y, position.z);
-					InstanciatePlayer(2, odd_position, i, game_settings);
-				} else {
-					InstanciatePlayer(2, position, i, game_settings);
-					position.x += players_distance;
-				}
-			}
-		} else {
-			position = new Vector3(0, 0.1012379f, team_2_inicial_z_position);
-
-			for(i = 0; i < num_team_2_players; i++) {
-				if(IsOdd(i)) {
-					odd_position = new Vector3(-position.x, position.y, position.z);
-					InstanciatePlayer(2, odd_position, i, game_settings);
-				} else {
-					position.x += players_distance;
-					InstanciatePlayer(2, position, i, game_settings);
-				}
-			}
-		}
+//		if (IsOdd(num_team_1_players)) {
+//
+//			position = new Vector3(0, 0.1012379f, team_1_inicial_z_position);
+//
+//			for(i = 0; i < num_team_1_players; i++) {
+//				if(IsOdd(i)) {
+//					odd_position = new Vector3(-position.x, position.y, position.z);
+//					SpawnPlayer(1, odd_position, i, game_settings);
+//				} else {
+//					SpawnPlayer(1, position, i, game_settings);
+//					position.x += players_distance;
+//				}
+//			}
+//		} else {
+//
+//			position = new Vector3(0, 0.1012379f, team_1_inicial_z_position);
+//
+//			for(i = 0; i < num_team_1_players; i++) {
+//				if(IsOdd(i)) {
+//					odd_position = new Vector3(-position.x, position.y, position.z);
+//					SpawnPlayer(1, odd_position, i, game_settings);
+//				} else {
+//					position.x += players_distance;
+//					SpawnPlayer(1, position, i, game_settings);
+//				}
+//			}
+//		}
+//
+//		if (IsOdd(num_team_2_players)) {
+//
+//			position = new Vector3(0, 0.1012379f, team_2_inicial_z_position);
+//
+//			for(i = 0; i < num_team_2_players; i++) {
+//				if(IsOdd(i)) {
+//					odd_position = new Vector3(-position.x, position.y, position.z);
+//					SpawnPlayer(2, odd_position, i, game_settings);
+//				} else {
+//					SpawnPlayer(2, position, i, game_settings);
+//					position.x += players_distance;
+//				}
+//			}
+//		} else {
+//			position = new Vector3(0, 0.1012379f, team_2_inicial_z_position);
+//
+//			for(i = 0; i < num_team_2_players; i++) {
+//				if(IsOdd(i)) {
+//					odd_position = new Vector3(-position.x, position.y, position.z);
+//					SpawnPlayer(2, odd_position, i, game_settings);
+//				} else {
+//					position.x += players_distance;
+//					SpawnPlayer(2, position, i, game_settings);
+//				}
+//			}
+//		}
 	}
 	
 	// variable used for testing (so we don't need to go always to the lobby screen)
@@ -301,7 +349,6 @@ public class Game_Behaviour : MonoBehaviour {
 	void Start () 
 	{
 		settings = GameObject.FindGameObjectWithTag("settings");
-		//screen_text_behaviour = screen_text.GetComponent<Screen_Text_Behaviour>();
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
 		gui_manager = guiManager.GetComponent<GUIManager>();
 
