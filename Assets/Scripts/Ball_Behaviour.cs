@@ -28,6 +28,9 @@ public class Ball_Behaviour : MonoBehaviour {
 				transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
 				StartCoroutine(LoopAnimation("Rolling_Eyes", 1));
 			}
+			else {
+				animation.Play("look_left");
+			}
 		}
 	}
 	
@@ -70,6 +73,11 @@ public class Ball_Behaviour : MonoBehaviour {
 		}
 		transform.animation.Stop();
 		transform.animation["Rolling_Eyes"].speed = 7.5f;
+		
+		animation["Blink"].AddMixingTransform( transform.Find("Armature_001") );
+//		animation["Blink"].AddMixingTransform( transform.Find("Armature_001/Bone") );
+//		animation["Blink"].AddMixingTransform( transform.Find("Bone") );
+		animation["Blink"].layer = 1;
 	}
 	
 	void Update()
