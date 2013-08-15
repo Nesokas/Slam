@@ -7,6 +7,8 @@ public class Ball_Behaviour : MonoBehaviour {
 	
 	private GameObject last_player_touched;
 	
+	private bool is_looking_somewhere;
+	
 	public void GameHasRestarted()
 	{
 		game_restarted = true;
@@ -26,20 +28,21 @@ public class Ball_Behaviour : MonoBehaviour {
 			int random = Random.Range(0,100);
 			if(random <= 10) {
 				transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
-				StartCoroutine(LoopAnimation("Rolling_Eyes", 1));
+				StartCoroutine(LoopAnimation("Rolling_Eyes", "Tired", 1));
 			}
 			else {
-				animation.Play("look_left");
+				animation.CrossFade("look_left", 0.5f);
+//				animation.CrossFade("Default", 1.5f);
 			}
 		}
 	}
 	
-	IEnumerator LoopAnimation(string str, int repeatNumber)
+	IEnumerator LoopAnimation(string anim1, string anim2, int repeatNumber)
 	{
-		transform.animation.CrossFade(str, 0.3f);
-		Debug.Log(animation[str].length*repeatNumber);
-		yield return new WaitForSeconds(animation[str].length*0.35f);
-		animation.CrossFade("Tired", 1.5f);
+		transform.animation.CrossFade(anim1, 0.3f);
+		Debug.Log(animation[anim1].length*repeatNumber);
+		yield return new WaitForSeconds(animation[anim1].length*0.35f);
+		animation.CrossFade(anim2, 1.5f);
 	}
 	
 	public GameObject GetLastPlayerTouched()
@@ -61,6 +64,8 @@ public class Ball_Behaviour : MonoBehaviour {
 
 	void Start () 
 	{	
+		is_looking_somewhere = false;
+		
 		if(Application.loadedLevelName == "Main_Game") {
 			GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 			GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
@@ -73,21 +78,39 @@ public class Ball_Behaviour : MonoBehaviour {
 		}
 		transform.animation.Stop();
 		transform.animation["Rolling_Eyes"].speed = 7.5f;
-		
+		animation["Rolling_Eyes"].layer=1;
 		animation["Blink"].AddMixingTransform( transform.Find("Armature_001") );
 //		animation["Blink"].AddMixingTransform( transform.Find("Armature_001/Bone") );
 //		animation["Blink"].AddMixingTransform( transform.Find("Bone") );
 		animation["Blink"].layer = 1;
+		animation["Tired"].layer = 1;
+//		animation["look_left"].AddMixingTransform(transform.Find("Armature/Bone_004"));
+//		animation["look_left"].wrapMode = WrapMode.ClampForever;
+		animation["Default"].layer = 10;
+//		animation["Default"].AddMixingTransform(transform.Find("Armature/Bone_004"));
 	}
 	
 	void Update()
 	{
-		if(!transform.animation.isPlaying && Random.Range(0,100) == 0) {
-			int random = Random.Range(0,100);
-			if(random <= 85)
-				transform.animation.Play("Blink");
-			else
-				transform.animation.Play("Tired");
-		}
+//		if (is_looking_somewhere && Random.Range(0,50) == 0) {
+//			animation.Blend("Default",1f, 0.3f);
+//			is_looking_somewhere = false;
+//		}
+//		if(Random.Range(0,100) == 0) {
+//			int random = Random.Range(0,100);
+//			if(random <= 50) {
+//				animation.Blend("Tired", 1f, 0.7f);
+//				
+//			} else if (random <= 100 && animation["look_left"].enabled == false) {
+//				transform.animation.CrossFade("look_left", 0.2f);
+//				is_looking_somewhere = true;
+//			} else if (random <= 20) {
+//				transform.animation.Play("look_right");
+//				is_looking_somewhere = true;
+//			}
+//			else {
+//				transform.animation.CrossFade("Blink",0.1f);
+//			}
+//		}
 	}
 }
