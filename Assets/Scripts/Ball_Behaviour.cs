@@ -52,7 +52,8 @@ public class Ball_Behaviour : MonoBehaviour {
 		transform.animation.CrossFade(anim1, 0.3f);
 		yield return new WaitForSeconds(animation[anim1].length*0.35f);
 		transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
-		animation.CrossFade(anim2, 1f);
+		animation.CrossFadeQueued(anim2, 1f, QueueMode.PlayNow);
+		 animation.CrossFadeQueued("Default", 2.5f, QueueMode.PlayNow);
 		rolling_eyes = false;
 	}
 	
