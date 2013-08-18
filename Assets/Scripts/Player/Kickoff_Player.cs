@@ -99,7 +99,7 @@ public class Kickoff_Player : Player_Behaviour {
 		
 		animation.Play("Idle");
 		initial_position = position;
-		controller_object = GameObject.FindGameObjectWithTag("GameController");
+		controller_object = GameObject.FindGameObjectWithTag("PlayerController");
 	}
 	
 	public void Awake() 
@@ -139,8 +139,23 @@ public class Kickoff_Player : Player_Behaviour {
 	
 	new void Update()
 	{
+		if(!ball_collision && commands.shoot != 0) {
+			networkView.RPC("UpdateMaterial", RPCMode.All, true);
+		} else {
+			networkView.RPC("UpdateMaterial", RPCMode.All, false);
+		}
+		
 		networkView.RPC("AskCommands", RPCMode.All);
 		base.Update();
+	}
+	
+	[RPC] 
+	void UpdateMaterial(bool shoot)
+	{
+		if (shoot)
+			player_base.renderer.material = shoot_material;
+		else
+			player_base.renderer.material = normal_material;
 	}
 	
 	[RPC]

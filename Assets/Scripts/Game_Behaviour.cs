@@ -27,8 +27,6 @@ public class Game_Behaviour : MonoBehaviour {
 	private List<GameObject> players_team_2 = new List<GameObject>();
 	private GameObject ball;
 	
-	private GameObject settings;
-	private Game_Settings game_settings;
 	private bool trigger_timer;
 	private bool finish_game = false;
 	public float timer_value;
@@ -269,23 +267,34 @@ public class Game_Behaviour : MonoBehaviour {
 
 	void Awake()
 	{
+		Debug.Log(Network.TestConnection());
+		if(Network.TestConnection() == ConnectionTesterStatus.Undetermined) {
+			Network.InitializeServer(32, 8000,false);
+		} 
 		if(Network.isServer) {
 			ball = (GameObject)Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);
 			ball.transform.name = "Ball";
-		
-			Game_Settings game_settings = GameObject.FindGameObjectWithTag("settings").GetComponent<Game_Settings>();
 			
-			for(int i = 0; i < game_settings.players.Count; i++) {
-				if(game_settings.players[i].team != 0) {
-					GameObject player = (GameObject)Network.Instantiate(player_prefab, game_settings.players[i].start_position, transform.rotation, 0);
-					
-					Kickoff_Player kp = (Kickoff_Player)player.GetComponent<Kickoff_Player>();
-					kp.InitializePlayerInfo(
-						game_settings.players[i].network_player, 
-						game_settings.players[i].team, 
-						game_settings.players[i].name, 
-						game_settings.players[i].start_position
-					);
+			GameObject settings =  GameObject.FindGameObjectWithTag("settings");
+			
+			if(settings == null) {
+				GameObject player = (GameObject)Network.Instantiate(player_prefab, new Vector3(-6.765259f, 0, 7.12416f), transform.rotation, 0);
+				Kickoff_Player kp = (Kickoff_Player)player.GetComponent<Kickoff_Player>();
+				kp.InitializePlayerInfo(Network.player, 1, "Test", new Vector3(-6.765259f, 0, 7.12416f));
+			} else {
+				Game_Settings game_settings = settings.GetComponent<Game_Settings>();
+				for(int i = 0; i < game_settings.players.Count; i++) {
+					if(game_settings.players[i].team != 0) {
+						GameObject player = (GameObject)Network.Instantiate(player_prefab, game_settings.players[i].start_position, transform.rotation, 0);
+						
+						Kickoff_Player kp = (Kickoff_Player)player.GetComponent<Kickoff_Player>();
+						kp.InitializePlayerInfo(
+							game_settings.players[i].network_player, 
+							game_settings.players[i].team, 
+							game_settings.players[i].name, 
+							game_settings.players[i].start_position
+						);
+					}
 				}
 			}
 		}
@@ -294,15 +303,8 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	void Start() 
 	{
-		settings = GameObject.FindGameObjectWithTag("settings");
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
 		gui_manager = guiManager.GetComponent<GUIManager>();
-
-		if(settings == null) {
-			settings = (GameObject)Instantiate(settings_prefab, new Vector3(0,0,0), settings_prefab.transform.rotation);
-			AddTestPlayers();
-			skiped_lobby = true;
-		}
 		
 		MovePlayersToStartPositions();
 	}
