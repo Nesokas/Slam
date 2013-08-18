@@ -26,13 +26,7 @@ public class Game_Behaviour : MonoBehaviour {
 	private List<GameObject> players_team_1 = new List<GameObject>();
 	private List<GameObject> players_team_2 = new List<GameObject>();
 	private GameObject ball;
-
-	private float players_distance = 1.5f;
-	private int gamepad_num = 1;
-	private bool keyboard_selected = false;
 	
-	private GameObject settings;
-	private Game_Settings game_settings;
 	private bool trigger_timer;
 	private bool finish_game = false;
 	public float timer_value;
@@ -59,6 +53,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public GameObject spawn_team_1;
 	public GameObject spawn_team_2;
+	public GameObject player_controller;
 	
 	private int spawn_team = 0;
 	
@@ -88,16 +83,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public void ReleasePlayers()
 	{
-		for(int i = 0; i < players_team_1.Count; i++) {
-			Kickoff_Player pb = players_team_1[i].GetComponent<Kickoff_Player>();
-			pb.EnableGotoCenter();
-		}
-		
-		for(int i = 0; i < players_team_2.Count; i++) {
-			Kickoff_Player pb = players_team_2[i].GetComponent<Kickoff_Player>();
-			pb.EnableGotoCenter();
-		}
-			
+		NotificationCenter.DefaultCenter.PostNotification(this, "EnableGotoCenter");	
 	}
 	
 	void StartGameAgain()
@@ -110,9 +96,7 @@ public class Game_Behaviour : MonoBehaviour {
 		if(winning_team == 0) {
 			MovePlayersToStartPositions();
 			trigger_timer = false;
-
 		} else {
-			
 			finish_game = true;
 			timer_value = 0f;
 			trigger_timer = true;
@@ -176,43 +160,44 @@ public class Game_Behaviour : MonoBehaviour {
 
 	string GetPlayer(int team, int position_in_team, Game_Settings game_settings)
 	{
-		if(team == 1)
-			return game_settings.players_team_1[position_in_team];
-		else
-			return game_settings.players_team_2[position_in_team];
+//		if(team == 1)
+//			return game_settings.players_team_1[position_in_team];
+//		else
+//			return game_settings.players_team_2[position_in_team];
+		return "";
 	}
 
 	void InstantiatePlayer(int team, Vector3 position, int team_position, Game_Settings game_settings) 
 	{
-		GameObject player = (GameObject)Instantiate(player_prefab, position, player_prefab.transform.rotation);
-		AddPlayerToTeam(team, player);
-
-		string player_name = GetPlayer(team, team_position, game_settings);
-		int player_num = System.Convert.ToInt32(GetPlayerNum(player_name));
-		Kickoff_Player player_component = player.GetComponent<Kickoff_Player>();
-		
-		player_component.Start();
-		player_component.InitializePlayerInfo(player_num, team, m_camera);
-		player_component.ChangeAnimation("Idle");
-		
-		player_component.DisableGotoCenter(scored_team);
+//		GameObject player = (GameObject)Instantiate(player_prefab, position, player_prefab.transform.rotation);
+//		AddPlayerToTeam(team, player);
+//
+//		string player_name = GetPlayer(team, team_position, game_settings);
+//		int player_num = System.Convert.ToInt32(GetPlayerNum(player_name));
+//		Kickoff_Player player_component = player.GetComponent<Kickoff_Player>();
+//		
+//		player_component.Start();
+//		player_component.InitializePlayerInfo(player_num, team, m_camera);
+//		player_component.ChangeAnimation("Idle");
+//		
+//		player_component.DisableGotoCenter(scored_team);
 
 	}
 	
 	void SpawnPlayer(int team, Vector3 pos)
 	{
-		GameObject player = (GameObject)Network.Instantiate(player_prefab, pos, player_prefab.transform.rotation, 0);
-		AddPlayerToTeam(team, player);
-
-		string player_name = "Player";
-		
-		Kickoff_Player player_component = player.GetComponent<Kickoff_Player>();
-		
-		player_component.Start();
-		player_component.InitializePlayerInfo(0, team, m_camera);
-		player_component.ChangeAnimation("Idle");
-		
-		player_component.DisableGotoCenter(scored_team);
+//		GameObject player = (GameObject)Network.Instantiate(player_prefab, pos, player_prefab.transform.rotation, 0);
+//		AddPlayerToTeam(team, player);
+//
+//		string player_name = "Player";
+//		
+//		Kickoff_Player player_component = player.GetComponent<Kickoff_Player>();
+//		
+//		player_component.Start();
+//		player_component.InitializePlayerInfo(0, team, m_camera);
+//		player_component.ChangeAnimation("Idle");
+//		
+//		player_component.DisableGotoCenter(scored_team);
 	}
 	
 	void OnServerInitialized()
@@ -253,79 +238,19 @@ public class Game_Behaviour : MonoBehaviour {
 		
 	void MovePlayersToStartPositions()
 	{
-		Vector3 position;
-		int i;
-		Vector3 odd_position;
-
-		gamepad_num = 1;
-		keyboard_selected = false;
-
-		DestroyAllPlayers();
-
-		ball.transform.position = ball_position;
-		ball.transform.rigidbody.velocity = Vector3.zero;
-		if (scored_team != 0) {
-			Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
-			bb.GameHasRestarted();
+		if(Network.isServer) {
+			ball.transform.position = ball_position;
+			ball.transform.rigidbody.velocity = Vector3.zero;
+			if (scored_team != 0) {
+				Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
+				bb.GameHasRestarted();
+			}
 		}
-
-		num_team_1_players = game_settings.players_team_1.Count;
-		num_team_2_players = game_settings.players_team_2.Count;
-
-//		if (IsOdd(num_team_1_players)) {
-//
-//			position = new Vector3(0, 0.1012379f, team_1_inicial_z_position);
-//
-//			for(i = 0; i < num_team_1_players; i++) {
-//				if(IsOdd(i)) {
-//					odd_position = new Vector3(-position.x, position.y, position.z);
-//					SpawnPlayer(1, odd_position, i, game_settings);
-//				} else {
-//					SpawnPlayer(1, position, i, game_settings);
-//					position.x += players_distance;
-//				}
-//			}
-//		} else {
-//
-//			position = new Vector3(0, 0.1012379f, team_1_inicial_z_position);
-//
-//			for(i = 0; i < num_team_1_players; i++) {
-//				if(IsOdd(i)) {
-//					odd_position = new Vector3(-position.x, position.y, position.z);
-//					SpawnPlayer(1, odd_position, i, game_settings);
-//				} else {
-//					position.x += players_distance;
-//					SpawnPlayer(1, position, i, game_settings);
-//				}
-//			}
-//		}
-//
-//		if (IsOdd(num_team_2_players)) {
-//
-//			position = new Vector3(0, 0.1012379f, team_2_inicial_z_position);
-//
-//			for(i = 0; i < num_team_2_players; i++) {
-//				if(IsOdd(i)) {
-//					odd_position = new Vector3(-position.x, position.y, position.z);
-//					SpawnPlayer(2, odd_position, i, game_settings);
-//				} else {
-//					SpawnPlayer(2, position, i, game_settings);
-//					position.x += players_distance;
-//				}
-//			}
-//		} else {
-//			position = new Vector3(0, 0.1012379f, team_2_inicial_z_position);
-//
-//			for(i = 0; i < num_team_2_players; i++) {
-//				if(IsOdd(i)) {
-//					odd_position = new Vector3(-position.x, position.y, position.z);
-//					SpawnPlayer(2, odd_position, i, game_settings);
-//				} else {
-//					position.x += players_distance;
-//					SpawnPlayer(2, position, i, game_settings);
-//				}
-//			}
-//		}
+		
+		Hashtable data = new Hashtable();
+		data["scored_team"] = scored_team;
+		NotificationCenter.DefaultCenter.PostNotification(this, "DisableGotoCenter", data);
+		NotificationCenter.DefaultCenter.PostNotification(this, "InitializePosition");
 	}
 	
 	// variable used for testing (so we don't need to go always to the lobby screen)
@@ -333,38 +258,60 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	void AddTestPlayers()
 	{
-		game_settings = settings.GetComponent<Game_Settings>();
-		game_settings.AddNewPlayer(1, "Player 0");
-		game_settings.AddNewPlayer(1, "Player 1");
-		game_settings.AddNewPlayer(2, "Player 2");
-		game_settings.AddNewPlayer(2, "Player 3");
+//		game_settings = settings.GetComponent<Game_Settings>();
+//		game_settings.AddNewPlayer(1, "Player 0");
+//		game_settings.AddNewPlayer(1, "Player 1");
+//		game_settings.AddNewPlayer(2, "Player 2");
+//		game_settings.AddNewPlayer(2, "Player 3");
 	}
 
 	void Awake()
 	{
-		ball = (GameObject)Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation);
-		ball.transform.name = "Ball";
+		Debug.Log(Network.TestConnection());
+		if(Network.TestConnection() == ConnectionTesterStatus.Undetermined) {
+			Network.InitializeServer(32, 8000,false);
+		} 
+		if(Network.isServer) {
+			ball = (GameObject)Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);
+			ball.transform.name = "Ball";
+			
+			GameObject settings =  GameObject.FindGameObjectWithTag("settings");
+			
+			if(settings == null) {
+				GameObject player = (GameObject)Network.Instantiate(player_prefab, new Vector3(0, 0, 7.12416f), transform.rotation, 0);
+				Kickoff_Player kp = (Kickoff_Player)player.GetComponent<Kickoff_Player>();
+				kp.InitializePlayerInfo(Network.player, 1, "Test", new Vector3(0, 0, 7.12416f));
+			} else {
+				Game_Settings game_settings = settings.GetComponent<Game_Settings>();
+				for(int i = 0; i < game_settings.players.Count; i++) {
+					if(game_settings.players[i].team != 0) {
+						GameObject player = (GameObject)Network.Instantiate(player_prefab, game_settings.players[i].start_position, transform.rotation, 0);
+						
+						Kickoff_Player kp = (Kickoff_Player)player.GetComponent<Kickoff_Player>();
+						kp.InitializePlayerInfo(
+							game_settings.players[i].network_player, 
+							game_settings.players[i].team, 
+							game_settings.players[i].name, 
+							game_settings.players[i].start_position
+						);
+					}
+				}
+			}
+		}
 		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
 	}
-	void Start () 
+	
+	void Start() 
 	{
-		settings = GameObject.FindGameObjectWithTag("settings");
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
 		gui_manager = guiManager.GetComponent<GUIManager>();
-
-		if(settings == null) {
-			settings = (GameObject)Instantiate(settings_prefab, new Vector3(0,0,0), settings_prefab.transform.rotation);
-			AddTestPlayers();
-			skiped_lobby = true;
-		} else {
-			game_settings = settings.GetComponent<Game_Settings>();
-		}
 		
 		MovePlayersToStartPositions();
 	}
 
 	// Update is called once per frame
 	void Update () {
+		
 		if(skiped_lobby) {
 			AddTestPlayers();
 			skiped_lobby = false;
@@ -377,14 +324,12 @@ public class Game_Behaviour : MonoBehaviour {
 				FinishGame();
 			else timer_value++;
 		}
-		if(is_celebrating) {
+		
+		if(is_celebrating)
 			team_scored_message_xpos += (Time.deltaTime * TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER);
-		}
 		
 		if (Input.GetKey(KeyCode.Escape))
-	    {
-	        Application.LoadLevel(1);
-	    }
+	        Application.LoadLevel(0);
 	}
 	
 	public int StopCelebration()

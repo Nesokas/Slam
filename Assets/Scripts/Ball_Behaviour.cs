@@ -66,6 +66,9 @@ public class Ball_Behaviour : MonoBehaviour {
 	{	
 		is_looking_somewhere = false;
 		
+		if (!networkView.isMine) {	
+			enabled = false;
+		}
 		if(Application.loadedLevelName == "Main_Game") {
 			GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 			GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");

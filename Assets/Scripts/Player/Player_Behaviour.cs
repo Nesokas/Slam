@@ -40,6 +40,8 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	protected bool is_adding_speed = false;
 	protected float animation_speed = 1f;
+	
+	protected PlayerController.Commands commands;
 
 
 	void VerifyShoot()
@@ -52,7 +54,7 @@ public class Player_Behaviour : MonoBehaviour {
 			Vector3 direction = ball.transform.position - transform.position;
 			direction.Normalize();
 
-			if((!gamepad && (Input.GetAxis("Shoot") != 0)) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num) != 0))){
+			if((!gamepad && commands.shoot != 0)){
 				ball_collider.rigidbody.velocity += direction * shootVelocity;
 				ball_collision = true;
 				colliding_with_ball = false;
@@ -91,13 +93,8 @@ public class Player_Behaviour : MonoBehaviour {
 	void IncreaseSpeed() 
 	{
 		if(move) {
-			if(gamepad){
-				direction.x = Input.GetAxis("Vertical_Gamepad_" + gamepad_num);
-				direction.z = Input.GetAxis("Horizontal_Gamepad_" + gamepad_num);
-			} else {
-				direction.x = Input.GetAxis("Vertical");
-				direction.z = Input.GetAxis("Horizontal");
-			}
+			direction.x = commands.vertical_direction;
+			direction.z = commands.horizontal_direction;
 			direction.Normalize();
 			
 			if(direction == Vector3.zero)
@@ -201,12 +198,12 @@ public class Player_Behaviour : MonoBehaviour {
 		if(player_base == null)
 			player_base = transform.Find("Base");
 
-		if(ball_collision && !((!gamepad && (Input.GetAxis("Shoot") != 0)) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num) != 0)))) {
+		if(ball_collision && commands.shoot == 0) {
 			ball_collision = false;
 		}
 		
 		if(move) {
-			if(!ball_collision && ((!gamepad && (Input.GetAxis("Shoot") != 0)) || (gamepad && (Input.GetAxis("Shoot_Gamepad_" + gamepad_num) != 0))))
+			if(!ball_collision && commands.shoot != 0)
 				player_base.renderer.material = shoot_material;
 			else
 				player_base.renderer.material = normal_material;
