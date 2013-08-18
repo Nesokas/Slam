@@ -157,72 +157,6 @@ public class Game_Behaviour : MonoBehaviour {
 		else
 			players_team_2.Add(player);
 	}
-
-	string GetPlayer(int team, int position_in_team, Game_Settings game_settings)
-	{
-//		if(team == 1)
-//			return game_settings.players_team_1[position_in_team];
-//		else
-//			return game_settings.players_team_2[position_in_team];
-		return "";
-	}
-
-	void InstantiatePlayer(int team, Vector3 position, int team_position, Game_Settings game_settings) 
-	{
-//		GameObject player = (GameObject)Instantiate(player_prefab, position, player_prefab.transform.rotation);
-//		AddPlayerToTeam(team, player);
-//
-//		string player_name = GetPlayer(team, team_position, game_settings);
-//		int player_num = System.Convert.ToInt32(GetPlayerNum(player_name));
-//		Kickoff_Player player_component = player.GetComponent<Kickoff_Player>();
-//		
-//		player_component.Start();
-//		player_component.InitializePlayerInfo(player_num, team, m_camera);
-//		player_component.ChangeAnimation("Idle");
-//		
-//		player_component.DisableGotoCenter(scored_team);
-
-	}
-	
-	void SpawnPlayer(int team, Vector3 pos)
-	{
-//		GameObject player = (GameObject)Network.Instantiate(player_prefab, pos, player_prefab.transform.rotation, 0);
-//		AddPlayerToTeam(team, player);
-//
-//		string player_name = "Player";
-//		
-//		Kickoff_Player player_component = player.GetComponent<Kickoff_Player>();
-//		
-//		player_component.Start();
-//		player_component.InitializePlayerInfo(0, team, m_camera);
-//		player_component.ChangeAnimation("Idle");
-//		
-//		player_component.DisableGotoCenter(scored_team);
-	}
-	
-	void OnServerInitialized()
-	{
-		Debug.Log("Server intitialized and ready");
-		if (spawn_team + 1 == 1)
-			SpawnPlayer(1, spawn_team_1.transform.position);
-		
-		else {
-			SpawnPlayer(2, spawn_team_2.transform.position);
-		}
-		
-	}
-
-	void OnConnectedToServer()
-	{
-		Debug.Log("Server intitialized and ready");
-		if (spawn_team + 1 == 1)
-			SpawnPlayer(1, spawn_team_1.transform.position);
-		
-		else {
-			SpawnPlayer(2, spawn_team_2.transform.position);
-		}
-		
-	}
 	
 	void OnPlayerDisconnected(NetworkPlayer player) 
 	{
@@ -252,23 +186,10 @@ public class Game_Behaviour : MonoBehaviour {
 		NotificationCenter.DefaultCenter.PostNotification(this, "DisableGotoCenter", data);
 		NotificationCenter.DefaultCenter.PostNotification(this, "InitializePosition");
 	}
-	
-	// variable used for testing (so we don't need to go always to the lobby screen)
-	private bool skiped_lobby = false;
-	
-	void AddTestPlayers()
-	{
-//		game_settings = settings.GetComponent<Game_Settings>();
-//		game_settings.AddNewPlayer(1, "Player 0");
-//		game_settings.AddNewPlayer(1, "Player 1");
-//		game_settings.AddNewPlayer(2, "Player 2");
-//		game_settings.AddNewPlayer(2, "Player 3");
-	}
 
 	void Awake()
 	{
 		if(Network.connections.Length == 0) {
-			Debug.Log(Network.TestConnection());
 			Network.InitializeServer(32, 8000,false);
 		} 
 		
@@ -311,12 +232,8 @@ public class Game_Behaviour : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
-		
-		if(skiped_lobby) {
-			AddTestPlayers();
-			skiped_lobby = false;
-		}
+	void Update () 
+	{
 		
 		if(trigger_timer){
 			if(timer_value > timer && !finish_game)
