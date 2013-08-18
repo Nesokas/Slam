@@ -92,21 +92,12 @@ public class Ball_Behaviour : MonoBehaviour {
 	{	
 		is_looking_somewhere = false;
 		
-<<<<<<< HEAD
-<<<<<<< HEAD
 		animationsType1 = new string[] {"look_left", "look_right"};
 		animationsType2 = new string[] {"Default"};
 		
-=======
 		if (!networkView.isMine) {	
 			enabled = false;
 		}
->>>>>>> 4819894bb1d3734b76e37484fa148b520f691afd
-=======
-		if (!networkView.isMine) {	
-			enabled = false;
-		}
->>>>>>> 4819894bb1d3734b76e37484fa148b520f691afd
 		if(Application.loadedLevelName == "Main_Game") {
 			GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 			GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
