@@ -4,6 +4,13 @@ using System.Collections;
 public class Ball_Behaviour : MonoBehaviour {
 	
 	private bool game_restarted = true;
+	private bool animation_finished = true;
+	private bool rolling_eyes = false;
+	
+	/*animations of type1 can be crossfaded to type2
+	 * such as look_left -> Default*/
+	string[] animationsType1;
+	string[] animationsType2;
 	
 	private GameObject last_player_touched;
 	
@@ -28,11 +35,14 @@ public class Ball_Behaviour : MonoBehaviour {
 			int random = Random.Range(0,100);
 			if(random <= 10) {
 				transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
-				StartCoroutine(LoopAnimation("Rolling_Eyes", "Tired", 1));
-			}
-			else {
-				animation.CrossFade("look_left", 0.5f);
-//				animation.CrossFade("Default", 1.5f);
+				if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
+					StopCoroutine("PlayAnimation");
+					animation.Stop();
+					rolling_eyes = true;
+					animation_finished = true;
+					StartCoroutine(LoopAnimation("Rolling_Eyes", "Tired", 1));
+				}
+				
 			}
 		}
 	}
@@ -40,9 +50,25 @@ public class Ball_Behaviour : MonoBehaviour {
 	IEnumerator LoopAnimation(string anim1, string anim2, int repeatNumber)
 	{
 		transform.animation.CrossFade(anim1, 0.3f);
-		Debug.Log(animation[anim1].length*repeatNumber);
 		yield return new WaitForSeconds(animation[anim1].length*0.35f);
-		animation.CrossFade(anim2, 1.5f);
+		transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
+		animation.CrossFade(anim2, 1f);
+		rolling_eyes = false;
+	}
+	
+	IEnumerator PlayAnimation(string[] animType1, string[] animType2, int repeatNumber)
+	{	
+		string animation1 = animType1[Random.Range(0, animType1.Length)];
+		string animation2 = animType2[0];
+		animation_finished = false;
+		animation[animation1].wrapMode = WrapMode.ClampForever;
+		transform.animation.CrossFade(animation1, 0.3f);
+		yield return new WaitForSeconds(animation[animation1].length*2.35f);
+		if (!rolling_eyes) {
+			animation.CrossFade(animation2, 0.2f);
+		}
+		animation_finished = true;
+//		animation[anim1].wrapMode = WrapMode.Default;
 	}
 	
 	public GameObject GetLastPlayerTouched()
@@ -66,6 +92,9 @@ public class Ball_Behaviour : MonoBehaviour {
 	{	
 		is_looking_somewhere = false;
 		
+		animationsType1 = new string[] {"look_left", "look_right"};
+		animationsType2 = new string[] {"Default"};
+		
 		if(Application.loadedLevelName == "Main_Game") {
 			GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 			GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
@@ -80,37 +109,28 @@ public class Ball_Behaviour : MonoBehaviour {
 		transform.animation["Rolling_Eyes"].speed = 7.5f;
 		animation["Rolling_Eyes"].layer=1;
 		animation["Blink"].AddMixingTransform( transform.Find("Armature_001") );
-//		animation["Blink"].AddMixingTransform( transform.Find("Armature_001/Bone") );
-//		animation["Blink"].AddMixingTransform( transform.Find("Bone") );
 		animation["Blink"].layer = 1;
 		animation["Tired"].layer = 1;
-//		animation["look_left"].AddMixingTransform(transform.Find("Armature/Bone_004"));
-//		animation["look_left"].wrapMode = WrapMode.ClampForever;
 		animation["Default"].layer = 10;
-//		animation["Default"].AddMixingTransform(transform.Find("Armature/Bone_004"));
+		animation_finished = true;
 	}
 	
 	void Update()
 	{
-//		if (is_looking_somewhere && Random.Range(0,50) == 0) {
-//			animation.Blend("Default",1f, 0.3f);
-//			is_looking_somewhere = false;
-//		}
-//		if(Random.Range(0,100) == 0) {
-//			int random = Random.Range(0,100);
-//			if(random <= 50) {
-//				animation.Blend("Tired", 1f, 0.7f);
-//				
-//			} else if (random <= 100 && animation["look_left"].enabled == false) {
-//				transform.animation.CrossFade("look_left", 0.2f);
-//				is_looking_somewhere = true;
-//			} else if (random <= 20) {
-//				transform.animation.Play("look_right");
-//				is_looking_somewhere = true;
-//			}
-//			else {
-//				transform.animation.CrossFade("Blink",0.1f);
-//			}
-//		}
+		if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
+			if (animation_finished == true) {
+				Debug.Log("FINISHED");
+				int rand = Random.Range(0, 100);
+				if (rand < 1) {
+					StartCoroutine(PlayAnimation(animationsType1, animationsType2, 1));
+				
+				}
+			} else {
+				Debug.Log("animation not finished");
+			}
+			if (Random.Range(0,100) == 0)
+				animation.Play("Blink");
+		}
+			
 	}
 }
