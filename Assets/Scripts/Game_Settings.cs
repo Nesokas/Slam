@@ -4,25 +4,30 @@ using System.Collections.Generic;
 
 public class Game_Settings : MonoBehaviour {
 	
-	public List<string> players_team_1;
-	public List<string> players_team_2;
+	public List<Player> players;
+	
+	public struct Player
+	{
+		public int team;
+		public string name;
+		public Vector3 start_position;
+		public NetworkPlayer network_player;
+	}
 
 	void Awake()
 	{
 		DontDestroyOnLoad (transform.gameObject);
+		players = new List<Player>();
 	}
 	
-	void Start()
+	public void AddPlayer(int team, string name, Vector3 start_position, NetworkPlayer network_player)
 	{
-		players_team_1 = new List<string>();
-		players_team_2 = new List<string>();
-	}
-	
-	public void AddNewPlayer(int team, string name)
-	{
-		if(team == 1)
-			players_team_1.Add(name);
-		else
-			players_team_2.Add(name);
+		Player player = new Player();
+		player.team = team;
+		player.name = name;
+		player.start_position = start_position;
+		player.network_player = network_player;
+		
+		players.Add(player);
 	}
 }
