@@ -267,10 +267,11 @@ public class Game_Behaviour : MonoBehaviour {
 
 	void Awake()
 	{
-		Debug.Log(Network.TestConnection());
-		if(Network.TestConnection() == ConnectionTesterStatus.Undetermined) {
+		if(Network.connections.Length == 0) {
+			Debug.Log(Network.TestConnection());
 			Network.InitializeServer(32, 8000,false);
 		} 
+		
 		if(Network.isServer) {
 			ball = (GameObject)Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);
 			ball.transform.name = "Ball";
