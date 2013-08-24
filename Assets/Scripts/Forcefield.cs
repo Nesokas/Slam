@@ -78,8 +78,9 @@ public class Forcefield : MonoBehaviour {
     {
 		if(!ball && GameObject.FindGameObjectWithTag("ball")) {
 			ball = GameObject.FindGameObjectWithTag("ball");
-	        //OnMouseHit();
-	        FadeMask();
+	        //OnMouseHit(); 
 		}
+		
+		FadeMask();
 	}
 }
