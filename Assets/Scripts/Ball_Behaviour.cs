@@ -32,9 +32,16 @@ public class Ball_Behaviour : MonoBehaviour {
 			networkView.RPC("CourtCollision", RPCMode.All, collider.contacts[0].point);
 		} else {
 			ReleasePlayers();
-			Debug.Log(collider.transform.tag);
-			if (collider.transform.tag == "court_walls") {
-				
+
+		}
+	}
+	
+	[RPC]
+	void CourtCollision(Vector3 point)
+	{
+		Forcefield forcefield = GameObject.FindGameObjectWithTag("forcefield").GetComponent<Forcefield>();
+		forcefield.BallCollition(point);
+						Debug.Log("wall hit");
 				int random = Random.Range(0,100);
 				if(random <= 10) {
 					transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
@@ -47,15 +54,6 @@ public class Ball_Behaviour : MonoBehaviour {
 					}
 					
 				}
-			}
-		}
-	}
-	
-	[RPC]
-	void CourtCollision(Vector3 point)
-	{
-		Forcefield forcefield = GameObject.FindGameObjectWithTag("forcefield").GetComponent<Forcefield>();
-		forcefield.BallCollition(point);
 	}
 	
 	IEnumerator LoopAnimation(string anim1, string anim2, int repeatNumber)
@@ -94,7 +92,6 @@ public class Ball_Behaviour : MonoBehaviour {
 		{
 			GameObject gbo = GameObject.FindGameObjectWithTag("GameController");
 			Game_Behaviour gb = gbo.GetComponent<Game_Behaviour>();
-			Debug.Log("Release Players");
 			gb.ReleasePlayers();
 			game_restarted = false;
 		}
@@ -134,7 +131,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	{
 		if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
 			if (animation_finished == true) {
-				Debug.Log("FINISHED");
+//				Debug.Log("FINISHED");
 				int rand = Random.Range(0, 1000);
 				if (rand < 1) {
 					animation.CrossFade("Tired", 0.1f);
@@ -142,7 +139,7 @@ public class Ball_Behaviour : MonoBehaviour {
 					StartCoroutine(PlayAnimation(animationsType1, animationsType2, 1));
 				}
 			} else {
-				Debug.Log("animation not finished");
+//				Debug.Log("animation not finished");
 			}
 			if (Random.Range(0,100) == 0)
 				animation.Play("Blink");
