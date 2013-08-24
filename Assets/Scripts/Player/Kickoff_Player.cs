@@ -109,10 +109,23 @@ public class Kickoff_Player : Player_Behaviour {
 		NotificationCenter.DefaultCenter.AddObserver(this, "InitializePosition");
 		NotificationCenter.DefaultCenter.AddObserver(this, "EnableGotoCenter");
 		NotificationCenter.DefaultCenter.AddObserver(this, "DisableGotoCenter");
+		NotificationCenter.DefaultCenter.AddObserver(this, "ChangeReaction");
+		NotificationCenter.DefaultCenter.AddObserver(this, "StopCelebration");
 		
 		center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 		center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
 		center_circle_right = GameObject.FindGameObjectWithTag("center-circle-right");
+	}
+	
+	void StopCelebration()
+	{
+		networkView.RPC("RPCStopCelebration", RPCMode.All);
+	}
+	
+	[RPC]
+	void RPCStopCelebration()
+	{
+		ChangeAnimation("Idle");
 	}
 	
 	new public void Start () {
@@ -147,6 +160,19 @@ public class Kickoff_Player : Player_Behaviour {
 		
 		networkView.RPC("AskCommands", RPCMode.All);
 		base.Update();
+	}
+	
+	void ChangeReaction(NotificationCenter.Notification notification)
+	{
+		if(team == (int)notification.data["team"]) {
+			networkView.RPC("RPCChangeReaction", RPCMode.All, (string)notification.data["reaction"]);
+		}
+	}
+				
+	[RPC]
+	void RPCChangeReaction(string reaction)
+	{
+		ChangeAnimation(reaction);
 	}
 	
 	[RPC] 

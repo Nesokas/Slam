@@ -138,10 +138,10 @@ public class Player_Behaviour : MonoBehaviour {
 				animation.Play("Idle");
 				break;
 			case "Celebrate":
-				animation.Play("Celebrate");
+				animation.CrossFade("Celebrate", 0.3f);
 				break;
 			case "Sad":
-				animation.Play("Sad");
+				animation.CrossFade("Sad", 0.3f);
 				break;
 		}
 	}

@@ -28,23 +28,34 @@ public class Ball_Behaviour : MonoBehaviour {
 	
 	void OnCollisionEnter(Collision collider)
 	{
-		ReleasePlayers();
-		Debug.Log(collider.transform.tag);
-		if (collider.transform.tag == "court_walls") {
-			
-			int random = Random.Range(0,100);
-			if(random <= 10) {
-				transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
-				if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
-					StopCoroutine("PlayAnimation");
-					animation.Stop();
-					rolling_eyes = true;
-					animation_finished = true;
-					StartCoroutine(LoopAnimation("Rolling_Eyes", "Tired", 1));
-				}
+		if(collider.gameObject.tag == "forcefield") {
+			networkView.RPC("CourtCollision", RPCMode.All, collider.contacts[0].point);
+		} else {
+			ReleasePlayers();
+			Debug.Log(collider.transform.tag);
+			if (collider.transform.tag == "court_walls") {
 				
+				int random = Random.Range(0,100);
+				if(random <= 10) {
+					transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
+					if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
+						StopCoroutine("PlayAnimation");
+						animation.Stop();
+						rolling_eyes = true;
+						animation_finished = true;
+						StartCoroutine(LoopAnimation("Rolling_Eyes", "Tired", 1));
+					}
+					
+				}
 			}
 		}
+	}
+	
+	[RPC]
+	void CourtCollision(Vector3 point)
+	{
+		Forcefield forcefield = GameObject.FindGameObjectWithTag("forcefield").GetComponent<Forcefield>();
+		forcefield.BallCollition(point);
 	}
 	
 	IEnumerator LoopAnimation(string anim1, string anim2, int repeatNumber)

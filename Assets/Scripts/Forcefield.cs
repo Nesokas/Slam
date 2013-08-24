@@ -53,13 +53,10 @@ public class Forcefield : MonoBehaviour {
         UpdateMask(hitPoint);      
     }
 	
-	void OnCollisionEnter(Collision collision)
+	public void BallCollition(Vector3 point)
 	{
-		if(collision.gameObject.name == "Ball") {
-			ContactPoint contact = collision.contacts[0];
-			UpdateMask(contact.point);
-			AudioSource.PlayClipAtPoint(wall_sound, contact.point, 0.3f);
-		}
+		UpdateMask(point);
+		AudioSource.PlayClipAtPoint(wall_sound, point, 0.3f);	
 	}
 
     void OnMouseHit()
@@ -79,7 +76,10 @@ public class Forcefield : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        //OnMouseHit();
-        FadeMask();
+		if(!ball && GameObject.FindGameObjectWithTag("ball")) {
+			ball = GameObject.FindGameObjectWithTag("ball");
+	        //OnMouseHit();
+	        FadeMask();
+		}
 	}
 }

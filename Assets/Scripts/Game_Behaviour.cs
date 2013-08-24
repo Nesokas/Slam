@@ -44,7 +44,6 @@ public class Game_Behaviour : MonoBehaviour {
 	private int team_celebrating;
 	public AudioClip goal_cheer;
 	
-	private bool is_goal = false;
 	private int team_scored = 0;
 	private float DEFAULT_TEAM_SCORED_MESSAGE_XPOS = -400f;
 	private float TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER = 400f;
@@ -55,13 +54,8 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject spawn_team_2;
 	public GameObject player_controller;
 	
-	private int spawn_team = 0;
-	
 	public void ScoreTeam(int team)
-	{
-		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
-		Crowd team_2_crowd = crowd_team_2.GetComponent<Crowd>();
-		
+	{		
 		if(team == 1) {
 			TeamReaction(1, "Celebrate");
 			TeamReaction(2, "Sad");
@@ -117,16 +111,12 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	void TeamReaction(int team, string reaction)
 	{
-		List<GameObject> players_team;
-		if(team == 1)
-			players_team = players_team_1;
-		else
-			players_team = players_team_2;
+	
+		Hashtable data = new Hashtable();
+		data["team"] = team;
+		data["reaction"] = reaction;
 		
-		for(int i = 0; i < players_team.Count; i++) {
-			Player_Behaviour player_behaviour = players_team[i].GetComponent<Player_Behaviour>();
-			player_behaviour.ChangeAnimation(reaction);
-		}
+		NotificationCenter.DefaultCenter.PostNotification(this, "ChangeReaction", data);
 	}
 
 	bool IsOdd(int num)
