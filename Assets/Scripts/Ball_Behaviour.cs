@@ -104,7 +104,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	{	
 		is_looking_somewhere = false;
 		
-		animationsType1 = new string[] {"look_left", "look_right"};
+		animationsType1 = new string[] {"look_left", "look_right", "look_up", "look_down"};
 		animationsType2 = new string[] {"Default"};
 		
 		if (!networkView.isMine) {	
@@ -135,10 +135,11 @@ public class Ball_Behaviour : MonoBehaviour {
 		if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
 			if (animation_finished == true) {
 				Debug.Log("FINISHED");
-				int rand = Random.Range(0, 100);
+				int rand = Random.Range(0, 1000);
 				if (rand < 1) {
+					animation.CrossFade("Tired", 0.1f);
+				} else if (rand < 10) {
 					StartCoroutine(PlayAnimation(animationsType1, animationsType2, 1));
-				
 				}
 			} else {
 				Debug.Log("animation not finished");
