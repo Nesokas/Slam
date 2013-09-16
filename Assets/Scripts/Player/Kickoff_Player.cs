@@ -9,13 +9,13 @@ public class Kickoff_Player : Player_Behaviour {
 	public Material normal_team_2_material;
 	public Material shoot_team_2_material;
 	
-	private GameObject center_circle_left;
-	private GameObject center_circle_right;
-	private GameObject[] center_planes;
+	protected GameObject center_circle_left;
+	protected GameObject center_circle_right;
+	protected GameObject[] center_planes;
 	
-	private Vector3 initial_position;
-	private NetworkPlayer owner;
-	private GameObject controller_object;
+	protected Vector3 initial_position;
+	protected NetworkPlayer owner;
+	protected GameObject controller_object;
 	
 	/* Only one team should kickoff, the other cannot go through the midfield circle or opposing side */
 	public void DisableGotoCenter(NotificationCenter.Notification notification)
@@ -82,26 +82,6 @@ public class Kickoff_Player : Player_Behaviour {
 		Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
 	}
 	
-	public void InitializePlayerInfo(NetworkPlayer network_player, int team_num, string player_name, Vector3 position)
-	{
-		networkView.RPC("TellInfoToPlayers", RPCMode.All, team_num, player_name, position, network_player);
-	}
-	
-	[RPC]
-	void TellInfoToPlayers(int team_num, string name, Vector3 position, NetworkPlayer network_player)
-	{
-		team = team_num;
-		
-		owner = network_player;
-		Player_Name name_component = transform.Find("Player_name").transform.GetComponent<Player_Name>();
-		name_component.m_camera = (Camera)GameObject.FindGameObjectWithTag("MainCamera").camera;
-		name_component.ChangeName(name);
-		
-		animation.Play("Idle");
-		initial_position = position;
-		controller_object = GameObject.FindGameObjectWithTag("PlayerController");
-	}
-	
 	public void Awake() 
 	{
 		Debug.Log("START PLAYER");
@@ -117,23 +97,8 @@ public class Kickoff_Player : Player_Behaviour {
 		center_circle_right = GameObject.FindGameObjectWithTag("center-circle-right");
 	}
 	
-	void StopCelebration()
-	{
-		networkView.RPC("RPCStopCelebration", RPCMode.All);
-	}
-	
-	[RPC]
-	void RPCStopCelebration()
-	{
-		ChangeAnimation("Idle");
-	}
-	
 	new public void Start () {
 		base.Start();
-		
-		if (!networkView.isMine) {	
-			enabled = false;
-		}
 				
 		if(team == 1) {
 			normal_material = normal_team_1_material;
@@ -148,60 +113,6 @@ public class Kickoff_Player : Player_Behaviour {
 	void InitializePosition()
 	{
 		transform.position = initial_position;
-	}
-	
-	new void Update()
-	{
-		if(!ball_collision && commands.shoot != 0) {
-			networkView.RPC("UpdateMaterial", RPCMode.All, true);
-		} else {
-			networkView.RPC("UpdateMaterial", RPCMode.All, false);
-		}
-		
-		networkView.RPC("AskCommands", RPCMode.All);
-		base.Update();
-	}
-	
-	void ChangeReaction(NotificationCenter.Notification notification)
-	{
-		if(team == (int)notification.data["team"]) {
-			networkView.RPC("RPCChangeReaction", RPCMode.All, (string)notification.data["reaction"]);
-		}
-	}
-				
-	[RPC]
-	void RPCChangeReaction(string reaction)
-	{
-		ChangeAnimation(reaction);
-	}
-	
-	[RPC] 
-	void UpdateMaterial(bool shoot)
-	{
-		if (shoot)
-			player_base.renderer.material = shoot_material;
-		else
-			player_base.renderer.material = normal_material;
-	}
-	
-	[RPC]
-	void AskCommands()
-	{
-		if(Network.player == owner) {
-			PlayerController player_controller = controller_object.GetComponent<PlayerController>();
-			commands = player_controller.GetCommands();
-			networkView.RPC("UpdateCommands", RPCMode.All, commands.horizontal_direction, commands.vertical_direction, commands.shoot, Network.player);
-		}
-	}
-	
-	[RPC]
-	void UpdateCommands(float horizontal, float vertical, float shoot, NetworkPlayer network_player)
-	{	
-		if(network_player == owner && Network.isServer) {
-			commands.horizontal_direction = horizontal;
-			commands.vertical_direction = vertical;
-			commands.shoot = shoot;
-		}
 	}
 	
 }

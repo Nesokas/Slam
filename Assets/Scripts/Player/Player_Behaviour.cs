@@ -22,6 +22,8 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	public Material normal_team_1_material;
 	public Material shoot_team_1_material;
+	
+	public GameObject player_controller_prefab;
 
 	protected Vector3 direction = Vector3.zero;
 	protected bool ball_collision = false;

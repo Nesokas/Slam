@@ -3,6 +3,12 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 	
+	public const int KEYBOARD = 0;
+	public const int JOYSTICK_1 = 1;
+	public const int JOYSTICK_2 = 2;
+	public const int JOYSTICK_3 = 3;
+	public const int JOYSTICK_4 = 4;
+	
 	public struct Commands 
 	{
 		public float vertical_direction;
@@ -11,6 +17,7 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	public Commands commands;
+	public int input_num;
 	
 	// Use this for initialization
 	void Awake () 
@@ -24,13 +31,24 @@ public class PlayerController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		commands.vertical_direction = Input.GetAxis("Vertical");
-		commands.horizontal_direction = Input.GetAxis("Horizontal");
-		commands.shoot = Input.GetAxis("Shoot");
+		if(input_num == KEYBOARD) {
+			commands.vertical_direction = Input.GetAxis("Vertical");
+			commands.horizontal_direction = Input.GetAxis("Horizontal");
+			commands.shoot = Input.GetAxis("Shoot");
+		} else {
+			commands.vertical_direction = Input.GetAxis("Vertical_Gamepad_" + input_num);
+			commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num);
+			commands.shoot = Input.GetAxis("Shoot_Gamepad_" + input_num);
+		}
 	}
 	
 	public Commands GetCommands()
 	{
 		return commands;
+	}
+	
+	public void setInputNum(int number)
+	{
+		input_num = number;
 	}
 }

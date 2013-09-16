@@ -3,18 +3,18 @@ using System.Collections;
 
 public class Ball_Behaviour : MonoBehaviour {
 	
-	private bool game_restarted = true;
-	private bool animation_finished = true;
-	private bool rolling_eyes = false;
+	protected bool game_restarted = true;
+	protected bool animation_finished = true;
+	protected bool rolling_eyes = false;
 	
 	/*animations of type1 can be crossfaded to type2
 	 * such as look_left -> Default*/
 	string[] animationsType1;
 	string[] animationsType2;
 	
-	private GameObject last_player_touched;
+	protected GameObject last_player_touched;
 	
-	private bool is_looking_somewhere;
+	protected bool is_looking_somewhere;
 	
 	public void GameHasRestarted()
 	{
@@ -26,37 +26,7 @@ public class Ball_Behaviour : MonoBehaviour {
 		last_player_touched = collider.gameObject;
 	}
 	
-	void OnCollisionEnter(Collision collider)
-	{
-		if(collider.gameObject.tag == "forcefield") {
-			networkView.RPC("CourtCollision", RPCMode.All, collider.contacts[0].point);
-		} else {
-			ReleasePlayers();
-
-		}
-	}
-	
-	[RPC]
-	void CourtCollision(Vector3 point)
-	{
-		Forcefield forcefield = GameObject.FindGameObjectWithTag("forcefield").GetComponent<Forcefield>();
-		forcefield.BallCollition(point);
-						Debug.Log("wall hit");
-				int random = Random.Range(0,100);
-				if(random <= 10) {
-					transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
-					if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
-						StopCoroutine("PlayAnimation");
-						animation.Stop();
-						rolling_eyes = true;
-						animation_finished = true;
-						StartCoroutine(LoopAnimation("Rolling_Eyes", "Tired", 1));
-					}
-					
-				}
-	}
-	
-	IEnumerator LoopAnimation(string anim1, string anim2, int repeatNumber)
+	protected IEnumerator LoopAnimation(string anim1, string anim2, int repeatNumber)
 	{
 		transform.animation.CrossFade(anim1, 0.3f);
 		yield return new WaitForSeconds(animation[anim1].length*0.35f);
@@ -66,7 +36,7 @@ public class Ball_Behaviour : MonoBehaviour {
 		rolling_eyes = false;
 	}
 	
-	IEnumerator PlayAnimation(string[] animType1, string[] animType2, int repeatNumber)
+	protected IEnumerator PlayAnimation(string[] animType1, string[] animType2, int repeatNumber)
 	{	
 		string animation1 = animType1[Random.Range(0, animType1.Length)];
 		string animation2 = animType2[0];
@@ -97,16 +67,13 @@ public class Ball_Behaviour : MonoBehaviour {
 		}
 	}
 
-	void Start () 
+	protected void Start () 
 	{	
 		is_looking_somewhere = false;
 		
 		animationsType1 = new string[] {"look_left", "look_right", "look_up", "look_down"};
 		animationsType2 = new string[] {"Default"};
 		
-		if (!networkView.isMine) {	
-			enabled = false;
-		}
 		if(Application.loadedLevelName == "Main_Game") {
 			GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 			GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
@@ -127,7 +94,7 @@ public class Ball_Behaviour : MonoBehaviour {
 		animation_finished = true;
 	}
 	
-	void Update()
+	protected void Update()
 	{
 		if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
 			if (animation_finished == true) {

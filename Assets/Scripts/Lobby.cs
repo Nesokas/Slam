@@ -6,11 +6,21 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 public class Lobby : MonoBehaviour {
-
+	
+	/************ CONSTANTS *****************/
+	
 	private const int INITIAL_SCREEN = 1;
-	private const int CREATE_SERVER = 2;
-	private const int JOIN_SERVER = 3;
-	private const int LOBBY = 4;
+	private const int NETWORK_GAME = 2;
+	private const int LOCAL_GAME = 3;
+	private const int CREATE_SERVER = 4;
+	private const int JOIN_SERVER = 5;
+	private const int LOBBY_NETWORK = 6;
+	private const int LOBBY_LOCAL = 7;
+	
+	private const int LOCAL = 1;
+	private const int NETWORK = 2;
+	
+	/**************************************/
 	
 	private string player_name = "";
 	private string ip = "127.0.0.1";
@@ -54,7 +64,14 @@ public class Lobby : MonoBehaviour {
 		public NetworkPlayer network_player;
 	}
 	
+	private struct Player_Local
+	{
+		public Player player;
+		public int controller;
+	}
+	
 	private List<Player> players;
+	private List<Player_Local> local_players;
 	private List<ServerPlayer> server_players;
 	
 	// Use this for initialization
@@ -63,6 +80,7 @@ public class Lobby : MonoBehaviour {
 		state = INITIAL_SCREEN;
 		players = new List<Player>();
 		server_players = new List<ServerPlayer>();
+		local_players = new List<Player_Local>();
 		
 		w = 300;
 		h = 200;
@@ -106,7 +124,7 @@ public class Lobby : MonoBehaviour {
 		server_players.Add(server_player);
 	}
 
-	void InitialScreen ()
+	void NetworkGame ()
 	{
 		label.x = initial_box.x + w*0.03f;
 		label.y = initial_box.y + h*0.33f;
@@ -115,18 +133,25 @@ public class Lobby : MonoBehaviour {
 		nickname_field.y = initial_box.y + h*0.33f;
 		player_name = GUI.TextField(nickname_field, player_name);
 		if(GUI.Button(new Rect(initial_box.x + w*0.1f, 
-							   initial_box.y + h*0.71f,
+							   initial_box.y + h*0.6f,
 							   buttons_width,
 						       buttons_height),
 		              "New Server")) {
 			state = CREATE_SERVER;
 		}
 		if(GUI.Button(new Rect(initial_box.x + w*0.9f - buttons_width, 
-							   initial_box.y + h*0.71f,
+							   initial_box.y + h*0.6f,
 							   buttons_width,
 						       buttons_height),
 		              "Connect")) {
 			state = JOIN_SERVER;
+		}
+		if(GUI.Button(new Rect(initial_box.x + initial_box.width/2 - buttons_width/2, 
+							   initial_box.y + h*0.8f,
+							   buttons_width,
+						       buttons_height),
+		              "Back")) {
+			state = INITIAL_SCREEN;
 		}
 	}
 
@@ -156,7 +181,7 @@ public class Lobby : MonoBehaviour {
 				connect_pressed = true;
 			} else {
 				Network.InitializeServer(32, int.Parse(port),false);
-				state = LOBBY;
+				state = LOBBY_NETWORK;
 				AddPlayer(Network.player, player_name);
 			}
 		}
@@ -200,7 +225,7 @@ public class Lobby : MonoBehaviour {
 				connect_pressed = true;
 			} else {
 				Network.Connect(ip, int.Parse(port));
-				state = LOBBY;
+				state = LOBBY_NETWORK;
 			}
 		}
 		if(connect_pressed){
@@ -210,16 +235,8 @@ public class Lobby : MonoBehaviour {
 		}
 	}
 	
-	void LobbyScreen()
+	void LobbyNetwork(Vector2 team_0, Vector2 team_1, Vector2 team_2)
 	{
-		GUI.Box(new Rect(10, 10, Screen.width-20, Screen.height-20), "Lobby"); 
-		GUI.Box(new Rect(Screen.width/4 - Screen.width/6, 40, Screen.width/4, Screen.height-60), "Team 1");
-		GUI.Box(new Rect(3*Screen.width/4 - Screen.width/12, 40, Screen.width/4, Screen.height-60), "Team 2");
-		
-		Vector2 team_0 = new Vector2(Screen.width/2,Screen.height/6);
-		Vector2 team_1 = new Vector2(Screen.width/6 + Screen.width/25,Screen.height/6);
-		Vector2 team_2 = new Vector2(5*Screen.width/6 - Screen.width/25,Screen.height/6);
-		
 		int num_players;
 		if(Network.isServer)
 			num_players = server_players.Count;
@@ -256,9 +273,9 @@ public class Lobby : MonoBehaviour {
 				if(player.team != 1) {
 					if(GUI.Button(new Rect(position.x - 55, position.y + 5, 20, 20), "<")) {
 						if (player.team == 0) {
-							ChangeTeamPlayer(i, 1);
+							ChangeTeamPlayer(NETWORK, i, 1);
 						} else {
-							ChangeTeamPlayer(i, 0);
+							ChangeTeamPlayer(NETWORK, i, 0);
 						}
 					}
 				}
@@ -266,9 +283,9 @@ public class Lobby : MonoBehaviour {
 				if(player.team != 2){
 					if(GUI.Button(new Rect(position.x + 35, position.y + 5, 20, 20), ">")) {
 						if (player.team == 0) {
-							ChangeTeamPlayer(i, 2);
+							ChangeTeamPlayer(NETWORK, i, 2);
 						} else {
-							ChangeTeamPlayer(i, 0);
+							ChangeTeamPlayer(NETWORK, i, 0);
 						}
 					}
 				}
@@ -277,7 +294,7 @@ public class Lobby : MonoBehaviour {
 		
 		if(Network.isServer) {
 			if(GUI.Button(new Rect(Screen.width/2 - 85, 6*Screen.height/7, 80, 25), "Start")){
-				StartGame();
+				StartNetworkGame();
 			}
 			if(GUI.Button(new Rect(Screen.width/2 + 5, 6*Screen.height/7, 80, 25), "Disconnect")){
 				Network.Disconnect();
@@ -288,6 +305,183 @@ public class Lobby : MonoBehaviour {
 				Network.Disconnect();
 			}
 		}
+	}
+	
+	void ChangePlayerName(string new_name, int i)
+	{
+		Player_Local temp_local_player = local_players[i];
+		temp_local_player.player.name = new_name;
+		local_players[i] = temp_local_player;
+	}
+	
+	void LobbyLocal(Vector2 team_0, Vector2 team_1, Vector2 team_2)
+	{
+		/********************** For the keyboard player **********************/
+		
+		Player_Local local_player = local_players[0];
+		Vector2 position = new Vector2(0,0);
+			
+		switch(local_player.player.team){
+		case 0:
+			position = team_0;
+			team_0.y += 35;
+			break;
+		case 1:
+			position = team_1;
+			team_1.y += 35;
+			break;
+		case 2:
+			position = team_2;
+			team_2.y += 35;
+			break;
+		}
+		
+		string new_name = GUI.TextField(new Rect(position.x - 30, position.y, 60, 30), local_player.player.name, 7);
+		
+		ChangePlayerName(new_name, 0);
+		
+		if(local_player.player.team != 1) {
+			if(GUI.Button(new Rect(position.x - 55, position.y + 5, 20, 20), "<")) {
+				if (local_player.player.team == 0) {
+					ChangeTeamPlayer(LOCAL, 0, 1);
+				} else {
+					ChangeTeamPlayer(LOCAL, 0, 0);
+				}
+			}
+		}
+		
+		if(local_player.player.team != 2){
+			if(GUI.Button(new Rect(position.x + 35, position.y + 5, 20, 20), ">")) {
+				if (local_player.player.team == 0) {
+					ChangeTeamPlayer(LOCAL, 0, 2);
+				} else {
+					ChangeTeamPlayer(LOCAL, 0, 0);
+				}
+			}
+		}
+		
+		/******************************************************************/
+		
+		for(int i = 1; i < local_players.Count; i++){
+			local_player = local_players[i];
+			position = new Vector2(0,0);
+				
+			switch(local_player.player.team){
+			case 0:
+				position = team_0;
+				team_0.y += 35;
+				break;
+			case 1:
+				position = team_1;
+				team_1.y += 35;
+				break;
+			case 2:
+				position = team_2;
+				team_2.y += 35;
+				break;
+			}
+			
+			new_name = GUI.TextField(new Rect(position.x - 30, position.y, 60, 30), local_player.player.name, 7);
+			
+			ChangePlayerName(new_name, i);
+				
+			if(local_player.player.team != 1) {
+				if(GUI.Button(new Rect(position.x - 55, position.y + 5, 20, 20), "<")) {
+					if (local_player.player.team == 0) {
+						ChangeTeamPlayer(LOCAL, i, 1);
+					} else {
+						ChangeTeamPlayer(LOCAL, i, 0);
+					}
+				}
+			}
+			
+			if(local_player.player.team != 2){
+				if(GUI.Button(new Rect(position.x + 35, position.y + 5, 20, 20), ">")) {
+					if (local_player.player.team == 0) {
+						ChangeTeamPlayer(LOCAL, i, 2);
+					} else {
+						ChangeTeamPlayer(LOCAL, i, 0);
+					}
+				}
+			}
+		}
+		
+		if(local_players.Count < Input.GetJoystickNames().Length + 1) {
+			for(int i = local_players.Count, j = local_players.Count - 1; i < Input.GetJoystickNames().Length + 1; i++, j++) {
+				Player_Local player_local = new Player_Local();
+				player_local.controller = i;
+				player_local.player.name = Input.GetJoystickNames()[j];
+				player_local.player.team = 0;
+				
+				local_players.Add(player_local);
+			}
+		} else if(local_players.Count > Input.GetJoystickNames().Length + 1) {
+			for(int i = 1, j = 0; i < Input.GetJoystickNames().Length; i++, j++) {
+				Player_Local player_local = new Player_Local();
+				player_local.controller = i;
+				player_local.player.name = Input.GetJoystickNames()[j];
+				player_local.player.team = 0;
+				
+				local_players[i] = player_local;
+			}
+			for(int i = Input.GetJoystickNames().Length + 1; i < local_players.Count; i++)
+				local_players.RemoveAt(i);
+		}
+
+		if(GUI.Button(new Rect(Screen.width/2 - 85, 6*Screen.height/7, 80, 25), "Start")){
+			StartLocalGame();
+		}
+		if(GUI.Button(new Rect(Screen.width/2 + 5, 6*Screen.height/7, 80, 25), "Back")){
+			state = INITIAL_SCREEN;
+		}
+	}
+
+	void StartLocalGame ()
+	{
+		int players_team_0 = 0;
+		int players_team_1 = 0;
+		int players_team_2 = 0;
+		
+		for (int i = 0; i < local_players.Count; i++) {
+			if(local_players[i].player.team == 0)
+				players_team_0++;
+			else if (local_players[i].player.team == 1)
+				players_team_1++;
+			else
+				players_team_2++;
+		}
+		
+		float court_lenght = court_start_position_team_1.transform.position.x*(-2);
+		float distance_team_1 = court_lenght/(players_team_1+1);
+		float distance_team_2 = court_lenght/(players_team_2+1);
+		
+		GameObject settings = (GameObject)Instantiate(settings_prefab);
+		Game_Settings game_settings = settings.GetComponent<Game_Settings>();
+	
+		for(int i = 0; i < local_players.Count; i++) {
+			Vector3 start_position = new Vector3(0,0,0);
+			Player player = local_players[i].player;
+			
+			if(player.team == 1) {
+				start_position = court_start_position_team_1.transform.position;
+				Debug.Log(start_position);
+				start_position.x = start_position.x + distance_team_1*players_team_1;
+				Debug.Log(distance_team_1*players_team_1);
+				Debug.Log(start_position);
+				players_team_1--;
+			} else if(player.team == 2) {
+				start_position = court_start_position_team_2.transform.position;
+				Debug.Log(start_position);
+				start_position.x = start_position.x + distance_team_2*players_team_2;
+				Debug.Log(distance_team_2*players_team_2);
+				Debug.Log(start_position);
+				players_team_2--;
+			}
+			Debug.Log("---------------------------" + player.name);
+			game_settings.AddLocalPlayer(player.team, player.name, start_position, local_players[i].controller);
+		}
+		game_settings.local_game = true;
+		Application.LoadLevel("Main_Game");
 	}
 	
 	void OnPlayerConnected(NetworkPlayer player) {
@@ -340,16 +534,28 @@ public class Lobby : MonoBehaviour {
 		return (List<Player>)bf.Deserialize(ins);
 	}
 	
-	void ChangeTeamPlayer(int i, int team) 
+	void ChangeTeamPlayer(int type, int i, int team) 
 	{
-		Player player = server_players[i].player;
+		Player player;
+		
+		if(type == NETWORK){
+			player = server_players[i].player;
+		} else {
+			player = local_players[i].player;
+		}
 		player.team = team;
 		
-		ServerPlayer server_player = server_players[i];
-		server_player.player = player;
-		server_players[i] = server_player;
-		string data = SerializePlayers();
-		networkView.RPC("UpdatePlayers", RPCMode.Others, data);
+		if(type == NETWORK) {
+			ServerPlayer server_player = server_players[i];
+			server_player.player = player;
+			server_players[i] = server_player;
+			string data = SerializePlayers();
+			networkView.RPC("UpdatePlayers", RPCMode.Others, data);
+		} else {
+			Player_Local local_player = local_players[i];
+			local_player.player = player;
+			local_players[i] = local_player;
+		}
 	}
 	
 	
@@ -375,29 +581,68 @@ public class Lobby : MonoBehaviour {
 		players = new_players;
 	}
 	
-	void OnGUI()
+	void InitialScreen()
 	{
-		if(state != LOBBY) {
-			GUI.Box(initial_box, "Welcome");
+		if(GUI.Button(new Rect(Screen.width/2 - 50, Screen.height/2 - 30, 100, 25), "Local Game")){
+			if(local_players.Count != 0)
+				local_players = new List<Player_Local>();
 			
-			switch(state)
-			{
-			case INITIAL_SCREEN:
-				InitialScreen ();
-				break;
-			case CREATE_SERVER:
-				CreateServer ();
-				break;
-			case JOIN_SERVER:
-				JoinServer ();
-				break;
-			}
-		} else {
-			LobbyScreen();
+			Player_Local player_local = new Player_Local();
+			player_local.controller = 0;
+			player_local.player.team = 0;
+			player_local.player.name = "Keyboard";
+			
+			local_players.Add(player_local);
+			
+			state = LOBBY_LOCAL;
+		}
+		if(GUI.Button(new Rect(Screen.width/2 - 50, Screen.height/2 + 30, 100, 25), "Network Game")){
+			state = NETWORK_GAME;
 		}
 	}
 	
-	void StartGame()
+	void OnGUI()
+	{
+		if(state != LOBBY_NETWORK && state != LOBBY_LOCAL) {
+			GUI.Box(initial_box, "Welcome");
+			
+			switch(state) {
+				case INITIAL_SCREEN:
+					InitialScreen();
+					break;
+				case NETWORK_GAME:
+					NetworkGame();
+					break;
+				case CREATE_SERVER:
+					CreateServer ();
+					break;
+				case JOIN_SERVER:
+					JoinServer ();
+					break;
+			}
+			
+		} else {
+			
+			GUI.Box(new Rect(10, 10, Screen.width-20, Screen.height-20), "Lobby"); 
+			GUI.Box(new Rect(Screen.width/4 - Screen.width/6, 40, Screen.width/4, Screen.height-60), "Team 1");
+			GUI.Box(new Rect(3*Screen.width/4 - Screen.width/12, 40, Screen.width/4, Screen.height-60), "Team 2");
+			
+			Vector2 team_0 = new Vector2(Screen.width/2,Screen.height/6);
+			Vector2 team_1 = new Vector2(Screen.width/6 + Screen.width/25,Screen.height/6);
+			Vector2 team_2 = new Vector2(5*Screen.width/6 - Screen.width/25,Screen.height/6);
+			
+			switch(state) {
+				case LOBBY_NETWORK:
+					LobbyNetwork(team_0, team_1, team_2);
+					break;
+				case LOBBY_LOCAL:
+					LobbyLocal(team_0, team_1, team_2);
+					break;
+			}
+		}
+	}
+	
+	void StartNetworkGame()
 	{
 		int players_team_0 = 0;
 		int players_team_1 = 0;
@@ -439,8 +684,9 @@ public class Lobby : MonoBehaviour {
 				players_team_2--;
 			}
 			
-			game_settings.AddPlayer(player.team, player.name, start_position, server_players[i].network_player);
+			game_settings.AddNetworkPlayer(player.team, player.name, start_position, server_players[i].network_player);
 		}
+		game_settings.local_game = false;
 		networkView.RPC("LoadGame", RPCMode.All);
 	}
 	
