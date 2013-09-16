@@ -2,11 +2,16 @@ using UnityEngine;
 using System.Collections;
 
 public class Player_Behaviour : MonoBehaviour {
-
+	
+	private float DASH_COOLDOWN = 10f;
+	private float DASH_DURATION = 2f;
+	private float dash_cooldown = 0f;
+	
 	public float acceleration = 0.2f;
 	public float shootVelocity = 11;
 	public float max_animation_speed = 2f;
 	public float increase_speed = 0.1f;
+	
 
 	public Vector3 velocity = Vector3.zero;
 	public Vector3 normalized_velocity = Vector3.zero;
@@ -66,6 +71,16 @@ public class Player_Behaviour : MonoBehaviour {
 				Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 				bb.ReleasePlayers();
 			}
+		}
+	}
+	
+	void VerifyDash()
+	{		
+		Debug.Log(dash_cooldown + " " + Time.time);
+		if (commands.dash != 0 && (Time.time > dash_cooldown) && (commands.horizontal_direction != 0 || commands.vertical_direction != 0)) {
+			dash_cooldown =  DASH_COOLDOWN + Time.time;
+			rigidbody.velocity *= 2f;
+			Debug.Log("DASHING");
 		}
 	}
 
@@ -210,9 +225,10 @@ public class Player_Behaviour : MonoBehaviour {
 			else
 				player_base.renderer.material = normal_material;
 		}
-
+		
 		IncreaseSpeed();
 		VerifyShoot();
+		VerifyDash();
 		UpdateRotation();
 		UpdateAnimationSpeed();
 
