@@ -73,13 +73,13 @@ public class Player_Behaviour : MonoBehaviour {
 	}
 	
 	void VerifyDash()
-{		Debug.Log(dash_cooldown + " " + Time.time);
+	{		
+		Debug.Log(dash_cooldown + " " + Time.time);
 		if (commands.dash != 0 && (Time.time > dash_cooldown) && (commands.horizontal_direction != 0 || commands.vertical_direction != 0)) {
 			dash_cooldown =  DASH_COOLDOWN + Time.time;
 			rigidbody.velocity *= 2f;
 			Debug.Log("DASHING");
-		} else if ((Time.time - dash_cooldown) < DASH_DURATION) {
-			}
+		}
 	}
 
 	protected void OnTriggerEnter (Collider collider) 
