@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
 		public float vertical_direction;
 		public float horizontal_direction;
 		public float shoot;
+		public float dash;
 	}
 	
 	public Commands commands;
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour {
 		commands.vertical_direction = 0;
 		commands.horizontal_direction = 0;
 		commands.shoot = 0;
+		commands.dash = 0;
 	}
 	
 	// Update is called once per frame
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour {
 		commands.vertical_direction = Input.GetAxis("Vertical");
 		commands.horizontal_direction = Input.GetAxis("Horizontal");
 		commands.shoot = Input.GetAxis("Shoot");
+		commands.dash = Input.GetAxis("Dash");
 	}
 	
 	public Commands GetCommands()
