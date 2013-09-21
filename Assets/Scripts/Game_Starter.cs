@@ -10,12 +10,16 @@ public class Game_Starter : MonoBehaviour {
 	void Start () {
 			
 		GameObject settings =  GameObject.FindGameObjectWithTag("settings");
-		Game_Settings game_settings = settings.GetComponent<Game_Settings>();
-		
-		if(game_settings.IsLocalGame()) {
-			Instantiate(local_game_prefab, Vector3.zero, transform.rotation);
+		if (settings != null) {
+			Game_Settings game_settings = settings.GetComponent<Game_Settings>();
+			
+			if(game_settings.IsLocalGame()) {
+				Instantiate(local_game_prefab, Vector3.zero, transform.rotation);
+			} else {
+				Instantiate(network_game_prefab, Vector3.zero, transform.rotation);
+			}
 		} else {
-			Instantiate(network_game_prefab, Vector3.zero, transform.rotation);
+			Instantiate(local_game_prefab, Vector3.zero, transform.rotation);
 		}
 	}
 }

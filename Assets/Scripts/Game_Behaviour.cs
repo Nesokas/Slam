@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Game_Behaviour : MonoBehaviour {
 
-	public Vector3 ball_position = new Vector3(0, 0.06968546f, 0);
+	public Vector3 ball_position = new Vector3(0, -0.04788643f, 0);
 
 	public float team_1_inicial_z_position = 7.812522f;
 	public float team_2_inicial_z_position = -7.812522f;

@@ -13,6 +13,7 @@ public class Local_Game : Game_Behaviour {
 		}
 		
 		Hashtable data = new Hashtable();
+		Debug.Log(scored_team);
 		data["scored_team"] = scored_team;
 		NotificationCenter.DefaultCenter.PostNotification(this, "DisableGotoCenter", data);
 		NotificationCenter.DefaultCenter.PostNotification(this, "InitializePosition");
@@ -46,5 +47,6 @@ public class Local_Game : Game_Behaviour {
 			}
 		}
 		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
+		MovePlayersToStartPositions();
 	}
 }
