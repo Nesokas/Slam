@@ -79,15 +79,13 @@ public class Game_Behaviour : MonoBehaviour {
 		NotificationCenter.DefaultCenter.PostNotification(this, "EnableGotoCenter");	
 	}
 	
-	protected void MovePlayersToStartPositions(){}
+	protected virtual void MovePlayersToStartPositions(){}
 	
 	protected void StartGameAgain()
 	{
 		Debug.Log("start game again");
 		int winning_team = StopCelebration();
-		Crowd team_1_crowd = crowd_team_1.GetComponent<Crowd>();
-		Crowd team_2_crowd = crowd_team_2.GetComponent<Crowd>();
-		
+
 		if(winning_team == 0) {
 			MovePlayersToStartPositions();
 			trigger_timer = false;
@@ -95,18 +93,6 @@ public class Game_Behaviour : MonoBehaviour {
 			finish_game = true;
 			timer_value = 0f;
 			trigger_timer = true;
-			
-			if(winning_team == 1) {
-				TeamReaction(1, "Celebrate");
-				team_1_crowd.Celebrate();
-				TeamReaction(2, "Sad");
-				team_2_crowd.Sad();
-			} else {
-				TeamReaction(2, "Celebrate");
-				team_2_crowd.Celebrate();
-				TeamReaction(1, "Sad");
-				team_1_crowd.Sad();
-			}
 		}
 	}
 	

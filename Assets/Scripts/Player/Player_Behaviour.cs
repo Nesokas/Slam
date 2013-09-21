@@ -152,7 +152,7 @@ public class Player_Behaviour : MonoBehaviour {
 	{
 		switch (animation_to_play){
 			case "Idle":
-				animation.Play("Idle");
+				animation.CrossFade("Idle", 0.3f);
 				break;
 			case "Celebrate":
 				animation.CrossFade("Celebrate", 0.3f);

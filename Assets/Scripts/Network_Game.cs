@@ -15,7 +15,7 @@ public class Network_Game : Game_Behaviour {
 		Network.DestroyPlayerObjects(Network.player);
 	}
 	
-	new protected void MovePlayersToStartPositions()
+	protected override void MovePlayersToStartPositions()
 	{
 		if(Network.isServer) {
 			ball.transform.position = ball_position;
@@ -66,5 +66,6 @@ public class Network_Game : Game_Behaviour {
 			}
 		}
 		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
+		MovePlayersToStartPositions();
 	}
 }

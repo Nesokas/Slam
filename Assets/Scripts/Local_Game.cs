@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Local_Game : Game_Behaviour {
 
-	new protected void MovePlayersToStartPositions()
+	protected override void MovePlayersToStartPositions()
 	{
 		ball.transform.position = ball_position;
 		ball.transform.rigidbody.velocity = Vector3.zero;
