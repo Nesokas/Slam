@@ -71,7 +71,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public void FinishGame()
 	{
-		Application.LoadLevel(1);
+		Application.LoadLevel(0);
 	}
 	
 	public void ReleasePlayers()
