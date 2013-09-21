@@ -38,6 +38,7 @@ public class Player_Behaviour : MonoBehaviour {
 	protected bool colliding_with_ball = false;
 	protected Collider ball_collider;
 	protected Transform player_base;
+	protected Transform dash_bar;
 	protected GameObject ball;
 
 	protected bool debug_key_pressed = false;
@@ -169,6 +170,7 @@ public class Player_Behaviour : MonoBehaviour {
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		player_base = transform.Find("Base");
+		dash_bar = transform.Find("Dash_Bar");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
 		Transform court_collider = court_walls.transform.Find("forcefield");
@@ -212,9 +214,17 @@ public class Player_Behaviour : MonoBehaviour {
 	// Update is called once per frame
 	protected void Update () 
 	{
-		if(player_base == null)
+		/* TODO: Uma forma mais inteligente de fazer isto */
+		if (player_base == null)
 			player_base = transform.Find("Base");
-
+		
+//		if (dash_bar == null)
+//			dash_bar = transform.Find("Dash_Bar");
+//		else {
+			dash_bar.rotation = Quaternion.Euler(90,0,0);
+//		}
+		/***************************************************/
+		
 		if(ball_collision && commands.shoot == 0) {
 			ball_collision = false;
 		}
