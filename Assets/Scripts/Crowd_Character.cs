@@ -60,6 +60,7 @@ public class Crowd_Character : MonoBehaviour {
 			}
 		} else if(!transform.animation.IsPlaying("Idle")) {
 			transform.animation.CrossFade("Idle",0.5f);
+			transform.animation["Idle"].time = Random.Range(0, transform.animation["Idle"].length);
 		}
 		
 	}
