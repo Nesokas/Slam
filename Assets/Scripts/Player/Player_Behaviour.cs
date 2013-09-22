@@ -3,8 +3,8 @@ using System.Collections;
 
 public class Player_Behaviour : MonoBehaviour {
 	
-	private float DASH_COOLDOWN = 10f;
-	private float DASH_DURATION = 2f;
+	private float DASH_COOLDOWN = 2f;
+//	private float DASH_DURATION = 2f;
 	private float dash_cooldown = 0f;
 	
 	public float acceleration = 0.2f;
@@ -39,6 +39,7 @@ public class Player_Behaviour : MonoBehaviour {
 	protected Collider ball_collider;
 	protected Transform player_base;
 	protected Transform dash_bar;
+	protected Transform dash_bar_fill;
 	protected GameObject ball;
 
 	protected bool debug_key_pressed = false;
@@ -82,7 +83,24 @@ public class Player_Behaviour : MonoBehaviour {
 			dash_cooldown =  DASH_COOLDOWN + Time.time;
 			rigidbody.velocity *= 2f;
 			Debug.Log("DASHING");
+			dash_bar_fill.renderer.material.color = Color.red;
 		}
+		UpdateDashBarFill();
+	}
+	
+	void UpdateDashBarFill()
+	{
+		float current_value = DASH_COOLDOWN - (dash_cooldown-Time.time);
+		if (current_value < 0)
+			current_value = DASH_COOLDOWN;
+		else if (current_value > DASH_COOLDOWN) {
+			current_value = DASH_COOLDOWN;
+			dash_bar_fill.renderer.material.color = Color.green;
+		}
+		float fill_percent = current_value/DASH_COOLDOWN;
+//		Debug.Log(fill_percent + "%");
+		Debug.Log(rigidbody.velocity);
+		dash_bar_fill.localScale = new Vector3(1f, 1f,fill_percent);
 	}
 
 	protected void OnTriggerEnter (Collider collider) 
@@ -171,6 +189,7 @@ public class Player_Behaviour : MonoBehaviour {
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		player_base = transform.Find("Base");
 		dash_bar = transform.Find("Dash_Bar");
+		dash_bar_fill = dash_bar.Find("Dash_Fill");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
 		Transform court_collider = court_walls.transform.Find("forcefield");
@@ -217,13 +236,12 @@ public class Player_Behaviour : MonoBehaviour {
 		/* TODO: Uma forma mais inteligente de fazer isto */
 		if (player_base == null)
 			player_base = transform.Find("Base");
-		
-//		if (dash_bar == null)
-//			dash_bar = transform.Find("Dash_Bar");
-//		else {
-			dash_bar.rotation = Quaternion.Euler(90,0,0);
-//		}
 		/***************************************************/
+		
+		if (dash_bar_fill == null)
+			dash_bar_fill = transform.Find("Dash_Fill");
+		
+		dash_bar.rotation = Quaternion.Euler(0,180f,0);
 		
 		if(ball_collision && commands.shoot == 0) {
 			ball_collision = false;
@@ -239,6 +257,7 @@ public class Player_Behaviour : MonoBehaviour {
 		IncreaseSpeed();
 		VerifyShoot();
 		VerifyDash();
+//		UpdateDashBarFill();
 		UpdateRotation();
 		UpdateAnimationSpeed();
 
