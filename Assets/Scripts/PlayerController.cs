@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour {
 			commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num);
 			commands.shoot = Input.GetAxis("Shoot_Gamepad_" + input_num);
 			commands.dash = Input.GetAxis("Dash_Gamepad_" + input_num);
-			Debug.Log("logging " + "Dash_Gamepad_" + input_num + " " + Input.GetAxis("Dash_Gamepad_" + input_num));
+//			Debug.Log("logging " + "Dash_Gamepad_" + input_num + " " + Input.GetAxis("Dash_Gamepad_" + input_num));
 		}
 	}
 	
