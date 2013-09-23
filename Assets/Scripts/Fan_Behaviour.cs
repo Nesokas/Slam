@@ -6,13 +6,13 @@ public class Fan_Behaviour : MonoBehaviour {
 	public int team;
 	private GameObject ball;
 	private bool celebration_period = false;
-	private int team_scored;
+	private string play_animation;
 	private bool was_sad;
 	
 	void Awake()
 	{
-		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
 		NotificationCenter.DefaultCenter.AddObserver(this, "StopCelebration");
+		NotificationCenter.DefaultCenter.AddObserver(this, "ChangeReaction");
 		transform.animation.Stop();
 	}
 	
@@ -21,11 +21,13 @@ public class Fan_Behaviour : MonoBehaviour {
 		celebration_period = false;
 	}
 	
-	void OnGoal(NotificationCenter.Notification notification)
+	void ChangeReaction(NotificationCenter.Notification notification)
 	{
-		team_scored = (int)notification.data["team"];
-		celebration_period = true;
-		was_sad = false;
+		if ((int)notification.data["team"] == team) {
+			play_animation = (string)notification.data["reaction"];
+			celebration_period = true;
+			was_sad = false;
+		}
 	}
 	
 	void UpdateRotation()
@@ -42,20 +44,10 @@ public class Fan_Behaviour : MonoBehaviour {
 	void Update () {
 		UpdateRotation();
 		if(celebration_period){
-			if(team == team_scored){
-				if(!transform.animation.IsPlaying("Celebrate")){
-					int random = Random.Range(0, 30);
-					if (random == 0){
-						transform.animation.CrossFade("Celebrate", 0.2f);
-					}
-				}
-			} else {
-				if(!transform.animation.IsPlaying("Sad") && !was_sad){
-					int random = Random.Range(0, 10);
-					if (random == 0){
-						was_sad = true;
-						transform.animation.CrossFade("Sad", 0.2f);
-					}
+			if(!transform.animation.IsPlaying(play_animation)){
+				int random = Random.Range(0, 30);
+				if (random == 0){
+					transform.animation.CrossFade(play_animation, 0.2f);
 				}
 			}
 		} else if(!transform.animation.IsPlaying("Idle")) {

@@ -14,8 +14,6 @@ public class GUIManager : MonoBehaviour {
 	
 	private float native_horizontal_resolution = 1296f;
 	private float native_vertical_resolution = 729f;
-	private string GOAL_STR = "GOAL!";
-	private int GOAL_STR_CHAR_WIDTH = 60;
 	private float goal_scored = 0.0f;
 	
 	public void Awake()
@@ -41,7 +39,7 @@ public class GUIManager : MonoBehaviour {
 		
 	 	style_title.font = slam_font;
 	}
-	
+/*	
 	public void DrawScore(int score_team1, int score_team2)
 	{
 		style_title.fontSize = 75;
@@ -53,11 +51,12 @@ public class GUIManager : MonoBehaviour {
 		pos.x += 50;
 		DrawOutline(pos, score_team2.ToString(), blue.color, Color.black);
 	}
+	*/
 	
-	public void DrawGoalScored(int team)
+	public void DrawGoalScored(int team, string str, int str_width)
 	{
 		style_title.fontSize = 100;
-		Rect pos = new Rect(native_horizontal_resolution/2 - GOAL_STR_CHAR_WIDTH*1/2*(GOAL_STR.Length-1), 90 , 10 , 50);
+		Rect pos = new Rect(native_horizontal_resolution/2 - str_width*1/2*(str.Length-1), 90 , 10 , 50);
 		Rect temp = pos;
 		Color color;
 	//	Debug.Log(team);
@@ -65,11 +64,11 @@ public class GUIManager : MonoBehaviour {
 			color = red.color;
 		else
 			color = blue.color;
-		foreach(char ch in GOAL_STR) {
+		foreach(char ch in str) {
 			temp.x = pos.x + Random.Range(-6, 6);
 			temp.y = pos.y + Random.Range(-6, 6);
 			DrawOutline(temp, ch.ToString() , color, Color.black);
-			pos.x += GOAL_STR_CHAR_WIDTH;
+			pos.x += str_width;
 		}
 	}
 	
