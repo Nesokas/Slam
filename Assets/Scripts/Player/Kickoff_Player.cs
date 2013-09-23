@@ -67,7 +67,7 @@ public class Kickoff_Player : Player_Behaviour {
 		}
 	}
 	
-	public void EnableGotoCenter()
+	public void ReleasePlayers()
 	{
 		player_base = transform.Find("Base");
 		Transform base_collider = player_base.Find("Collider");
@@ -87,7 +87,7 @@ public class Kickoff_Player : Player_Behaviour {
 		Debug.Log("START PLAYER");
 		
 		NotificationCenter.DefaultCenter.AddObserver(this, "InitializePosition");
-		NotificationCenter.DefaultCenter.AddObserver(this, "EnableGotoCenter");
+		NotificationCenter.DefaultCenter.AddObserver(this, "ReleasePlayers");
 		NotificationCenter.DefaultCenter.AddObserver(this, "DisableGotoCenter");
 		NotificationCenter.DefaultCenter.AddObserver(this, "ChangeReaction");
 		NotificationCenter.DefaultCenter.AddObserver(this, "StopCelebration");

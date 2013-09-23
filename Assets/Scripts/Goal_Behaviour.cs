@@ -7,6 +7,19 @@ public class Goal_Behaviour : MonoBehaviour {
 	//public GameObject game_behaviour;
 	public AudioClip goal_sound;
 	
+	private bool celebrating;
+	
+	void Start()
+	{
+		NotificationCenter.DefaultCenter.AddObserver(this, "StopCelebration");
+		celebrating = false;
+	}
+	
+	void StopCelebration()
+	{
+		celebrating = false;
+	}
+	
 	void OnTriggerEnter(Collider collider)
 	{
 		if(collider.gameObject.tag == "ball") {
@@ -17,7 +30,10 @@ public class Goal_Behaviour : MonoBehaviour {
 				else
 					data["team"] = 1;
 				//Game_Behaviour game_manager = game_behaviour.GetComponent<Game_Behaviour>();
-				NotificationCenter.DefaultCenter.PostNotification(this, "OnGoal", data);
+				if(!celebrating) {
+					celebrating = true;
+					NotificationCenter.DefaultCenter.PostNotification(this, "OnGoal", data);
+				}
 			}
 		}
 	}

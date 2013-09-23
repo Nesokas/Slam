@@ -3,9 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Game_Behaviour : MonoBehaviour {
-
+	
+	// For when a player scores
+	private string GOAL_STR = "GOAL!";
+	private int GOAL_STR_CHAR_WIDTH = 60;
+	
+	// initial ball position
 	public Vector3 ball_position = new Vector3(0, -0.04788643f, 0);
-
+	
+	// initial z position for player to be distribute
 	public float team_1_inicial_z_position = 7.812522f;
 	public float team_2_inicial_z_position = -7.812522f;
 
@@ -29,6 +35,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected bool trigger_timer;
 	protected bool finish_game = false;
+	// timer for celebration
 	public float timer_value;
 	
 	protected int scored_team = 0;
@@ -76,7 +83,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public void ReleasePlayers()
 	{
-		NotificationCenter.DefaultCenter.PostNotification(this, "EnableGotoCenter");	
+		NotificationCenter.DefaultCenter.PostNotification(this, "ReleasePlayers");	
 	}
 	
 	protected virtual void MovePlayersToStartPositions(){}
@@ -86,15 +93,28 @@ public class Game_Behaviour : MonoBehaviour {
 		Debug.Log("start game again");
 		int winning_team = StopCelebration();
 
-		if(winning_team == 0) {
-			MovePlayersToStartPositions();
-			trigger_timer = false;
-		} else {
-			finish_game = true;
-			timer_value = 0f;
-			trigger_timer = true;
-		}
+		MovePlayersToStartPositions();
+		trigger_timer = false;
 	}
+	
+	public void TimeFinished()
+	{
+		finish_game = true;
+		timer_value = 0f;
+		trigger_timer = true;
+		is_celebrating = true;
+		
+		if(score_team_1 > score_team_2){
+			TeamReaction(1, "Celebrate");
+			TeamReaction(2, "Sad");
+		} else if(score_team_1 < score_team_2) {
+			TeamReaction(2, "Celebrate");
+			TeamReaction(1, "Sad");
+		} else {
+			TeamReaction(1, "Celebrate");
+			TeamReaction(2, "Celebrate");
+		}
+	}	
 	
 	protected void TeamReaction(int team, string reaction)
 	{
@@ -149,7 +169,6 @@ public class Game_Behaviour : MonoBehaviour {
 	// Update is called once per frame
 	protected void Update () 
 	{
-		
 		if(trigger_timer){
 			if(timer_value > timer && !finish_game)
 				StartGameAgain();
@@ -208,10 +227,21 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void OnGUI()
 	{	
-		if(is_celebrating)
-			gui_manager.DrawGoalScored(team_scored);
-		 else
-			gui_manager.DrawScore(score_team_1, score_team_2);
+		if(is_celebrating){
+			if (!finish_game)
+				gui_manager.DrawGoalScored(team_scored, GOAL_STR, GOAL_STR_CHAR_WIDTH);
+			else {
+				if(score_team_1 > score_team_2)
+					gui_manager.DrawGoalScored(1, "RED TEAM WINS", GOAL_STR_CHAR_WIDTH);
+				else if(score_team_1 < score_team_2)
+					gui_manager.DrawGoalScored(2, "BLUE TEAM WINS", GOAL_STR_CHAR_WIDTH);
+				else {
+					gui_manager.DrawGoalScored(Random.Range(1,2), "NO WINNERS", GOAL_STR_CHAR_WIDTH);
+				}
+			}
+		}
+		 //else
+		//	gui_manager.DrawScore(score_team_1, score_team_2);
 			
 	}
 }
