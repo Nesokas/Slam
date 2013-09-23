@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Player_Behaviour : MonoBehaviour {
 	
-	private float DASH_COOLDOWN = 12f;
+	private float DASH_COOLDOWN = 1f;
 	private float DASH_STRENGTH = 2f;
 	private float dash_cooldown = 0f;
 	
@@ -40,6 +40,7 @@ public class Player_Behaviour : MonoBehaviour {
 	protected Transform player_base;
 	protected Transform dash_bar;
 	protected Transform dash_bar_fill;
+	protected Transform dash_trail;
 	protected GameObject ball;
 
 	protected bool debug_key_pressed = false;
@@ -82,11 +83,19 @@ public class Player_Behaviour : MonoBehaviour {
 		if (commands.dash != 0 && (Time.time > dash_cooldown) && (commands.horizontal_direction != 0 || commands.vertical_direction != 0)) {
 			dash_cooldown =  DASH_COOLDOWN + Time.time;
 			rigidbody.velocity *= DASH_STRENGTH;
-			Debug.Log("DASHING");
+//			StartCoroutine(DrawDashTrail());
 			dash_bar_fill.renderer.material.color = Color.red;
 		}
 		UpdateDashBarFill();
 	}
+	
+//	protected IEnumerator DrawDashTrail()
+//	{
+//		Debug.Log("DASHING");
+//		dash_trail.particleEmitter.emit = true;
+//		yield return new WaitForSeconds(0.2f);
+//		dash_trail.particleEmitter.emit = false;
+//	}
 	
 	void UpdateDashBarFill()
 	{
@@ -190,6 +199,7 @@ public class Player_Behaviour : MonoBehaviour {
 		player_base = transform.Find("Base");
 		dash_bar = transform.Find("Dash_Bar");
 		dash_bar_fill = dash_bar.Find("Dash_Fill");
+//		dash_trail = player_base.Find("Dash_Trail");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
 		Transform court_collider = court_walls.transform.Find("forcefield");
