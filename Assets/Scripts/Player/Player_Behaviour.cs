@@ -99,7 +99,7 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 		float fill_percent = current_value/DASH_COOLDOWN;
 //		Debug.Log(fill_percent + "%");
-		Debug.Log(rigidbody.velocity);
+//		Debug.Log(rigidbody.velocity);
 		dash_bar_fill.localScale = new Vector3(1f, 1f,fill_percent);
 	}
 

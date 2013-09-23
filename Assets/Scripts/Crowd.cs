@@ -1,29 +1,30 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Crowd : MonoBehaviour {
 	
-	public void Celebrate()
+	private List<GameObject> all_fans;
+	
+	void Start()
 	{
-		foreach (Transform child in transform) {
-			child.animation.Play("Celebrate");
-			child.animation["Celebrate"].time = Random.Range(0.0f, child.animation["Celebrate"].length);
+		all_fans = new List<GameObject>();
+			
+		foreach(Transform child in transform) {
+			if(child.parent == transform) {
+				all_fans.Add(child.gameObject);
+			}
 		}
 	}
 	
-	public void Sad()
+	void Update() 
 	{
-		foreach (Transform child in transform) {
-			child.animation.Play("Sad");
-			child.animation["Sad"].time = Random.Range(0.0f, child.animation["Sad"].length);
-		}
-	}
-	
-	public void Idle()
-	{
-		foreach (Transform child in transform) {
-			child.animation.Play("Idle");
-			child.animation["Idle"].time = Random.Range(0.0f, child.animation["Idle"].length);
+		// randomly chooce a fan to cheer for his team
+		if(Random.Range(0,20) == 0) {
+			GameObject fan = all_fans[Random.Range(0, all_fans.Count)];
+			
+			Fan_Behaviour fan_behaviour = fan.GetComponent<Fan_Behaviour>();
+			StartCoroutine(fan_behaviour.Celebrate());
 		}
 	}
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class Crowd_Character : MonoBehaviour {
+public class Fan_Behaviour : MonoBehaviour {
 	
 	public int team;
 	private GameObject ball;
@@ -63,5 +63,14 @@ public class Crowd_Character : MonoBehaviour {
 			transform.animation["Idle"].time = Random.Range(0, transform.animation["Idle"].length);
 		}
 		
+	}
+	
+	public IEnumerator Celebrate()
+	{
+		if(!celebration_period) {
+			transform.animation.CrossFade("Celebrate", 1f);
+			yield return new WaitForSeconds(Random.Range(transform.animation["Celebrate"].length*8f, transform.animation["Celebrate"].length*16f));
+			transform.animation.CrossFade("Idle", 0.5f);
+		}
 	}
 }
