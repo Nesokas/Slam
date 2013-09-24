@@ -114,6 +114,8 @@ public class Game_Behaviour : MonoBehaviour {
 			TeamReaction(1, "Celebrate");
 			TeamReaction(2, "Celebrate");
 		}
+		
+		AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 	}	
 	
 	protected void TeamReaction(int team, string reaction)
@@ -172,8 +174,6 @@ public class Game_Behaviour : MonoBehaviour {
 		if(trigger_timer){
 			if(timer_value > timer && !finish_game)
 				StartGameAgain();
-			else if (timer_value > timer && finish_game)
-				FinishGame();
 			else timer_value++;
 		}
 		
@@ -187,17 +187,7 @@ public class Game_Behaviour : MonoBehaviour {
 	public int StopCelebration()
 	{
 		is_celebrating = false;
-		
 		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
-		if(score_team_1 == 5) {
-			is_celebrating = true;
-			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
-			return 1;
-		} else if(score_team_2 == 5) {
-			is_celebrating = true;
-			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
-			return 2;
-		}
 		
 		if (!is_celebrating)
 			NotificationCenter.DefaultCenter.PostNotification(this, "StopCelebration");
