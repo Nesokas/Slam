@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Player_Behaviour : MonoBehaviour {
 	
-	private float DASH_COOLDOWN = 1f;
+	private float DASH_COOLDOWN = 12f;
 	private float DASH_STRENGTH = 2f;
 	private float dash_cooldown = 0f;
 	
