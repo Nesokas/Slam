@@ -25,10 +25,6 @@ public class ScoreBoard : MonoBehaviour {
 	private float time;
 	private bool update_timer;
 	
-	// team scores
-	private int score_team_1;
-	private int score_team_2;
-	
 	// finish game only once
 	private bool game_finished;
 	
@@ -72,9 +68,11 @@ public class ScoreBoard : MonoBehaviour {
 		update_timer = true;
 	}
 	
-	// update team LEDs
-	void UpdateScore()
+	// update team score LEDs
+	public void UpdateScore(int score_team_1, int score_team_2)
 	{
+		update_timer = false;
+		
 		red_0.SetCurrentNumber((int)score_team_1/10);
 		red_1.SetCurrentNumber((int)score_team_1%10);
 		
@@ -116,19 +114,6 @@ public class ScoreBoard : MonoBehaviour {
 				}
 			}
 		}
-	}
-	
-	// Team scored
-	void OnGoal(NotificationCenter.Notification notification)
-	{
-		update_timer = false;
-		if((int)notification.data["team"] == 1) {
-			score_team_1++;
-		}
-		else {
-			score_team_2++;
-		}
-		UpdateScore();
 	}
 	
 	// GameFinished

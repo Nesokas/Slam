@@ -78,6 +78,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public void FinishGame()
 	{
+		Destroy(GameObject.FindGameObjectWithTag("settings"));
 		Application.LoadLevel(0);
 	}
 	
@@ -174,6 +175,8 @@ public class Game_Behaviour : MonoBehaviour {
 		if(trigger_timer){
 			if(timer_value > timer && !finish_game)
 				StartGameAgain();
+			else if(timer_value > timer && finish_game)
+				FinishGame();
 			else timer_value++;
 		}
 		
@@ -212,7 +215,18 @@ public class Game_Behaviour : MonoBehaviour {
 			}
 			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			is_celebrating = true;
+			
+			ScoreBoard scoreboard = GameObject.Find("Score Board").GetComponent<ScoreBoard>();
+			scoreboard.UpdateScore(score_team_1, score_team_2);
 		}
+	}
+	
+	public int GetTeamScore(int team)
+	{
+		if (team == 1)
+			return score_team_1;
+		else
+			return score_team_2;
 	}
 	
 	protected void OnGUI()
@@ -226,7 +240,7 @@ public class Game_Behaviour : MonoBehaviour {
 				else if(score_team_1 < score_team_2)
 					gui_manager.DrawGoalScored(2, "BLUE TEAM WINS", GOAL_STR_CHAR_WIDTH);
 				else {
-					gui_manager.DrawGoalScored(Random.Range(1,2), "NO WINNERS", GOAL_STR_CHAR_WIDTH);
+					gui_manager.DrawGoalScored(Random.Range(1,2), "DRAW", GOAL_STR_CHAR_WIDTH);
 				}
 			}
 		}
