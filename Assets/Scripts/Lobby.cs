@@ -316,6 +316,7 @@ public class Lobby : MonoBehaviour {
 	
 	void LobbyLocal(Vector2 team_0, Vector2 team_1, Vector2 team_2)
 	{
+		int num = 0;
 		/********************** For the keyboard player **********************/
 		
 		Player_Local local_player = local_players[0];
@@ -410,7 +411,7 @@ public class Lobby : MonoBehaviour {
 			for(int i = local_players.Count, j = local_players.Count - 1; i < Input.GetJoystickNames().Length + 1; i++, j++) {
 				Player_Local player_local = new Player_Local();
 				player_local.controller = i;
-				player_local.player.name = Input.GetJoystickNames()[j];
+				player_local.player.name = (j + 1).ToString();
 				player_local.player.team = 0;
 				
 				local_players.Add(player_local);
@@ -419,7 +420,7 @@ public class Lobby : MonoBehaviour {
 			for(int i = 1, j = 0; i < Input.GetJoystickNames().Length; i++, j++) {
 				Player_Local player_local = new Player_Local();
 				player_local.controller = i;
-				player_local.player.name = Input.GetJoystickNames()[j];
+				player_local.player.name = (j + 1).ToString();
 				player_local.player.team = 0;
 				
 				local_players[i] = player_local;
@@ -590,7 +591,7 @@ public class Lobby : MonoBehaviour {
 			Player_Local player_local = new Player_Local();
 			player_local.controller = 0;
 			player_local.player.team = 0;
-			player_local.player.name = "Keyboard";
+			player_local.player.name = "0";
 			
 			local_players.Add(player_local);
 			
