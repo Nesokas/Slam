@@ -5,13 +5,12 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	private float DASH_COOLDOWN = 12f;
 	private float DASH_STRENGTH = 2f;
-	private float dash_cooldown = 0f;
+	public float ACCELERATION = 0.065f;
+	public float MAX_ANIMATION_SPEED = 2f;
+	public float SHOOT_VELOCITY = 9;
 	
-	public float acceleration = 0.2f;
-	public float shootVelocity = 11;
-	public float max_animation_speed = 2f;
 	public float increase_speed = 0.1f;
-	
+	private float dash_cooldown;
 
 	public Vector3 velocity = Vector3.zero;
 	public Vector3 normalized_velocity = Vector3.zero;
@@ -65,7 +64,7 @@ public class Player_Behaviour : MonoBehaviour {
 			direction.Normalize();
 
 			if((!gamepad && commands.shoot != 0)){
-				ball_collider.rigidbody.velocity += direction * shootVelocity;
+				ball_collider.rigidbody.velocity += direction * SHOOT_VELOCITY;
 				ball_collision = true;
 				colliding_with_ball = false;
 				debug_hit_remaining_time = debug_hit_time;
@@ -147,7 +146,7 @@ public class Player_Behaviour : MonoBehaviour {
 			else
 				is_adding_speed = true;
 	
-			rigidbody.velocity += direction*acceleration;
+			rigidbody.velocity += direction*ACCELERATION;
 		}
 	}
 
@@ -162,10 +161,10 @@ public class Player_Behaviour : MonoBehaviour {
 	void UpdateAnimationSpeed()
 	{
 		if(is_adding_speed) {
-			if(animation_speed < max_animation_speed)
+			if(animation_speed < MAX_ANIMATION_SPEED)
 				animation_speed += increase_speed;
-			else if(animation_speed > max_animation_speed)
-				animation_speed = max_animation_speed;
+			else if(animation_speed > MAX_ANIMATION_SPEED)
+				animation_speed = MAX_ANIMATION_SPEED;
 		} else {
 			if(animation_speed > 1f)
 				animation_speed -= increase_speed;
@@ -241,7 +240,7 @@ public class Player_Behaviour : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	protected void Update () 
+	protected void FixedUpdate () 
 	{
 		/* TODO: Uma forma mais inteligente de fazer isto */
 		if (player_base == null)

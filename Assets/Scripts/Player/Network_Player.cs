@@ -38,7 +38,7 @@ public class Network_Player: Kickoff_Player {
 		ChangeAnimation("Idle");
 	}
 	
-	new void Update()
+	void Update()
 	{
 		if(!ball_collision && commands.shoot != 0) {
 			networkView.RPC("UpdateMaterial", RPCMode.All, true);
@@ -47,7 +47,6 @@ public class Network_Player: Kickoff_Player {
 		}
 		
 		networkView.RPC("AskCommands", RPCMode.All);
-		base.Update();
 	}
 	
 	[RPC] 

@@ -23,7 +23,7 @@ public class Local_Player : Kickoff_Player {
 		ChangeAnimation("Idle");
 	}
 	
-	new void Update()
+	new void FixedUpdate()
 	{
 		if(!ball_collision && commands.shoot != 0) {
 			player_base.renderer.material = shoot_material;
@@ -32,7 +32,7 @@ public class Local_Player : Kickoff_Player {
 		}
 		
 		UpdateCommands();
-		base.Update();
+		base.FixedUpdate();
 	}
 	
 	void UpdateCommands()
