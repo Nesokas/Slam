@@ -39,7 +39,8 @@ public class Player_Behaviour : MonoBehaviour {
 	protected Transform player_base;
 	protected Transform dash_bar;
 	protected Transform dash_bar_fill;
-	protected Transform dash_trail;
+	protected Transform player_indicator_container;
+	public Vector3 viewport_dash_pos;
 	protected GameObject ball;
 
 	protected bool debug_key_pressed = false;
@@ -190,7 +191,7 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 	}
 	
-	protected void Start () 
+	protected void Start() 
 	{		
 		GameObject court_walls = GameObject.FindGameObjectWithTag("court_walls");
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
@@ -198,7 +199,7 @@ public class Player_Behaviour : MonoBehaviour {
 		player_base = transform.Find("Base");
 		dash_bar = transform.Find("Dash_Bar");
 		dash_bar_fill = dash_bar.Find("Dash_Fill");
-//		dash_trail = player_base.Find("Dash_Trail");
+		
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
 		Transform court_collider = court_walls.transform.Find("forcefield");
@@ -222,6 +223,12 @@ public class Player_Behaviour : MonoBehaviour {
 
 		animation["Idle"].time = Random.Range(0.0f, animation["Idle"].length);
 	}
+	
+	protected 
+	void Awake()
+	{
+		player_indicator_container = transform.Find("Player_Indicator_Container");
+	}
 
 	void DebugMode() 
 	{
@@ -238,6 +245,16 @@ public class Player_Behaviour : MonoBehaviour {
 
 		Debug.DrawLine(transform.position, transform.position + direction*3, Color.yellow);	
 	}
+	
+	private void UpdatePlayerIndicator()
+	{
+//		player_indicator_container.position = Camera.main.ViewportToWorldPoint(viewport_dash_pos);
+//		Vector3 new_position = new Vector3(player_indicator_container.position.x,
+//											player_indicator_container.position.y + 0.5f,
+//											player_indicator_container.position.z);
+//		player_indicator_container.position = new_position;
+		player_indicator_container.rotation = Quaternion.LookRotation(Camera.main.transform.position - player_indicator_container.position);
+	}
 
 	// Update is called once per frame
 	protected void FixedUpdate () 
@@ -251,6 +268,9 @@ public class Player_Behaviour : MonoBehaviour {
 			dash_bar_fill = transform.Find("Dash_Fill");
 		
 		dash_bar.rotation = Quaternion.Euler(0,180f,0);
+		viewport_dash_pos = Camera.main.WorldToViewportPoint(dash_bar.position);
+		
+//		Debug.Log(Camera.main.WorldToViewportPoint(dash_bar.position));
 		
 		if(ball_collision && commands.shoot == 0) {
 			ball_collision = false;
@@ -266,7 +286,7 @@ public class Player_Behaviour : MonoBehaviour {
 		IncreaseSpeed();
 		VerifyShoot();
 		VerifyDash();
-//		UpdateDashBarFill();
+		UpdatePlayerIndicator();
 		UpdateRotation();
 		UpdateAnimationSpeed();
 

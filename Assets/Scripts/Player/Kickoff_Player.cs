@@ -95,6 +95,7 @@ public class Kickoff_Player : Player_Behaviour {
 		center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 		center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
 		center_circle_right = GameObject.FindGameObjectWithTag("center-circle-right");
+		base.Awake();
 	}
 	
 	new public void Start () {
