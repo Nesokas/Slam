@@ -60,6 +60,8 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject spawn_team_2;
 	public GameObject player_controller;
 	
+	public Texture[] player_arrows;
+	
 	public void ScoreTeam(int team)
 	{		
 		if(team == 1) {

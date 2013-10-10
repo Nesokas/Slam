@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Local_Player : Kickoff_Player {
 
-	public void InitializePlayerInfo(int team_num, string player_name, Vector3 position, int input_num, Color color)
+	public void InitializePlayerInfo(int team_num, string player_name, Vector3 position, int input_num, Texture color)
 	{
 		team = team_num;
 
@@ -17,7 +17,8 @@ public class Local_Player : Kickoff_Player {
 		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
 		player_controller.setInputNum(input_num);
 		
-		player_indicator_container.transform.Find("Player_Indicator").renderer.material.color = color;
+		
+		indicator_arrow = color;
 	}
 	
 	void StopCelebration()

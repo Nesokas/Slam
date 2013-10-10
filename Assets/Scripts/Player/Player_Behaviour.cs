@@ -248,12 +248,16 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	private void UpdatePlayerIndicator()
 	{
-//		player_indicator_container.position = Camera.main.ViewportToWorldPoint(viewport_dash_pos);
-//		Vector3 new_position = new Vector3(player_indicator_container.position.x,
-//											player_indicator_container.position.y + 0.5f,
-//											player_indicator_container.position.z);
-//		player_indicator_container.position = new_position;
-		player_indicator_container.rotation = Quaternion.LookRotation(Camera.main.transform.position - player_indicator_container.position);
+		//player_indicator_container.rotation = Quaternion.LookRotation(Camera.main.transform.position - player_indicator_container.position);
+		
+	}
+	
+	public Texture indicator_arrow;
+	
+	void OnGUI()
+	{
+		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(dash_bar.position);
+		GUI.DrawTexture(new Rect(player_indicator_position.x * Screen.width - 10, (1 - player_indicator_position.y) * Screen.height - 25, 20, 20), indicator_arrow, ScaleMode.ScaleToFit, true);
 	}
 
 	// Update is called once per frame
