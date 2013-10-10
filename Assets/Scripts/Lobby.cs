@@ -20,11 +20,14 @@ public class Lobby : MonoBehaviour {
 	private const int LOCAL = 1;
 	private const int NETWORK = 2;
 	
+	private const string GAME_TYPE = "Default";
+	
 	/**************************************/
 	
 	private string player_name = "";
 	private string ip = "127.0.0.1";
 	private string port = "8000";
+	private string room_name = "";
 		
 	private int state;
 	
@@ -32,6 +35,7 @@ public class Lobby : MonoBehaviour {
 	private Rect nickname_field;
 	private Rect ip_field;
 	private Rect port_field;
+	private Rect room_name_field;
 	private Rect label;
 	
 	private GUIStyle label_style;
@@ -43,6 +47,8 @@ public class Lobby : MonoBehaviour {
 	
 	private int buttons_width = 90;
 	private int buttons_height = 25;
+	
+	private ArrayList available_rooms;
 	
 	// position from witch the court all beggins
 	// for start placing the players
@@ -77,6 +83,7 @@ public class Lobby : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{		
+		
 		state = INITIAL_SCREEN;
 		players = new List<Player>();
 		server_players = new List<ServerPlayer>();
@@ -109,6 +116,29 @@ public class Lobby : MonoBehaviour {
 		//port field
 		port_field.width = w*0.95f - 35;
 	  	port_field.height = 21;
+		
+		//room name field
+		room_name_field.width = w*0.75f - 35;
+	  	room_name_field.height = 21;
+		
+		InitializeMSF();
+		
+		available_rooms = new ArrayList();
+	}
+	
+	// Function to initialize the master server and the facilitator IPs
+	// and initialize the server room list
+	void InitializeMSF()
+	{
+		MasterServer.ipAddress = "85.240.134.57";
+		MasterServer.port = 23466;
+		
+		Network.natFacilitatorIP = "85.240.134.57";
+		Network.natFacilitatorPort = 50005;
+		
+		MasterServer.ClearHostList();
+	    MasterServer.RequestHostList(GAME_TYPE);
+		MasterServer.updateRate = 2;
 	}
 	
 	void AddPlayer(NetworkPlayer network_player, string player_name)
@@ -136,14 +166,14 @@ public class Lobby : MonoBehaviour {
 							   initial_box.y + h*0.6f,
 							   buttons_width,
 						       buttons_height),
-		              "New Server")) {
+		              "Create Room")) {
 			state = CREATE_SERVER;
 		}
 		if(GUI.Button(new Rect(initial_box.x + w*0.9f - buttons_width, 
 							   initial_box.y + h*0.6f,
 							   buttons_width,
 						       buttons_height),
-		              "Connect")) {
+		              "Join Room")) {
 			state = JOIN_SERVER;
 		}
 		if(GUI.Button(new Rect(initial_box.x + initial_box.width/2 - buttons_width/2, 
@@ -159,16 +189,16 @@ public class Lobby : MonoBehaviour {
 	{
 		label.x = initial_box.x + w*0.03f;
 		label.y = initial_box.y + h*0.33f;
-		GUI.Label(label, "Port");
-		port_field.x = initial_box.x + 35f;
-		port_field.y = initial_box.y + h*0.33f;
-		port = GUI.TextField(port_field, port);
+		GUI.Label(label, "Room Name");
+		room_name_field.x = initial_box.x + 90f;
+		room_name_field.y = initial_box.y + h*0.33f;
+		room_name = GUI.TextField(room_name_field, room_name);
 		if(GUI.Button(new Rect(initial_box.x + w*0.1f, 
 							   initial_box.y + h*0.71f,
 							   buttons_width,
 						       buttons_height),
 		              "Back")) {
-			port = "";
+			room_name = "";
 			connect_pressed = false;
 			state = INITIAL_SCREEN;
 		}
@@ -177,10 +207,15 @@ public class Lobby : MonoBehaviour {
 							   buttons_width,
 						       buttons_height),
 		              "Create")) {
-			if(port == ""){
+			if(room_name == ""){
 				connect_pressed = true;
 			} else {
-				Network.InitializeServer(32, int.Parse(port),false);
+				bool useNat = !Network.HavePublicAddress();
+				Network.InitializeServer(32, 25002, useNat);
+				
+				// For now the game type will be "Default"
+				MasterServer.RegisterHost(GAME_TYPE, room_name);
+				
 				state = LOBBY_NETWORK;
 				AddPlayer(Network.player, player_name);
 			}
@@ -188,51 +223,76 @@ public class Lobby : MonoBehaviour {
 		if(connect_pressed){
 			label.x = initial_box.x + w*0.33f;
 			label.y = initial_box.y + h*0.6f;
-			GUI.Label(label, "Insert a valid port");
+			GUI.Label(label, "Insert a room name");
 		}
 	}
-
+	
+	private Vector2 scrollPosition = Vector2.zero;
+	
 	void JoinServer ()
 	{
-		label.x = initial_box.x + w*0.03f;
-		label.y = initial_box.y + h*0.33f;
-		GUI.Label(label, "IP");
-		ip_field.x = initial_box.x + 25;
-		ip_field.y = initial_box.y + h*0.33f;
-		ip = GUI.TextField(ip_field, ip);
-		label.x = initial_box.x + w*0.03f;
-		label.y = initial_box.y + h*0.33f*1.5f;
-		GUI.Label(label, "Port");
-		port_field.x = initial_box.x + 35;
-		port_field.y = initial_box.y + h*0.33f*1.5f;
-		port = GUI.TextField(port_field, port);
-		if(GUI.Button(new Rect(initial_box.x + w*0.1f, 
-							   initial_box.y + h*0.71f,
-							   85,
-						       25),
-		              "Back")) {
-			port = "";
-			ip = "";
-			connect_pressed = false;
-			state = INITIAL_SCREEN;
-		}
-		if(GUI.Button(new Rect(initial_box.x + w*0.9f - 80, 
-							   initial_box.y + h*0.71f,
-							   85,
-						       25),
-		              "Join")) {
-			if(ip == "" || port == ""){
-				connect_pressed = true;
-			} else {
-				Network.Connect(ip, int.Parse(port));
+		
+		GUILayout.BeginArea(new Rect(Screen.width*0.05f, Screen.height*0.05f, Screen.width*0.9f, Screen.height*0.9f));
+		if (MasterServer.PollHostList().Length != 0) {
+            HostData[] hostData = MasterServer.PollHostList();
+			available_rooms = new ArrayList();
+            for (int i = 0; i < hostData.Length; i++) {
+				available_rooms.Add(hostData[i]);
+            }
+            MasterServer.ClearHostList();
+        }
+		
+		GUILayout.Label("Join Room");
+		scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width*0.9f), GUILayout.Height(Screen.height*0.8f));
+		GUILayout.BeginVertical("box");
+		for(int i = 0; i < available_rooms.Count; i++) {
+			if(GUILayout.Button(((HostData)available_rooms[i]).gameName)) {
+				Network.Connect(((HostData)available_rooms[i]).ip, ((HostData)available_rooms[i]).port);
 				state = LOBBY_NETWORK;
 			}
 		}
-		if(connect_pressed){
-			label.x = initial_box.x + w*0.2f;
-			label.y = initial_box.y + h*0.6f;
-			GUI.Label(label, "Insert a valid ip address and port");
-		}
+		GUILayout.EndVertical();
+		GUILayout.EndScrollView();
+		GUILayout.EndArea();
+//		label.x = initial_box.x + w*0.03f;
+//		label.y = initial_box.y + h*0.33f;
+//		GUI.Label(label, "IP");
+//		ip_field.x = initial_box.x + 25;
+//		ip_field.y = initial_box.y + h*0.33f;
+//		ip = GUI.TextField(ip_field, ip);
+//		label.x = initial_box.x + w*0.03f;
+//		label.y = initial_box.y + h*0.33f*1.5f;
+//		GUI.Label(label, "Port");
+//		port_field.x = initial_box.x + 35;
+//		port_field.y = initial_box.y + h*0.33f*1.5f;
+//		port = GUI.TextField(port_field, port);
+//		if(GUI.Button(new Rect(initial_box.x + w*0.1f, 
+//							   initial_box.y + h*0.71f,
+//							   85,
+//						       25),
+//		              "Back")) {
+//			port = "";
+//			ip = "";
+//			connect_pressed = false;
+//			state = INITIAL_SCREEN;
+//		}
+//		if(GUI.Button(new Rect(initial_box.x + w*0.9f - 80, 
+//							   initial_box.y + h*0.71f,
+//							   85,
+//						       25),
+//		              "Join")) {
+//			if(ip == "" || port == ""){
+//				connect_pressed = true;
+//			} else {
+//				Network.Connect(ip, int.Parse(port));
+//				state = LOBBY_NETWORK;
+//			}
+//		}
+//		if(connect_pressed){
+//			label.x = initial_box.x + w*0.2f;
+//			label.y = initial_box.y + h*0.6f;
+//			GUI.Label(label, "Insert a valid ip address and port");
+//		}
 	}
 	
 	void LobbyNetwork(Vector2 team_0, Vector2 team_1, Vector2 team_2)
@@ -316,7 +376,6 @@ public class Lobby : MonoBehaviour {
 	
 	void LobbyLocal(Vector2 team_0, Vector2 team_1, Vector2 team_2)
 	{
-		int num = 0;
 		/********************** For the keyboard player **********************/
 		
 		Player_Local local_player = local_players[0];
@@ -604,7 +663,7 @@ public class Lobby : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		if(state != LOBBY_NETWORK && state != LOBBY_LOCAL) {
+		if(state != LOBBY_NETWORK && state != LOBBY_LOCAL && state != JOIN_SERVER) {
 			GUI.Box(initial_box, "Welcome");
 			
 			switch(state) {
@@ -617,11 +676,11 @@ public class Lobby : MonoBehaviour {
 				case CREATE_SERVER:
 					CreateServer ();
 					break;
-				case JOIN_SERVER:
-					JoinServer ();
-					break;
+				
 			}
 			
+		} else if (state == JOIN_SERVER) {
+			JoinServer();
 		} else {
 			
 			GUI.Box(new Rect(10, 10, Screen.width-20, Screen.height-20), "Lobby"); 
