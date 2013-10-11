@@ -12,8 +12,8 @@ public class GUIManager : MonoBehaviour {
 	
 	private GUIStyle style_title;
 	
-	private float native_horizontal_resolution = 1296f;
-	private float native_vertical_resolution = 729f;
+	private float NATIVE_HORIZONTAL_RESOLUTION = 1296f;
+	private float NATIVE_VERTICAL_RESOLUTION = 729f;
 	private float goal_scored = 0.0f;
 	
 	public void Awake()
@@ -56,7 +56,7 @@ public class GUIManager : MonoBehaviour {
 	public void DrawGoalScored(int team, string str, int str_width)
 	{
 		style_title.fontSize = 100;
-		Rect pos = new Rect(native_horizontal_resolution/2 - str_width*1/2*(str.Length-1), 90 , 10 , 50);
+		Rect pos = new Rect(NATIVE_HORIZONTAL_RESOLUTION/2 - str_width*1/2*(str.Length-1), 90 , 10 , 50);
 		Rect temp = pos;
 		Color color;
 	//	Debug.Log(team);
@@ -75,7 +75,7 @@ public class GUIManager : MonoBehaviour {
 	private void DrawOutline(Rect pos, string str, Color color, Color outline)
 	{
 		GUI.matrix = Matrix4x4.TRS (new Vector3(0,0,0),
-		Quaternion.identity, new Vector3 (Screen.width / native_horizontal_resolution, Screen.height / native_vertical_resolution, 1));
+		Quaternion.identity, new Vector3 (Screen.width / NATIVE_HORIZONTAL_RESOLUTION, Screen.height / NATIVE_VERTICAL_RESOLUTION, 1));
 		
 		style_title.normal.textColor = outline;
 		pos.x--;

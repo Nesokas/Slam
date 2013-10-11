@@ -51,8 +51,13 @@ public class Player_Behaviour : MonoBehaviour {
 	protected bool is_adding_speed = false;
 	protected float animation_speed = 1f;
 	
+	private float NATIVE_HORIZONTAL_RESOLUTION = 1296f;
+	private float NATIVE_VERTICAL_RESOLUTION = 729f;
+	
 	protected PlayerController.Commands commands;
-
+	
+	private float PLAYER_ARROW_SIZE = 0.012f;
+    private float PLAYER_ARROW_HEIGHT = 0.02f;
 
 	void VerifyShoot()
 	{
@@ -258,13 +263,53 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		float dash_bar_position_heigth = 20;
+		float x;
+		float y;
+		float width;
+		float height;
+		
 		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(dash_bar.position);
-		GUI.DrawTexture(new Rect(player_indicator_position.x * Screen.width - 10, (1 - player_indicator_position.y) * Screen.height - 25, 20, 20), 
-						indicator_arrow, 
-						ScaleMode.ScaleToFit, 
-						true);
-
+		
+		if (player_indicator_position.x < 0) {
+			x = Screen.height*PLAYER_ARROW_HEIGHT;
+			y = (1 - player_indicator_position.y) * Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+			GUIUtility.RotateAroundPivot(90f, new Vector2(x, y));
+			
+		
+		} else if (player_indicator_position.x > 1) {
+			x = Screen.width - Screen.height*PLAYER_ARROW_HEIGHT;
+			y = (1 - player_indicator_position.y)* Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+			GUIUtility.RotateAroundPivot(-90f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
+			
+		} else if (player_indicator_position.y > 1) {
+			x = (player_indicator_position.x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f);
+			y = 0;
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+			GUIUtility.RotateAroundPivot(180f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
+		
+		} else if (player_indicator_position.y < 0) {
+			x = (player_indicator_position.x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f);
+			y = Screen.height*0.99f - Screen.height*PLAYER_ARROW_SIZE;
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+//			GUIUtility.RotateAroundPivot(180f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
+		}
+		
+		else {
+			x = (player_indicator_position.x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f);
+			y = (1 - player_indicator_position.y) * Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+		}
+		
+		
+		GUI.DrawTexture( new Rect(x, y, width, height), indicator_arrow,	ScaleMode.ScaleToFit, true);
+			
 // FOR MAKING THE DASHBAR WITH TEXTURES
 //		float dash_bar_width = 50;
 //		float dash_bar_height = 5;
@@ -273,7 +318,7 @@ public class Player_Behaviour : MonoBehaviour {
 //		GUI.DrawTexture(new Rect(player_indicator_position.x * Screen.width - dash_bar_width/2f, (1 - player_indicator_position.y) * Screen.height - dash_bar_height/2f - dash_bar_position_heigth, dash_bar_width, dash_bar_height), 
 //						dash_bar_outline, 
 //						ScaleMode.StretchToFill, 
-//						true);
+//	
 	}
 
 	// Update is called once per frame
