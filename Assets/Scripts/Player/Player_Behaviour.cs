@@ -107,8 +107,7 @@ public class Player_Behaviour : MonoBehaviour {
 			dash_bar_fill.renderer.material.color = Color.green;
 		}
 		float fill_percent = current_value/DASH_COOLDOWN;
-//		Debug.Log(fill_percent + "%");
-//		Debug.Log(rigidbody.velocity);
+
 		dash_bar_fill.localScale = new Vector3(1f, 1f,fill_percent);
 	}
 
@@ -253,11 +252,28 @@ public class Player_Behaviour : MonoBehaviour {
 	}
 	
 	public Texture indicator_arrow;
+	public Texture dash_bar_outline;
+	public Texture dash_bar_green;
+	public Texture dash_bar_red;
 	
 	void OnGUI()
 	{
+		float dash_bar_position_heigth = 20;
 		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(dash_bar.position);
-		GUI.DrawTexture(new Rect(player_indicator_position.x * Screen.width - 10, (1 - player_indicator_position.y) * Screen.height - 25, 20, 20), indicator_arrow, ScaleMode.ScaleToFit, true);
+		GUI.DrawTexture(new Rect(player_indicator_position.x * Screen.width - 10, (1 - player_indicator_position.y) * Screen.height - 25, 20, 20), 
+						indicator_arrow, 
+						ScaleMode.ScaleToFit, 
+						true);
+
+// FOR MAKING THE DASHBAR WITH TEXTURES
+//		float dash_bar_width = 50;
+//		float dash_bar_height = 5;
+//		
+//		
+//		GUI.DrawTexture(new Rect(player_indicator_position.x * Screen.width - dash_bar_width/2f, (1 - player_indicator_position.y) * Screen.height - dash_bar_height/2f - dash_bar_position_heigth, dash_bar_width, dash_bar_height), 
+//						dash_bar_outline, 
+//						ScaleMode.StretchToFill, 
+//						true);
 	}
 
 	// Update is called once per frame
