@@ -721,6 +721,8 @@ public class Lobby : MonoBehaviour {
 		float distance_team_1 = court_lenght/(players_team_1+1);
 		float distance_team_2 = court_lenght/(players_team_2+1);
 		
+		networkView.RPC("LoadSettings", RPCMode.Others);
+		
 		GameObject settings = (GameObject)Instantiate(settings_prefab);
 		Game_Settings game_settings = settings.GetComponent<Game_Settings>();
 	
@@ -748,6 +750,14 @@ public class Lobby : MonoBehaviour {
 		}
 		game_settings.local_game = false;
 		networkView.RPC("LoadGame", RPCMode.All);
+	}
+	
+	[RPC]
+	void LoadSettings()
+	{
+		GameObject settings = (GameObject)Instantiate(settings_prefab);
+		Game_Settings game_settings = settings.GetComponent<Game_Settings>();
+		game_settings.local_game = false;
 	}
 	
 	[RPC]

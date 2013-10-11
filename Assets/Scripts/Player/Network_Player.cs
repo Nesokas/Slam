@@ -51,7 +51,7 @@ public class Network_Player: Kickoff_Player {
 	
 	[RPC] 
 	void UpdateMaterial(bool shoot)
-	{
+	{	
 		if (shoot)
 			player_base.renderer.material = shoot_material;
 		else
