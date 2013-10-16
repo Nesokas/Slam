@@ -263,14 +263,42 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		float x;
-		float y;
-		float width;
-		float height;
+		float x=0;
+		float y=0;
+		float width=0;
+		float height=0;
 		
 		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(dash_bar.position);
 		
-		if (player_indicator_position.x < 0) {
+		if (player_indicator_position.x < 0 && player_indicator_position.y < 0) {
+		
+			y = Screen.height*0.99f - Screen.height*PLAYER_ARROW_SIZE;
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+			GUIUtility.RotateAroundPivot(45f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
+		
+		} else if (player_indicator_position.x < 0 && player_indicator_position.y > 1) {
+		
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+			GUIUtility.RotateAroundPivot(135f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
+			
+		} else if (player_indicator_position.x > 1 && player_indicator_position.y < 0) {
+			y = Screen.height*0.99f - Screen.height*PLAYER_ARROW_SIZE;
+			x = Screen.width - Screen.height*PLAYER_ARROW_HEIGHT;
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+			GUIUtility.RotateAroundPivot(-45f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
+			
+		} else if (player_indicator_position.x > 1 && player_indicator_position.y > 1) {
+			x= Screen.width - Screen.height*PLAYER_ARROW_HEIGHT;
+			width = Screen.width*PLAYER_ARROW_SIZE;
+			height = Screen.width*PLAYER_ARROW_SIZE;
+			GUIUtility.RotateAroundPivot(-135f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
+			
+		}
+			
+		else if (player_indicator_position.x < 0) {
 			x = Screen.height*PLAYER_ARROW_HEIGHT;
 			y = (1 - player_indicator_position.y) * Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
 			width = Screen.width*PLAYER_ARROW_SIZE;
@@ -297,7 +325,6 @@ public class Player_Behaviour : MonoBehaviour {
 			y = Screen.height*0.99f - Screen.height*PLAYER_ARROW_SIZE;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
-//			GUIUtility.RotateAroundPivot(180f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
 		}
 		
 		else {
@@ -306,7 +333,6 @@ public class Player_Behaviour : MonoBehaviour {
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 		}
-		
 		
 		GUI.DrawTexture( new Rect(x, y, width, height), indicator_arrow,	ScaleMode.ScaleToFit, true);
 			
