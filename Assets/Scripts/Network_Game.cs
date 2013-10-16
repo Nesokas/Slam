@@ -47,7 +47,7 @@ public class Network_Game : Game_Behaviour {
 			if(settings == null) {
 				GameObject player = (GameObject)Network.Instantiate(player_prefab, new Vector3(0, 0, 7.12416f), transform.rotation, 0);
 				Network_Player np = (Network_Player)player.GetComponent<Network_Player>();
-				np.InitializePlayerInfo(Network.player, 1, "Test", new Vector3(0, 0, 7.12416f));
+				np.InitializePlayerInfo(Network.player, 1, "Test", new Vector3(0, 0, 7.12416f), 0);
 			} else {
 				Game_Settings game_settings = settings.GetComponent<Game_Settings>();
 				for(int i = 0; i < game_settings.players.Count; i++) {
@@ -59,7 +59,8 @@ public class Network_Game : Game_Behaviour {
 							game_settings.players[i].network_player, 
 							game_settings.players[i].team, 
 							game_settings.players[i].name, 
-							game_settings.players[i].start_position
+							game_settings.players[i].start_position,
+							i
 						);
 					}
 				}
@@ -67,5 +68,10 @@ public class Network_Game : Game_Behaviour {
 		}
 		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
 		MovePlayersToStartPositions();
+	}
+	
+	public Texture GetTexture(int id)
+	{
+		return player_arrows[id];
 	}
 }

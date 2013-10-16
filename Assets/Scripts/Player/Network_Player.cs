@@ -3,20 +3,20 @@ using System.Collections;
 
 public class Network_Player: Kickoff_Player {
 
-	public void InitializePlayerInfo(NetworkPlayer network_player, int team_num, string player_name, Vector3 position)
+	public void InitializePlayerInfo(NetworkPlayer network_player, int team_num, string player_name, Vector3 position, int textureID)
 	{
-		networkView.RPC("TellInfoToPlayers", RPCMode.All, team_num, player_name, position, network_player);
+		networkView.RPC("TellInfoToPlayers", RPCMode.All, team_num, player_name, position, network_player, textureID);
 	}
 	
 	[RPC]
-	void TellInfoToPlayers(int team_num, string name, Vector3 position, NetworkPlayer network_player)
+	void TellInfoToPlayers(int team_num, string name, Vector3 position, NetworkPlayer network_player, int textureID)
 	{
 		team = team_num;
 		
 		owner = network_player;
-		Player_Name name_component = transform.Find("Player_name").transform.GetComponent<Player_Name>();
-		name_component.m_camera = (Camera)GameObject.FindGameObjectWithTag("MainCamera").camera;
-		name_component.ChangeName(name);
+//		Player_Name name_component = transform.Find("Player_name").transform.GetComponent<Player_Name>();
+//		name_component.m_camera = (Camera)GameObject.FindGameObjectWithTag("MainCamera").camera;
+//		name_component.ChangeName(name);
 		
 		animation.Play("Idle");
 		initial_position = position;
@@ -25,6 +25,10 @@ public class Network_Player: Kickoff_Player {
 			PlayerController player_controller = controller_object.GetComponent<PlayerController>();
 			player_controller.setInputNum(0);
 		}
+		
+		GameObject game_controller = GameObject.FindGameObjectWithTag("GameController");
+        Network_Game network_game = game_controller.GetComponent<Network_Game>();
+        indicator_arrow = network_game.GetTexture(textureID);
 	}
 	
 	void StopCelebration()
@@ -93,9 +97,9 @@ public class Network_Player: Kickoff_Player {
 	
 	new void Start()
 	{
-		if (!networkView.isMine) {	
-			enabled = false;
-		}
+//		if (!networkView.isMine) {	
+//			enabled = false;
+//		}
 		base.Start();
 	}
 }
