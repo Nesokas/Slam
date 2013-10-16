@@ -4,6 +4,13 @@ using System.Collections;
 public class GUIManager : MonoBehaviour {
 	
 	public Font slam_font ;
+	
+	private int GOAL_STR_CHAR_WIDTH = 60;
+	private int GOAL_STR_CHAR_SIZE = 100;
+	
+	private int DRAW_STR_CHAR_WIDTH = 30;
+	private int DRAW_STR_CHAR_SIZE = 50;
+	
 	public Material red;
 	public Material blue;
 	
@@ -53,10 +60,10 @@ public class GUIManager : MonoBehaviour {
 	}
 	*/
 	
-	public void DrawGoalScored(int team, string str, int str_width)
+	public void DrawGoalScored(int team, string str)
 	{
-		style_title.fontSize = 100;
-		Rect pos = new Rect(NATIVE_HORIZONTAL_RESOLUTION/2 - str_width*1/2*(str.Length-1), 90 , 10 , 50);
+		style_title.fontSize = GOAL_STR_CHAR_SIZE;
+		Rect pos = new Rect(NATIVE_HORIZONTAL_RESOLUTION/2 - GOAL_STR_CHAR_WIDTH*1/2*(str.Length-1), 90 , 10 , 50);
 		Rect temp = pos;
 		Color color;
 	//	Debug.Log(team);
@@ -68,7 +75,18 @@ public class GUIManager : MonoBehaviour {
 			temp.x = pos.x + Random.Range(-6, 6);
 			temp.y = pos.y + Random.Range(-6, 6);
 			DrawOutline(temp, ch.ToString() , color, Color.black);
-			pos.x += str_width;
+			pos.x += GOAL_STR_CHAR_WIDTH;
+		}
+	}
+	
+	/* It will display the appropriate message - "Draw", or "Golden Goal" */
+	public void DrawTieMessage(string str)
+	{
+		style_title.fontSize = DRAW_STR_CHAR_SIZE;
+		Rect pos = new Rect(NATIVE_HORIZONTAL_RESOLUTION/6 - DRAW_STR_CHAR_WIDTH*1/2*(str.Length-1), 45 , 10 , 50);
+		foreach(char ch in str) {
+			DrawOutline(pos, ch.ToString() , Color.yellow, Color.black);
+			pos.x += DRAW_STR_CHAR_WIDTH;
 		}
 	}
 	

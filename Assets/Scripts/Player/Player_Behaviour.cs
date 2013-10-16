@@ -50,10 +50,7 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	protected bool is_adding_speed = false;
 	protected float animation_speed = 1f;
-	
-	private float NATIVE_HORIZONTAL_RESOLUTION = 1296f;
-	private float NATIVE_VERTICAL_RESOLUTION = 729f;
-	
+
 	protected PlayerController.Commands commands;
 	
 	private float PLAYER_ARROW_SIZE = 0.012f;

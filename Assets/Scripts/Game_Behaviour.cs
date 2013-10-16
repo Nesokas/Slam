@@ -7,6 +7,7 @@ public class Game_Behaviour : MonoBehaviour {
 	// For when a player scores
 	private string GOAL_STR = "GOAL!";
 	private int GOAL_STR_CHAR_WIDTH = 60;
+	private int TIE_STR_CHAR_WIDTH = 30;
 	
 	// initial ball position
 	public Vector3 ball_position = new Vector3(0, -0.04788643f, 0);
@@ -62,6 +63,8 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public Texture[] player_arrows;
 	
+	private bool isTimeUp = false;
+	
 	public void ScoreTeam(int team)
 	{		
 		if(team == 1) {
@@ -84,6 +87,11 @@ public class Game_Behaviour : MonoBehaviour {
 		Application.LoadLevel(0);
 	}
 	
+//	public void setTimeUp(bool val)
+//	{
+//		isTimeUp = val;
+//	}
+	
 	public void ReleasePlayers()
 	{
 		NotificationCenter.DefaultCenter.PostNotification(this, "ReleasePlayers");	
@@ -102,24 +110,30 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public void TimeFinished()
 	{
-		finish_game = true;
 		timer_value = 0f;
-		trigger_timer = true;
-		is_celebrating = true;
+		isTimeUp = true;
 		
 		if(score_team_1 > score_team_2){
 			TeamReaction(1, "Celebrate");
 			TeamReaction(2, "Sad");
+			finish_game = true;
+			is_celebrating = true;
+			trigger_timer = true;
+			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 		} else if(score_team_1 < score_team_2) {
 			TeamReaction(2, "Celebrate");
 			TeamReaction(1, "Sad");
+			finish_game = true;
+			is_celebrating = true;
+			trigger_timer = true;
+			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 		} else {
-			TeamReaction(1, "Celebrate");
-			TeamReaction(2, "Celebrate");
+			finish_game = false;
+			is_celebrating = false;
 		}
 		
-		AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
-	}	
+//		AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
+	}
 	
 	protected void TeamReaction(int team, string reaction)
 	{
@@ -215,6 +229,9 @@ public class Game_Behaviour : MonoBehaviour {
 				ScoreTeam(2);
 				team_celebrating = 2;
 			}
+			if (isTimeUp)
+				finish_game = true;
+			
 			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			is_celebrating = true;
 			
@@ -233,21 +250,31 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void OnGUI()
 	{	
-		if(is_celebrating){
-			if (!finish_game)
-				gui_manager.DrawGoalScored(team_scored, GOAL_STR, GOAL_STR_CHAR_WIDTH);
-			else {
-				if(score_team_1 > score_team_2)
-					gui_manager.DrawGoalScored(1, "RED TEAM WINS", GOAL_STR_CHAR_WIDTH);
-				else if(score_team_1 < score_team_2)
-					gui_manager.DrawGoalScored(2, "BLUE TEAM WINS", GOAL_STR_CHAR_WIDTH);
-				else {
-					gui_manager.DrawGoalScored(Random.Range(1,2), "DRAW", GOAL_STR_CHAR_WIDTH);
-				}
-			}
+//		if(is_celebrating){
+//			if (!finish_game)
+//				gui_manager.DrawGoalScored(team_scored, GOAL_STR);
+//			else {
+//				if(score_team_1 > score_team_2) {
+//					gui_manager.DrawGoalScored(1, "RED TEAM WINS");
+//					AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
+//				}
+//				else if(score_team_1 < score_team_2) {
+//					gui_manager.DrawGoalScored(2, "BLUE TEAM WINS");
+//					AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
+//				}
+//			}
+//			
+//		} else 
+		if (is_celebrating && !isTimeUp)
+			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
+		if (isTimeUp) {
+			Debug.Log(score_team_1 + " " + score_team_2);
+			if (score_team_1 == score_team_2)
+				gui_manager.DrawTieMessage("Golden Goal");
+			else if (score_team_1 > score_team_2)
+				gui_manager.DrawGoalScored(1, "RED TEAM WINS");
+			else if (score_team_1 < score_team_2)
+				gui_manager.DrawGoalScored(2, "BLUE TEAM WINS");
 		}
-		 //else
-		//	gui_manager.DrawScore(score_team_1, score_team_2);
-			
 	}
 }
