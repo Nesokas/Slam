@@ -26,7 +26,7 @@ public class ScoreBoard : MonoBehaviour {
 	private bool update_timer;
 	
 	// finish game only once
-	private bool game_finished;
+	private bool time_finished;
 	
 	
 	// Use this for initialization
@@ -35,9 +35,9 @@ public class ScoreBoard : MonoBehaviour {
 		NotificationCenter.DefaultCenter.AddObserver(this, "ReleasePlayers");
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
 		
-		time = 300.0f; // 5 minutes
+		time = 3.0f; // 5 minutes
 		update_timer = false;
-		game_finished = false;
+		time_finished = false;
 		
 		timer_0_min = timer.transform.Find("0_min").GetComponent<LED>();
 		timer_1_min = timer.transform.Find("1_min").GetComponent<LED>();
@@ -86,15 +86,15 @@ public class ScoreBoard : MonoBehaviour {
 		float minutes = Mathf.Floor(time / 60);
 		float seconds = Mathf.RoundToInt(time%60);
 		
-		if(!game_finished) {
+		if(!time_finished) {
 			if(time <= 0.0f) {
 				timer_0_min.SetCurrentNumber(0);
 				timer_1_min.SetCurrentNumber(0);
 				
 				timer_0_seg.SetCurrentNumber(0);
 				timer_1_seg.SetCurrentNumber(0);
-				game_finished = true;
-				FinishGame();
+				time_finished = true;
+				TimeFinished();
 			} else {
 			
 				if((int)seconds == 60) {
@@ -117,7 +117,7 @@ public class ScoreBoard : MonoBehaviour {
 	}
 	
 	// GameFinished
-	void FinishGame()
+	void TimeFinished()
 	{
 		Game_Behaviour game_behaviour = GameObject.FindGameObjectWithTag("GameController").GetComponent<Game_Behaviour>();
 		game_behaviour.TimeFinished();
