@@ -245,7 +245,8 @@ public class Player_Behaviour : MonoBehaviour {
 	public Texture dash_bar_outline;
 	public Texture dash_bar_green;
 	public Texture dash_bar_red;
-	public Texture dash_arrow;
+	public Texture dash_arrow_full;
+	public Texture dash_arrow_fill;
 	
 	void OnGUI()
 	{
@@ -321,34 +322,25 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 		
 		y = y - Screen.height*0.03f;
+		Texture dash_arrow_texture = dash_arrow_fill;
+		
 		GUI.DrawTexture( new Rect(x, y, width, height), indicator_arrow,	ScaleMode.ScaleToFit, true);
 		
 		float current_value = DASH_COOLDOWN - (dash_cooldown-Time.time);
-		if (current_value < 0)
+		if (current_value < 0) {
 			current_value = DASH_COOLDOWN;
-		else if (current_value > DASH_COOLDOWN) {
+		}else if (current_value > DASH_COOLDOWN) {
 			current_value = DASH_COOLDOWN;
+			dash_arrow_texture = dash_arrow_full;
 		}
 		float fill_percent = current_value/DASH_COOLDOWN;
 		
-		float dash_arrow_width = 6;
-		float dash_arrow_height = 4;
-		
-		GUI.BeginGroup(new Rect (x-(dash_arrow_width/2f), y - (dash_arrow_height/2f), width + dash_arrow_width, height*fill_percent + dash_arrow_height));
-		GUI.DrawTexture(new Rect(0, 0, width + dash_arrow_width, height + dash_arrow_height), dash_arrow);
+		float dash_arrow_width = 0.005f * Screen.width;
+		float dash_arrow_height = 0.006f * Screen.height;
+
+		GUI.BeginGroup(new Rect (x-(dash_arrow_width/2f), y + height*(1f-fill_percent), width + dash_arrow_width, height*fill_percent + dash_arrow_height));
+		GUI.DrawTexture(new Rect(0, -(1f-fill_percent)*height, width + dash_arrow_width, height + dash_arrow_height), dash_arrow_texture);
 		GUI.EndGroup();
-//						dash_bar_outline, 
-//						ScaleMode.StretchToFill, 
-			
-// FOR MAKING THE DASHBAR WITH TEXTURES
-//		float dash_bar_width = 50;
-//		float dash_bar_height = 5;
-//		
-//		
-//		GUI.DrawTexture(new Rect(player_indicator_position.x * Screen.width - dash_bar_width/2f, (1 - player_indicator_position.y) * Screen.height - dash_bar_height/2f - dash_bar_position_heigth, dash_bar_width, dash_bar_height), 
-//						dash_bar_outline, 
-//						ScaleMode.StretchToFill, 
-//	
 	}
 
 	// Update is called once per frame
