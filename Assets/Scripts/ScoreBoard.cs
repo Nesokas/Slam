@@ -35,7 +35,7 @@ public class ScoreBoard : MonoBehaviour {
 		NotificationCenter.DefaultCenter.AddObserver(this, "ReleasePlayers");
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
 		
-		time = 3.0f; // 5 minutes
+		time = 300.0f; // 5 minutes
 		update_timer = false;
 		time_finished = false;
 		
