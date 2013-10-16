@@ -104,16 +104,16 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	void UpdateDashBarFill()
 	{
-		float current_value = DASH_COOLDOWN - (dash_cooldown-Time.time);
-		if (current_value < 0)
-			current_value = DASH_COOLDOWN;
-		else if (current_value > DASH_COOLDOWN) {
-			current_value = DASH_COOLDOWN;
-			dash_bar_fill.renderer.material.color = Color.green;
-		}
-		float fill_percent = current_value/DASH_COOLDOWN;
-
-		dash_bar_fill.localScale = new Vector3(1f, 1f,fill_percent);
+//		float current_value = DASH_COOLDOWN - (dash_cooldown-Time.time);
+//		if (current_value < 0)
+//			current_value = DASH_COOLDOWN;
+//		else if (current_value > DASH_COOLDOWN) {
+//			current_value = DASH_COOLDOWN;
+//			dash_bar_fill.renderer.material.color = Color.green;
+//		}
+//		float fill_percent = current_value/DASH_COOLDOWN;
+//
+//		dash_bar_fill.localScale = new Vector3(1f, 1f,fill_percent);
 	}
 
 	protected void OnTriggerEnter (Collider collider) 
@@ -260,6 +260,7 @@ public class Player_Behaviour : MonoBehaviour {
 	public Texture dash_bar_outline;
 	public Texture dash_bar_green;
 	public Texture dash_bar_red;
+	public Texture dash_arrow;
 	
 	void OnGUI()
 	{
@@ -334,7 +335,25 @@ public class Player_Behaviour : MonoBehaviour {
 			height = Screen.width*PLAYER_ARROW_SIZE;
 		}
 		
+		y = y - Screen.height*0.03f;
 		GUI.DrawTexture( new Rect(x, y, width, height), indicator_arrow,	ScaleMode.ScaleToFit, true);
+		
+		float current_value = DASH_COOLDOWN - (dash_cooldown-Time.time);
+		if (current_value < 0)
+			current_value = DASH_COOLDOWN;
+		else if (current_value > DASH_COOLDOWN) {
+			current_value = DASH_COOLDOWN;
+		}
+		float fill_percent = current_value/DASH_COOLDOWN;
+		
+		float dash_arrow_width = 6;
+		float dash_arrow_height = 4;
+		
+		GUI.BeginGroup(new Rect (x-(dash_arrow_width/2f), y - (dash_arrow_height/2f), width + dash_arrow_width, height*fill_percent + dash_arrow_height));
+		GUI.DrawTexture(new Rect(0, 0, width + dash_arrow_width, height + dash_arrow_height), dash_arrow);
+		GUI.EndGroup();
+//						dash_bar_outline, 
+//						ScaleMode.StretchToFill, 
 			
 // FOR MAKING THE DASHBAR WITH TEXTURES
 //		float dash_bar_width = 50;
