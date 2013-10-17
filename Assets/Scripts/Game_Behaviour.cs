@@ -216,6 +216,8 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void OnGoal(NotificationCenter.Notification notification)
 	{
+		GameObject last_player_touched;
+		
 		if(!is_celebrating){
 			if((int)notification.data["team"] == 1) {
 				team_scored = 1;
@@ -238,6 +240,11 @@ public class Game_Behaviour : MonoBehaviour {
 			ScoreBoard scoreboard = GameObject.Find("Score Board").GetComponent<ScoreBoard>();
 			scoreboard.UpdateScore(score_team_1, score_team_2);
 		}
+		Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
+		last_player_touched = bb.GetLastPlayerTouched();
+		
+		Player_Behaviour pb = last_player_touched.GetComponent<Player_Behaviour>();
+		pb.GoalScored();
 	}
 	
 	public int GetTeamScore(int team)

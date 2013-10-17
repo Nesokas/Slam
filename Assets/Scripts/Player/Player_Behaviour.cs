@@ -55,7 +55,10 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	private float PLAYER_ARROW_SIZE = 0.012f;
     private float PLAYER_ARROW_HEIGHT = 0.02f;
-
+	
+	
+	private int goals_scored = 0;
+	
 	void VerifyShoot()
 	{
 		if(colliding_with_ball && !ball_collision && move){
@@ -81,38 +84,23 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	void VerifyDash()
 	{		
-//		Debug.Log(dash_cooldown + " " + Time.time);
 		if (commands.dash != 0 && (Time.time > dash_cooldown) && (commands.horizontal_direction != 0 || commands.vertical_direction != 0)) {
 			dash_cooldown =  DASH_COOLDOWN + Time.time;
 			rigidbody.velocity *= DASH_STRENGTH;
-//			StartCoroutine(DrawDashTrail());
 			dash_bar_fill.renderer.material.color = Color.red;
 		}
-		UpdateDashBarFill();
 	}
 	
-//	protected IEnumerator DrawDashTrail()
-//	{
-//		Debug.Log("DASHING");
-//		dash_trail.particleEmitter.emit = true;
-//		yield return new WaitForSeconds(0.2f);
-//		dash_trail.particleEmitter.emit = false;
-//	}
-	
-	void UpdateDashBarFill()
+	public void GoalScored()
 	{
-//		float current_value = DASH_COOLDOWN - (dash_cooldown-Time.time);
-//		if (current_value < 0)
-//			current_value = DASH_COOLDOWN;
-//		else if (current_value > DASH_COOLDOWN) {
-//			current_value = DASH_COOLDOWN;
-//			dash_bar_fill.renderer.material.color = Color.green;
-//		}
-//		float fill_percent = current_value/DASH_COOLDOWN;
-//
-//		dash_bar_fill.localScale = new Vector3(1f, 1f,fill_percent);
+		goals_scored++;
 	}
-
+	
+	public int getGoalsScored()
+	{
+		return goals_scored;
+	}
+	
 	protected void OnTriggerEnter (Collider collider) 
 	{
 	    if(collider.gameObject.tag == "ball") {

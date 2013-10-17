@@ -13,6 +13,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	string[] animationsType2;
 	
 	protected GameObject last_player_touched;
+	protected GameObject last_player_shot;
 	
 	protected bool is_looking_somewhere;
 	
