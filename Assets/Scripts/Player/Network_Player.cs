@@ -50,8 +50,9 @@ public class Network_Player: Kickoff_Player {
 			} else {
 				networkView.RPC("UpdateMaterial", RPCMode.All, false);
 			}
-			
+		
 			networkView.RPC("AskCommands", RPCMode.All);
+			
 		}
 	}
 	
@@ -105,4 +106,21 @@ public class Network_Player: Kickoff_Player {
 //		}
 		base.Start();
 	}
+	
+	override protected void VerifyDash()
+	{
+		if (Network.isServer){
+			networkView.RPC("UpdateServerDash", RPCMode.Others, commands.dash, commands.horizontal_direction, commands.vertical_direction);
+			Dash(commands.dash, commands.horizontal_direction, commands.vertical_direction);
+		}
+	}
+	
+	[RPC]
+	void UpdateServerDash(float dash, float horizontal_direction, float vertical_direction)
+	{
+//		Debug.Log("UpdateServerDash called: " + dash);
+		commands.dash = dash;
+		Dash(dash, horizontal_direction, vertical_direction);
+	}
+		
 }
