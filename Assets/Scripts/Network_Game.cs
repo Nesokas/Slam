@@ -74,4 +74,18 @@ public class Network_Game : Game_Behaviour {
 	{
 		return player_arrows[id];
 	}
+	
+	public override void ReleasePlayers()
+	{
+		if(Network.isServer) {
+			networkView.RPC("ReleaseClientPlayers", RPCMode.Others);
+			base.ReleasePlayers();
+		}
+	}
+	
+	[RPC]
+	public void ReleaseClientPlayers()
+	{
+		base.ReleasePlayers();
+	}
 }
