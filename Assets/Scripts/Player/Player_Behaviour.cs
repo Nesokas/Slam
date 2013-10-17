@@ -82,9 +82,14 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 	}
 	
-	void VerifyDash()
+	protected virtual void VerifyDash()
+	{
+		Dash(commands.dash, commands.horizontal_direction, commands.vertical_direction);
+	}
+	
+	protected void Dash(float dash, float horizontal_direction, float vertical_direction)
 	{		
-		if (commands.dash != 0 && (Time.time > dash_cooldown) && (commands.horizontal_direction != 0 || commands.vertical_direction != 0)) {
+		if (dash != 0 && (Time.time > dash_cooldown) && (horizontal_direction != 0 || vertical_direction != 0)) {
 			dash_cooldown =  DASH_COOLDOWN + Time.time;
 			rigidbody.velocity *= DASH_STRENGTH;
 			dash_bar_fill.renderer.material.color = Color.red;
@@ -322,11 +327,13 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 		
 		y = y - Screen.height*0.03f;
-		Texture dash_arrow_texture = dash_arrow_fill;
 		
 		GUI.DrawTexture( new Rect(x, y, width, height), indicator_arrow,	ScaleMode.ScaleToFit, true);
 		
+		// Dash indicator arrow
+		Texture dash_arrow_texture = dash_arrow_fill;
 		float current_value = DASH_COOLDOWN - (dash_cooldown-Time.time);
+		
 		if (current_value < 0) {
 			current_value = DASH_COOLDOWN;
 		}else if (current_value > DASH_COOLDOWN) {
