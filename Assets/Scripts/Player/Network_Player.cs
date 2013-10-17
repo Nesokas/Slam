@@ -44,13 +44,15 @@ public class Network_Player: Kickoff_Player {
 	
 	void Update()
 	{
-		if(!ball_collision && commands.shoot != 0) {
-			networkView.RPC("UpdateMaterial", RPCMode.All, true);
-		} else {
-			networkView.RPC("UpdateMaterial", RPCMode.All, false);
+		if(Network.isServer){
+			if(!ball_collision && commands.shoot != 0) {
+				networkView.RPC("UpdateMaterial", RPCMode.All, true);
+			} else {
+				networkView.RPC("UpdateMaterial", RPCMode.All, false);
+			}
+			
+			networkView.RPC("AskCommands", RPCMode.All);
 		}
-		
-		networkView.RPC("AskCommands", RPCMode.All);
 	}
 	
 	[RPC] 
@@ -68,17 +70,18 @@ public class Network_Player: Kickoff_Player {
 		if(Network.player == owner) {
 			PlayerController player_controller = controller_object.GetComponent<PlayerController>();
 			commands = player_controller.GetCommands();
-			networkView.RPC("UpdateCommands", RPCMode.All, commands.horizontal_direction, commands.vertical_direction, commands.shoot, Network.player);
+			networkView.RPC("UpdateCommands", RPCMode.All, commands.horizontal_direction, commands.vertical_direction, commands.shoot, commands.dash, Network.player);
 		}
 	}
 	
 	[RPC]
-	void UpdateCommands(float horizontal, float vertical, float shoot, NetworkPlayer network_player)
+	void UpdateCommands(float horizontal, float vertical, float shoot, float dash, NetworkPlayer network_player)
 	{	
 		if(network_player == owner && Network.isServer) {
 			commands.horizontal_direction = horizontal;
 			commands.vertical_direction = vertical;
 			commands.shoot = shoot;
+			commands.dash = dash;
 		}
 	}
 	
