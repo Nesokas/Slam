@@ -92,8 +92,9 @@ public class Game_Behaviour : MonoBehaviour {
 //		isTimeUp = val;
 //	}
 	
-	public void ReleasePlayers()
+	public virtual void ReleasePlayers()
 	{
+		Debug.Log("releasing players");
 		NotificationCenter.DefaultCenter.PostNotification(this, "ReleasePlayers");	
 	}
 	
