@@ -15,9 +15,6 @@ public class Network_Player: Kickoff_Player {
 		team = team_num;
 		
 		owner = network_player;
-//		Player_Name name_component = transform.Find("Player_name").transform.GetComponent<Player_Name>();
-//		name_component.m_camera = (Camera)GameObject.FindGameObjectWithTag("MainCamera").camera;
-//		name_component.ChangeName(name);
 		
 		animation.Play("Idle");
 		initial_position = position;

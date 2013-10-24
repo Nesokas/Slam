@@ -130,10 +130,10 @@ public class Lobby : MonoBehaviour {
 	// and initialize the server room list
 	void InitializeMSF()
 	{
-		MasterServer.ipAddress = "85.240.137.114";
+		MasterServer.ipAddress = "85.247.148.87";
 		MasterServer.port = 23466;
 		
-		Network.natFacilitatorIP = "85.240.137.114";
+		Network.natFacilitatorIP = "85.247.148.87";
 		Network.natFacilitatorPort = 50005;
 		
 		MasterServer.ClearHostList();
