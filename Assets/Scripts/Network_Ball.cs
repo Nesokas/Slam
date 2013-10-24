@@ -18,7 +18,6 @@ public class Network_Ball : Ball_Behaviour {
 	{
 		Forcefield forcefield = GameObject.FindGameObjectWithTag("forcefield").GetComponent<Forcefield>();
 		forcefield.BallCollition(point);
-		Debug.Log("wall hit");
 		int random = Random.Range(0,100);
 		if(random <= 10) {
 			transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;

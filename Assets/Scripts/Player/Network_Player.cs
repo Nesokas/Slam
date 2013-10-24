@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 public class Network_Player: Kickoff_Player {
-
+	
+//	Sends player info to every client
 	public void InitializePlayerInfo(NetworkPlayer network_player, int team_num, string player_name, Vector3 position, int textureID)
 	{
 		networkView.RPC("TellInfoToPlayers", RPCMode.All, team_num, player_name, position, network_player, textureID);

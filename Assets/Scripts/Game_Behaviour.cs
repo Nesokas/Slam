@@ -276,7 +276,6 @@ public class Game_Behaviour : MonoBehaviour {
 		if (is_celebrating && !isTimeUp)
 			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
 		if (isTimeUp) {
-			Debug.Log(score_team_1 + " " + score_team_2);
 			if (score_team_1 == score_team_2)
 				gui_manager.DrawTieMessage("Golden Goal");
 			else if (score_team_1 > score_team_2)
