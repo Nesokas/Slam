@@ -110,6 +110,11 @@ public class Network_Ball : Ball_Behaviour {
 		if (server_state_buffer[0] == null)
 			server_state_buffer[0] = new NetState(0, transform.position, transform.rigidbody.velocity);
 		
+		
+		Debug.Log(Network.time - server_state_buffer[0].timestamp);
+		
+
+		
 		//Try interpolation if possible.
 		//If the latest server_state_buffer timestamp is smaller than the latency
 		//we're not slow enough to really lag out and just extrapolate.
@@ -144,8 +149,19 @@ public class Network_Ball : Ball_Behaviour {
 			transform.position = Vector3.Lerp(transform.position, latest.pos, 0.5f);
 			transform.rigidbody.velocity = latest.velocity;
 			server_state_buffer[0].state_used = true;
+			
+			
+			float x,y,z;
+		
+			x = server_state_buffer[0].pos.x + server_state_buffer[0].velocity.x*((float)Network.time - server_state_buffer[0].timestamp);
+			y = server_state_buffer[0].pos.y + server_state_buffer[0].velocity.y*((float)Network.time - server_state_buffer[0].timestamp);
+			z = server_state_buffer[0].pos.z + server_state_buffer[0].velocity.z*((float)Network.time - server_state_buffer[0].timestamp);
+			
+			transform.position =  Vector3.Lerp (transform.position, new Vector3(x,y,z), 0.25f);
+			
+			
 		}
-		Debug.Log(transform.rigidbody.velocity + " " + transform.position);
+//		Debug.Log(transform.rigidbody.velocity + " " + transform.position);
 //		}
 	}
 }
