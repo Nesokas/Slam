@@ -405,11 +405,13 @@ public class Lobby : MonoBehaviour
 						else
 							networkView.RPC("ChangeNetworkPlayerTeam", RPCMode.All, players[i].network_player, team, new_team);
 					}
+				GUILayout.FlexibleSpace();
 				GUILayout.Label(players[i].player.name);
 				if(players[i].network_player != networkView.owner) {
 					GUILayout.Label("" + Network.GetAveragePing(players[i].network_player));
 				}
-				if((team == TEAM_1 || team == SPECTATING) && (offline_game || Network.isServer))
+				GUILayout.FlexibleSpace();
+				if((team == TEAM_1 || team == SPECTATING) && (offline_game || Network.isServer)) {
 					if(GUILayout.Button(">", GUILayout.MaxWidth(0.03f*Screen.width))) {
 						int new_team = SPECTATING;
 						if(team == SPECTATING)
@@ -419,6 +421,7 @@ public class Lobby : MonoBehaviour
 						else
 							networkView.RPC("ChangeNetworkPlayerTeam", RPCMode.All, players[i].network_player, team, new_team);
 					}
+				}
 			GUILayout.EndHorizontal();
 		}
 	}
@@ -509,23 +512,27 @@ public class Lobby : MonoBehaviour
 	{
 		GUILayout.BeginVertical();
 			GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
-				GUILayout.BeginVertical();
+				GUILayout.BeginVertical(GUILayout.MinWidth(0.3f*Screen.width));
 					int temp_team_1_color = GUILayout.Toolbar(team_1_color, team_colors);
 					if (temp_team_1_color != team_2_color)
 						team_1_color = temp_team_1_color;
-					GUILayout.BeginVertical("box",GUILayout.ExpandHeight(true));
+					GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
 						DrawPlayers(team_1, TEAM_1);
 					GUILayout.EndVertical();
 				GUILayout.EndVertical();
 				GUILayout.FlexibleSpace();
-				GUILayout.BeginVertical();
-					GUILayout.Label("Spectating");
+				GUILayout.BeginVertical(GUILayout.MinWidth(0.3f*Screen.width));
+					GUILayout.BeginHorizontal();
+						GUILayout.FlexibleSpace();
+						GUILayout.Label("Spectating");
+						GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
 					GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
 						DrawPlayers(spectating, SPECTATING);
 					GUILayout.EndVertical();
 				GUILayout.EndVertical();
 				GUILayout.FlexibleSpace();
-				GUILayout.BeginVertical();
+				GUILayout.BeginVertical(GUILayout.MinWidth(0.3f*Screen.width));
 					int temp_team_2_color = GUILayout.Toolbar(team_2_color, team_colors);
 					if (temp_team_2_color != team_1_color)
 						team_2_color = temp_team_2_color;
