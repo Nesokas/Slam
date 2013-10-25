@@ -66,15 +66,18 @@ public class Network_Ball : Ball_Behaviour {
 	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
 	{
 		Vector3 pos = observed_transform.position;
+		Vector3 velocity = observed_transform.rigidbody.velocity;
 		
 		if (stream.isWriting) {
 		
 			stream.Serialize(ref pos);
+			stream.Serialize(ref velocity);
 			
 		} else {
 			
 			//This code takes care of the local client
 			stream.Serialize(ref pos);
+			stream.Serialize(ref velocity);
 			server_pos = pos;
 			
 			// smoothly correct clients position
@@ -86,7 +89,7 @@ public class Network_Ball : Ball_Behaviour {
 				server_state_buffer[i] = server_state_buffer[i-1];
 			
 			//Override the first element with the latest server info
-			server_state_buffer[0] = new NetState((float)info.timestamp, pos);
+			server_state_buffer[0] = new NetState((float)info.timestamp, pos, velocity);
 		}
 	}
 	
@@ -99,49 +102,50 @@ public class Network_Ball : Ball_Behaviour {
 		}
 		
 		//client side has **only the server connected**
-		client_ping = (Network.GetAveragePing(Network.connections[0]) / 100);
+		client_ping = (Network.GetAveragePing(Network.connections[0]) / 100) + PING_MARGIN;
 		
 		float interpolation_time = (float)Network.time - client_ping;
 		
-		Debug.Log(interpolation_time);
-		
 		//ensure the buffer has at last one element
 		if (server_state_buffer[0] == null)
-			server_state_buffer[0] = new NetState(0, transform.position);
-		
-		Debug.Log(server_state_buffer[0].timestamp - interpolation_time);
+			server_state_buffer[0] = new NetState(0, transform.position, transform.rigidbody.velocity);
 		
 		//Try interpolation if possible.
 		//If the latest server_state_buffer timestamp is smaller than the latency
 		//we're not slow enough to really lag out and just extrapolate.
-		if (server_state_buffer[0].timestamp > interpolation_time) {
-			for (int i = 0; i < server_state_buffer.Length; i++) {
-				if (server_state_buffer[i] == null)
-					continue;
-				// Find the state which matches the interp. time or use last state
-				if (server_state_buffer[i].timestamp <= interpolation_time || i == server_state_buffer.Length-1) {
-					// The state one frame newer than the best playback state
-					NetState best_target = server_state_buffer[Mathf.Max(i-1,0)];
-					//The best playback state (closest current network time)
-					NetState best_start = server_state_buffer[i];
-					
-					float time_diff = best_target.timestamp - best_start.timestamp;
-					float lerp_time = 0.0f;
-					
-					if (time_diff > 0.0001) {
-						lerp_time = ((interpolation_time - best_start.timestamp) / time_diff);
-					}
-					
-					transform.position = Vector3.Lerp(best_start.pos, best_target.pos, lerp_time);
-					
-					return;
-				}
-			}
-		}
-		
-		else {
-			NetState latest = server_state_buffer[0];
+//		if (server_state_buffer[0].timestamp > interpolation_time) {
+//			for (int i = 0; i < server_state_buffer.Length; i++) {
+//				if (server_state_buffer[i] == null)
+//					continue;
+//				// Find the state which matches the interp. time or use last state
+//				if (server_state_buffer[i].timestamp <= interpolation_time || i == server_state_buffer.Length-1) {
+//					// The state one frame newer than the best playback state
+//					NetState best_target = server_state_buffer[Mathf.Max(i-1,0)];
+//					//The best playback state (closest current network time)
+//					NetState best_start = server_state_buffer[i];
+//					
+//					float time_diff = best_target.timestamp - best_start.timestamp;
+//					float lerp_time = 0.0f;
+//					
+//					if (time_diff > 0.0001) {
+//						lerp_time = ((interpolation_time - best_start.timestamp) / time_diff);
+//					}
+//					
+//					transform.position = Vector3.Lerp(best_start.pos, best_target.pos, lerp_time);
+//					
+//					return;
+//				}
+//			}
+//		}
+//		
+//		else {
+		NetState latest = server_state_buffer[0];
+		if(!latest.state_used){
 			transform.position = Vector3.Lerp(transform.position, latest.pos, 0.5f);
+			transform.rigidbody.velocity = latest.velocity;
+			server_state_buffer[0].state_used = true;
 		}
+		Debug.Log(transform.rigidbody.velocity + " " + transform.position);
+//		}
 	}
 }
