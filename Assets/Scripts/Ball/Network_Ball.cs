@@ -60,7 +60,6 @@ public class Network_Ball : Ball_Behaviour {
 		predictor.PredictBall(networkView);
 		
 		transform.position = predictor.getPredictedTransform().position;
-		transform.rotation = predictor.getPredictedTransform().rotation;
 			
 	}
 }

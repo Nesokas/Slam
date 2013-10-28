@@ -12,7 +12,6 @@ public class Predictor {
 	public Transform observed_transform;
 	
 	public Vector3 server_pos;
-	public Quaternion server_rot;
 	
 	public Predictor(Transform transform)
 	{
@@ -32,23 +31,9 @@ public class Predictor {
 		}
 	}
 	
-	public void LerpRotToTarget()
-	{
-		float distance = Vector3.Distance(observed_transform.rotation.eulerAngles, server_rot.eulerAngles);
-		
-		// only correct if the error margin (the distance) is too extreme
-		if (distance >= position_error_threshold) {
-			
-			float lerp = ((1 / distance) * 10f) / 100f;
-			
-			observed_transform.rotation = Quaternion.Euler(Vector3.Lerp (observed_transform.rotation.eulerAngles, server_rot.eulerAngles, lerp));
-		}
-	}
-	
 	public void OnSerializeNetworkViewBall(BitStream stream, NetworkMessageInfo info)
 	{
 		Vector3 pos = observed_transform.position;
-		Quaternion rot = observed_transform.rotation;
 		Vector3 angVelocity = observed_transform.rigidbody.angularVelocity;
 		Vector3 velocity = observed_transform.rigidbody.velocity;
 		
@@ -56,7 +41,6 @@ public class Predictor {
 		
 			stream.Serialize(ref pos);
 			stream.Serialize(ref velocity);
-			stream.Serialize(ref rot);
 			stream.Serialize(ref angVelocity);
 			
 		} else {
@@ -64,17 +48,14 @@ public class Predictor {
 			//This code takes care of the local client
 			stream.Serialize(ref pos);
 			stream.Serialize(ref velocity);
-			stream.Serialize(ref rot);
 			stream.Serialize(ref angVelocity);
 			server_pos = pos;
-			server_rot = rot;
 			
 			// smoothly correct clients position
 			LerpPosToTarget();
-			LerpRotToTarget();
 			
 			//Override the first element with the latest server info
-			server_state = new NetState((float)info.timestamp, pos, rot, velocity, angVelocity);
+			server_state = new NetState((float)info.timestamp, pos, velocity, angVelocity);
 		}
 	}
 	
@@ -110,7 +91,7 @@ public class Predictor {
 		return observed_transform;
 	}
 	
-	public void Predict(NetworkView networkView)
+	public void PredictPlayer(NetworkView networkView)
 	{
 		
 		if (Network.player == networkView.owner || Network.isServer) {
@@ -175,13 +156,12 @@ public class Predictor {
 		
 		//ensure the buffer has at last one element
 		if (server_state == null)
-			server_state = new NetState(0, observed_transform.position, observed_transform.rotation, observed_transform.rigidbody.velocity, observed_transform.rigidbody.angularVelocity);
+			server_state = new NetState(0, observed_transform.position, observed_transform.rigidbody.velocity, observed_transform.rigidbody.angularVelocity);
 
 		NetState latest = server_state;
 		if(!latest.state_used) {
 //			observed_transform.position = Vector3.Lerp(observed_transform.position, latest.pos, 0.5f);
 			observed_transform.rigidbody.velocity = latest.velocity;
-			observed_transform.rotation = latest.rot;
 			observed_transform.rigidbody.angularVelocity = latest.angVelocity;
 			
 			server_state.state_used = true;

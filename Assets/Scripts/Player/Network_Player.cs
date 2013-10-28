@@ -61,7 +61,7 @@ public class Network_Player: Kickoff_Player {
 		
 			networkView.RPC("AskCommands", RPCMode.All);
 		} else {
-			predictor.Predict(networkView);
+			predictor.PredictPlayer(networkView);
 		
 			transform.position = predictor.getPredictedTransform().position;
 			transform.rigidbody.velocity = predictor.getPredictedTransform().rigidbody.velocity;
@@ -129,7 +129,6 @@ public class Network_Player: Kickoff_Player {
 	
 	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
 	{
-		Debug.Log("onserializenetworkviewplayer");
 		predictor.OnSerializeNetworkViewPlayer(stream, info);
 	}
 	
