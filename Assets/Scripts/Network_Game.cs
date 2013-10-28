@@ -34,9 +34,11 @@ public class Network_Game : Game_Behaviour {
 	
 	void Awake()
 	{
-		if(Network.connections.Length == 0) {
-			Network.InitializeServer(32, 8000,false);
-		} 
+//		if(Network.connections.Length == 1) {
+//			Network.InitializeServer(32, 8000,false);
+//		}
+		
+		Debug.Log("NETWORK GAME");
 		
 		if(Network.isServer) {
 			ball = (GameObject)Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);

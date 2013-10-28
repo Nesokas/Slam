@@ -394,35 +394,36 @@ public class Lobby : MonoBehaviour
 	void DrawPlayers(List<Player> players, int team)
 	{
 		for(int i = 0; i < players.Count; i++) {
+			bool change_team = false;
+			int new_team = SPECTATING;
+			
 			GUILayout.BeginHorizontal();
 				if((team == TEAM_2 || team == SPECTATING) && (offline_game || Network.isServer))
 					if(GUILayout.Button("<", GUILayout.MaxWidth(0.03f*Screen.width))) {
-						int new_team = SPECTATING;
 						if(team == SPECTATING)
 							new_team = TEAM_1;
-						if(offline_game)
-							ChangeLocalPlayerTeam(players[i].controller, team, new_team);
-						else
-							networkView.RPC("ChangeNetworkPlayerTeam", RPCMode.All, players[i].network_player, team, new_team);
+						change_team = true;
 					}
 				GUILayout.FlexibleSpace();
 				GUILayout.Label(players[i].player.name);
-				if(players[i].network_player != networkView.owner) {
+				if(players[i].network_player != Network.player) {
 					GUILayout.Label("" + Network.GetAveragePing(players[i].network_player));
 				}
 				GUILayout.FlexibleSpace();
 				if((team == TEAM_1 || team == SPECTATING) && (offline_game || Network.isServer)) {
 					if(GUILayout.Button(">", GUILayout.MaxWidth(0.03f*Screen.width))) {
-						int new_team = SPECTATING;
 						if(team == SPECTATING)
 							new_team = TEAM_2;
-						if(offline_game)
-							ChangeLocalPlayerTeam(players[i].controller, team, new_team);
-						else
-							networkView.RPC("ChangeNetworkPlayerTeam", RPCMode.All, players[i].network_player, team, new_team);
+						change_team = true;
 					}
 				}
 			GUILayout.EndHorizontal();
+			if(change_team) {
+				if(offline_game)
+					ChangeLocalPlayerTeam(players[i].controller, team, new_team);
+				else
+					networkView.RPC("ChangeNetworkPlayerTeam", RPCMode.All, players[i].network_player, team, new_team);
+			}
 		}
 	}
 	
