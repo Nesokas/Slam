@@ -7,7 +7,6 @@ public class Game_Behaviour : MonoBehaviour {
 	// For when a player scores
 	private string GOAL_STR = "GOAL!";
 	private int GOAL_STR_CHAR_WIDTH = 60;
-	private int TIE_STR_CHAR_WIDTH = 30;
 	
 	// initial ball position
 	public Vector3 ball_position = new Vector3(0, -0.04788643f, 0);

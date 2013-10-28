@@ -61,7 +61,39 @@ public class Predictor {
 		}
 	}
 	
-	public Transform getObservedTransform()
+	
+	public void OnSerializeNetworkViewPlayer(BitStream stream, NetworkMessageInfo info)
+	{
+		Vector3 pos = observed_transform.position;
+		Vector3 velocity = observed_transform.rigidbody.velocity;
+		
+		if (stream.isWriting) {
+		
+			stream.Serialize(ref pos);
+			stream.Serialize(ref velocity);
+			
+		} else {
+			
+			//This code takes care of the local client
+			stream.Serialize(ref pos);
+			stream.Serialize(ref velocity);
+			server_pos = pos;
+			
+			// smoothly correct clients position
+			LerpToTarget();
+			
+			// Take care of data for interpolating remote objects movements
+			// Shift up the buffer
+			for (int i = server_state_buffer.Length-1; i >= 1; i--)
+				server_state_buffer[i] = server_state_buffer[i-1];
+			
+			//Override the first element with the latest server info
+			server_state_buffer[0] = new NetState((float)info.timestamp, pos, velocity);
+		}
+	}
+	
+	
+	public Transform getPredictedTransform()
 	{
 		return observed_transform;
 	}

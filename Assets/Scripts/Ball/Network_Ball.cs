@@ -3,19 +3,11 @@ using System.Collections;
 
 public class Network_Ball : Ball_Behaviour {
 	
-	private float client_ping;
-	private NetState[] server_state_buffer = new NetState[20];
-	public float position_error_threshold = 0.2f;
-	
-	public float PING_MARGIN = 0.5f;
-	
 	public Transform observed_transform;
-	
-	public Vector3 server_pos;
 	
 	private Predictor predictor;
 	
-	new void Awake()
+	void Awake()
 	{
 //		base.Awake();
 		observed_transform = transform;
@@ -67,7 +59,7 @@ public class Network_Ball : Ball_Behaviour {
 			
 		predictor.Predict(networkView);
 		
-		transform.position = predictor.getObservedTransform().position;
+		transform.position = predictor.getPredictedTransform().position;
 			
 	}
 }

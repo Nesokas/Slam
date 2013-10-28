@@ -3,6 +3,16 @@ using System.Collections;
 
 public class Network_Player: Kickoff_Player {
 	
+	
+	private Predictor predictor;
+	
+	
+	new void Start()
+	{
+		base.Start();
+		predictor = new Predictor(transform);	
+	}
+	
 //	Sends player info to every client
 	public void InitializePlayerInfo(NetworkPlayer network_player, int team_num, string player_name, Vector3 position, int textureID)
 	{
@@ -97,14 +107,6 @@ public class Network_Player: Kickoff_Player {
 		ChangeAnimation(reaction);
 	}
 	
-	new void Start()
-	{
-//		if (!networkView.isMine) {	
-//			enabled = false;
-//		}
-		base.Start();
-	}
-	
 	override protected void VerifyDash()
 	{
 		if (Network.isServer){
@@ -116,9 +118,23 @@ public class Network_Player: Kickoff_Player {
 	[RPC]
 	void UpdateServerDash(float dash, float horizontal_direction, float vertical_direction)
 	{
-//		Debug.Log("UpdateServerDash called: " + dash);
 		commands.dash = dash;
 		Dash(dash, horizontal_direction, vertical_direction);
+	}
+	
+	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+	{
+		predictor.OnSerializeNetworkViewPlayer(stream, info);
+	}
+	
+	new void FixedUpdate()
+	{
+		base.FixedUpdate();
+		
+		predictor.Predict(networkView);
+		
+		transform.position = predictor.getPredictedTransform().position;
+		
 	}
 		
 }
