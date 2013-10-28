@@ -7,7 +7,7 @@ public class Game_Starter : MonoBehaviour {
 	public GameObject network_game_prefab;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 			
 		GameObject settings =  GameObject.FindGameObjectWithTag("settings");
 		if (settings != null) {
@@ -17,6 +17,7 @@ public class Game_Starter : MonoBehaviour {
 			if(game_settings.IsLocalGame()) {
 				Instantiate(local_game_prefab, Vector3.zero, transform.rotation);
 			} else {
+				Debug.Log("instanciating network game");
 				Instantiate(network_game_prefab, Vector3.zero, transform.rotation);
 			}
 		} else {
