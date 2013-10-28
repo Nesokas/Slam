@@ -24,6 +24,9 @@ public class Kickoff_Player : Player_Behaviour {
 		player_base = transform.Find("Base");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
+		
+		Debug.Log("Disable goto center: " + scored_team + " " + team);
+		
 		if (scored_team == 0){
 			if(team == 1){
 				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);

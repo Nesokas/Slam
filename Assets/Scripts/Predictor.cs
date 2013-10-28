@@ -181,12 +181,12 @@ public class Predictor {
 			float distance = Vector3.Distance(latest.pos, predicted_pos);
 			
 			if(distance!=0 && Physics.Raycast(latest.pos, direction, out hit, Mathf.Abs(distance))) {
-			
-				direction = direction*(-1);
-				x = hit.point.x + direction.x*((SphereCollider)observed_transform.collider).radius;
-				y = hit.point.y + direction.y*((SphereCollider)observed_transform.collider).radius;
-				z = hit.point.z + direction.z*((SphereCollider)observed_transform.collider).radius;
-
+				if(hit.collider.gameObject.tag == "court_walls"){
+					direction = direction*(-1);
+					x = hit.point.x + direction.x*((SphereCollider)observed_transform.collider).radius;
+					y = hit.point.y + direction.y*((SphereCollider)observed_transform.collider).radius;
+					z = hit.point.z + direction.z*((SphereCollider)observed_transform.collider).radius;
+				}
 				
 			}
 
