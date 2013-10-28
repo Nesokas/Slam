@@ -4,7 +4,7 @@ using System.Collections;
 public class Predictor {
 	
 	private float client_ping;
-	private NetState[] server_state_buffer = new NetState[20];
+	private NetState server_state;
 	public float position_error_threshold = 0.2f;
 	
 	public float PING_MARGIN = 0.5f;
@@ -51,13 +51,8 @@ public class Predictor {
 			// smoothly correct clients position
 			LerpToTarget();
 			
-			// Take care of data for interpolating remote objects movements
-			// Shift up the buffer
-			for (int i = server_state_buffer.Length-1; i >= 1; i--)
-				server_state_buffer[i] = server_state_buffer[i-1];
-			
 			//Override the first element with the latest server info
-			server_state_buffer[0] = new NetState((float)info.timestamp, pos, velocity);
+			server_state = new NetState((float)info.timestamp, pos, velocity);
 		}
 	}
 	
@@ -72,6 +67,8 @@ public class Predictor {
 			stream.Serialize(ref pos);
 			stream.Serialize(ref velocity);
 			
+			Debug.Log(velocity);
+			
 		} else {
 			
 			//This code takes care of the local client
@@ -82,13 +79,8 @@ public class Predictor {
 			// smoothly correct clients position
 			LerpToTarget();
 			
-			// Take care of data for interpolating remote objects movements
-			// Shift up the buffer
-			for (int i = server_state_buffer.Length-1; i >= 1; i--)
-				server_state_buffer[i] = server_state_buffer[i-1];
-			
 			//Override the first element with the latest server info
-			server_state_buffer[0] = new NetState((float)info.timestamp, pos, velocity);
+			server_state = new NetState((float)info.timestamp, pos, velocity);
 		}
 	}
 	
@@ -111,25 +103,21 @@ public class Predictor {
 		float interpolation_time = (float)Network.time - client_ping;
 		
 		//ensure the buffer has at last one element
-		if (server_state_buffer[0] == null)
-			server_state_buffer[0] = new NetState(0, observed_transform.position, observed_transform.rigidbody.velocity);
-		
-		
-		Debug.Log(Network.time - server_state_buffer[0].timestamp);
-		
+		if (server_state == null)
+			server_state = new NetState(0, observed_transform.position, observed_transform.rigidbody.velocity);
 
-		NetState latest = server_state_buffer[0];
+		NetState latest = server_state;
 		if(!latest.state_used) {
-			observed_transform.position = Vector3.Lerp(observed_transform.position, latest.pos, 0.5f);
+//			observed_transform.position = Vector3.Lerp(observed_transform.position, latest.pos, 0.5f);
 			observed_transform.rigidbody.velocity = latest.velocity;
-			server_state_buffer[0].state_used = true;
+			server_state.state_used = true;
 			
 			
 			float x,y,z;
 		
-			x = server_state_buffer[0].pos.x + server_state_buffer[0].velocity.x*((float)Network.time - server_state_buffer[0].timestamp);
-			y = server_state_buffer[0].pos.y + server_state_buffer[0].velocity.y*((float)Network.time - server_state_buffer[0].timestamp);
-			z = server_state_buffer[0].pos.z + server_state_buffer[0].velocity.z*((float)Network.time - server_state_buffer[0].timestamp);
+			x = server_state.pos.x + server_state.velocity.x*((float)Network.time - server_state.timestamp);
+			y = server_state.pos.y + server_state.velocity.y*((float)Network.time - server_state.timestamp);
+			z = server_state.pos.z + server_state.velocity.z*((float)Network.time - server_state.timestamp);
 			
 			RaycastHit hit;
 			Vector3 predicted_pos = new Vector3(x,y,z);

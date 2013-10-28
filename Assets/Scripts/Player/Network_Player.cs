@@ -60,7 +60,14 @@ public class Network_Player: Kickoff_Player {
 			}
 		
 			networkView.RPC("AskCommands", RPCMode.All);
+		} else {
+			predictor.Predict(networkView);
+		
+			transform.position = predictor.getPredictedTransform().position;
+			transform.rigidbody.velocity = predictor.getPredictedTransform().rigidbody.velocity;
 			
+			if(Network.player != owner)
+				Debug.Log(transform.rigidbody.velocity);
 		}
 	}
 	
@@ -124,17 +131,15 @@ public class Network_Player: Kickoff_Player {
 	
 	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
 	{
+		Debug.Log("onserializenetworkviewplayer");
 		predictor.OnSerializeNetworkViewPlayer(stream, info);
 	}
 	
-	new void FixedUpdate()
-	{
-		base.FixedUpdate();
-		
-		predictor.Predict(networkView);
-		
-		transform.position = predictor.getPredictedTransform().position;
-		
-	}
-		
+//	new void FixedUpdate()
+//	{
+//		base.FixedUpdate();
+//		
+//	}
+	
+
 }
