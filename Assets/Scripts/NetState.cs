@@ -7,6 +7,8 @@ public class NetState {
 	public Vector3 pos;
 	public Vector3 velocity;
 	public bool state_used;
+	public Quaternion rot;
+	public Vector3 angVelocity;
 	
 	public NetState() 
 	{
@@ -22,5 +24,17 @@ public class NetState {
 		this.pos = pos;
 		this.velocity = velocity;
 		state_used = false;
+		this.angVelocity = Vector3.zero;
+		this.rot = Quaternion.identity;
+	}
+	
+	public NetState(float time, Vector3 pos, Quaternion rot, Vector3 velocity, Vector3 angVelocity)
+	{
+		timestamp = time;
+		this.pos = pos;
+		this.velocity = velocity;
+		state_used = false;
+		this.rot = rot;
+		this.angVelocity = angVelocity;
 	}
 }

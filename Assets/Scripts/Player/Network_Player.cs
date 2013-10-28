@@ -66,8 +66,6 @@ public class Network_Player: Kickoff_Player {
 			transform.position = predictor.getPredictedTransform().position;
 			transform.rigidbody.velocity = predictor.getPredictedTransform().rigidbody.velocity;
 			
-			if(Network.player != owner)
-				Debug.Log(transform.rigidbody.velocity);
 		}
 	}
 	
