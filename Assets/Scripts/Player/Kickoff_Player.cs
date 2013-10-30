@@ -118,4 +118,9 @@ public class Kickoff_Player : Player_Behaviour {
 		transform.position = initial_position;
 	}
 	
+	public int GetTeam()
+	{
+		return team;
+	}
+	
 }

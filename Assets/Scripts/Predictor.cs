@@ -67,8 +67,6 @@ public class Predictor {
 			stream.Serialize(ref pos);
 			stream.Serialize(ref velocity);
 			
-			Debug.Log(velocity);
-			
 		} else {
 			
 			//This code takes care of the local client

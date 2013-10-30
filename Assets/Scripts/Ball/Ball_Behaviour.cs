@@ -13,7 +13,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	string[] animationsType2;
 	
 	protected GameObject last_player_touched;
-	protected GameObject last_player_shot;
+	protected GameObject last_player_shoot;
 	
 	protected bool is_looking_somewhere;
 	
@@ -22,9 +22,53 @@ public class Ball_Behaviour : MonoBehaviour {
 		game_restarted = true;
 	}
 	
+	void OnCollisionEnter(Collision collider)
+	{
+		if(collider.gameObject.tag == "forcefield") {
+			CourtCollision(collider.contacts[0].point);
+		} else {
+			ReleasePlayers();
+		}
+		
+	}
+	
+		void CourtCollision(Vector3 point)
+	{
+		Forcefield forcefield = GameObject.FindGameObjectWithTag("forcefield").GetComponent<Forcefield>();
+		forcefield.BallCollition(point);
+		int random = Random.Range(0,100);
+		if(random <= 10) {
+			transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
+			if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
+				StopCoroutine("PlayAnimation");
+				animation.Stop();
+				rolling_eyes = true;
+				animation_finished = true;
+				StartCoroutine(LoopAnimation("Rolling_Eyes", "Tired", 1));
+			}
+			
+		}
+	}
+	
+	public GameObject GetLastPlayerTouched() 
+	{
+		return last_player_touched;
+	}
+	
+	public GameObject GetLastPlayerShoot()
+	{
+		return last_player_shoot;
+	}
+	
+	public void LastPlayerShoot(GameObject player_shoot)
+	{
+		last_player_shoot = player_shoot;
+	}
+	
 	public void OnCollisionExit(Collision collider)
 	{
-		last_player_touched = collider.gameObject;
+		if(collider.gameObject.tag == "Player") 
+			last_player_touched = collider.gameObject;
 	}
 	
 	protected IEnumerator LoopAnimation(string anim1, string anim2, int repeatNumber)
@@ -50,11 +94,6 @@ public class Ball_Behaviour : MonoBehaviour {
 		}
 		animation_finished = true;
 //		animation[anim1].wrapMode = WrapMode.Default;
-	}
-	
-	public GameObject GetLastPlayerTouched()
-	{
-		return last_player_touched;
 	}
 	
 	public void ReleasePlayers()

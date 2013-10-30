@@ -58,6 +58,7 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	
 	private int goals_scored = 0;
+	private bool best_score = false;
 	
 	void VerifyShoot()
 	{
@@ -78,6 +79,7 @@ public class Player_Behaviour : MonoBehaviour {
 				
 				Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 				bb.ReleasePlayers();
+				bb.LastPlayerShoot(this.gameObject);
 			}
 		}
 	}
@@ -99,6 +101,32 @@ public class Player_Behaviour : MonoBehaviour {
 	public void GoalScored()
 	{
 		goals_scored++;
+		if(goals_scored >= 3) {
+			best_score = true;
+			
+			GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+			foreach(GameObject player in players){
+				if(player != this.gameObject){
+					Player_Behaviour pb = (Player_Behaviour)player.GetComponent<Player_Behaviour>();
+					if(pb.DoYouHaveMoreGoals(this.gameObject, goals_scored)) {
+						best_score = false;
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	bool DoYouHaveMoreGoals(GameObject player, int new_player_score)
+	{
+		if(new_player_score <= goals_scored) {
+			if(new_player_score == goals_scored)
+				best_score = false;
+			return true;
+		} else {
+			best_score = false;
+			return false;
+		}
 	}
 	
 	public int getGoalsScored()
@@ -187,6 +215,8 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	protected void Start() 
 	{		
+		NotificationCenter.DefaultCenter.AddObserver(this, "DoYouHaveMoreGoals");
+		
 		GameObject court_walls = GameObject.FindGameObjectWithTag("court_walls");
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -252,6 +282,7 @@ public class Player_Behaviour : MonoBehaviour {
 	public Texture dash_bar_red;
 	public Texture dash_arrow_full;
 	public Texture dash_arrow_fill;
+	public Texture star;
 	
 	void OnGUI()
 	{
@@ -261,28 +292,30 @@ public class Player_Behaviour : MonoBehaviour {
 		float height=0;
 		
 		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(dash_bar.position);
+		float player_x = (float)System.Math.Round((double)player_indicator_position.x, 3);
+		float player_y = (float)System.Math.Round((double)player_indicator_position.y, 3);
 		
-		if (player_indicator_position.x < 0 && player_indicator_position.y < 0) {
+		if (player_x < 0 && player_y < 0) {
 		
 			y = Screen.height*0.99f - Screen.height*PLAYER_ARROW_SIZE;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 			GUIUtility.RotateAroundPivot(45f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
 		
-		} else if (player_indicator_position.x < 0 && player_indicator_position.y > 1) {
+		} else if (player_x < 0 && player_y > 1) {
 		
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 			GUIUtility.RotateAroundPivot(135f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
 			
-		} else if (player_indicator_position.x > 1 && player_indicator_position.y < 0) {
+		} else if (player_x > 1 && player_y < 0) {
 			y = Screen.height*0.99f - Screen.height*PLAYER_ARROW_SIZE;
 			x = Screen.width - Screen.height*PLAYER_ARROW_HEIGHT;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 			GUIUtility.RotateAroundPivot(-45f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
 			
-		} else if (player_indicator_position.x > 1 && player_indicator_position.y > 1) {
+		} else if (player_x > 1 && player_y > 1) {
 			x= Screen.width - Screen.height*PLAYER_ARROW_HEIGHT;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
@@ -290,45 +323,54 @@ public class Player_Behaviour : MonoBehaviour {
 			
 		}
 			
-		else if (player_indicator_position.x < 0) {
+		else if (player_x < 0) {
 			x = Screen.height*PLAYER_ARROW_HEIGHT;
-			y = (1 - player_indicator_position.y) * Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
+			y = (1 - player_y) * Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 			GUIUtility.RotateAroundPivot(90f, new Vector2(x, y));
 			
 		
-		} else if (player_indicator_position.x > 1) {
+		} else if (player_x > 1) {
 			x = Screen.width - Screen.height*PLAYER_ARROW_HEIGHT;
-			y = (1 - player_indicator_position.y)* Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
+			y = (1 - player_y)* Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 			GUIUtility.RotateAroundPivot(-90f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
 			
-		} else if (player_indicator_position.y > 1) {
-			x = (player_indicator_position.x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f);
+		} else if (player_y > 1) {
+			x = player_x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f;
 			y = 0;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 			GUIUtility.RotateAroundPivot(180f, new Vector2(x+Screen.width*PLAYER_ARROW_SIZE/2f, y+Screen.width*PLAYER_ARROW_SIZE/2f));
 		
-		} else if (player_indicator_position.y < 0) {
-			x = (player_indicator_position.x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f);
+		} else if (player_y < 0) {
+			x = (player_x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f);
 			y = Screen.height*0.99f - Screen.height*PLAYER_ARROW_SIZE;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 		}
 		
 		else {
-			x = (player_indicator_position.x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f);
-			y = (1 - player_indicator_position.y) * Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
+			x = (player_x * Screen.width - Screen.width*PLAYER_ARROW_SIZE/2f);
+			y = (1 - player_y) * Screen.height - Screen.width*PLAYER_ARROW_SIZE/2f - Screen.height*PLAYER_ARROW_HEIGHT;
 			width = Screen.width*PLAYER_ARROW_SIZE;
 			height = Screen.width*PLAYER_ARROW_SIZE;
 		}
 		
 		y = y - Screen.height*0.03f;
+		if(best_score){
+			x = x - 0.004f*Screen.width;
+			y = y - 0.006f*Screen.height;
+			width = width + 0.007f*Screen.width;
+			height = height + 0.012f*Screen.height;
+		}
 		
-		GUI.DrawTexture( new Rect(x, y, width, height), indicator_arrow,	ScaleMode.ScaleToFit, true);
+		GUI.DrawTexture( new Rect(x, y, width, height - 0.002f*Screen.height), indicator_arrow, ScaleMode.ScaleToFit, true);
+		
+		if(best_score)
+			GUI.DrawTexture( new Rect(x + 0.0045f*Screen.width, y + 0.002f*Screen.height, width - 0.009f*Screen.width, height - 0.015f*Screen.height), star, ScaleMode.ScaleToFit, true);
 		
 		// Dash indicator arrow
 		Texture dash_arrow_texture = dash_arrow_fill;
@@ -343,9 +385,10 @@ public class Player_Behaviour : MonoBehaviour {
 		float fill_percent = current_value/DASH_COOLDOWN;
 		
 		float dash_arrow_width = 0.005f * Screen.width;
-		float dash_arrow_height = 0.006f * Screen.height;
-
-		GUI.BeginGroup(new Rect (x-(dash_arrow_width/2f), y + height*(1f-fill_percent), width + dash_arrow_width, height*fill_percent + dash_arrow_height));
+		float dash_arrow_height = 0.004f * Screen.height;
+		
+		
+		GUI.BeginGroup(new Rect (x-(dash_arrow_width/2f), y - (dash_arrow_height/2f) + height*(1f-fill_percent), width + dash_arrow_width, height*fill_percent + dash_arrow_height - 0.002f*Screen.height));
 		GUI.DrawTexture(new Rect(0, -(1f-fill_percent)*height, width + dash_arrow_width, height + dash_arrow_height), dash_arrow_texture);
 		GUI.EndGroup();
 	}

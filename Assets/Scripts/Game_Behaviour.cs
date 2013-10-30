@@ -215,9 +215,7 @@ public class Game_Behaviour : MonoBehaviour {
 	}
 	
 	protected void OnGoal(NotificationCenter.Notification notification)
-	{
-		GameObject last_player_touched;
-		
+	{		
 		if(!is_celebrating){
 			if((int)notification.data["team"] == 1) {
 				team_scored = 1;
@@ -235,16 +233,20 @@ public class Game_Behaviour : MonoBehaviour {
 				finish_game = true;
 			
 			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
-			is_celebrating = true;
-			
+			is_celebrating = true;			
 			ScoreBoard scoreboard = GameObject.Find("Score Board").GetComponent<ScoreBoard>();
 			scoreboard.UpdateScore(score_team_1, score_team_2);
 		}
+		if(ball == null)
+			ball = GameObject.FindGameObjectWithTag("ball");
 		Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
-		last_player_touched = bb.GetLastPlayerTouched();
-		
-		Player_Behaviour pb = last_player_touched.GetComponent<Player_Behaviour>();
-		pb.GoalScored();
+		GameObject last_player_touched = bb.GetLastPlayerTouched();
+		GameObject last_player_shoot = bb.GetLastPlayerShoot();
+	
+		Kickoff_Player pb = last_player_touched.GetComponent<Kickoff_Player>();
+		int player_score_team = pb.GetTeam();
+		if(player_score_team == team_scored)
+			pb.GoalScored();
 	}
 	
 	public int GetTeamScore(int team)
@@ -257,21 +259,6 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void OnGUI()
 	{	
-//		if(is_celebrating){
-//			if (!finish_game)
-//				gui_manager.DrawGoalScored(team_scored, GOAL_STR);
-//			else {
-//				if(score_team_1 > score_team_2) {
-//					gui_manager.DrawGoalScored(1, "RED TEAM WINS");
-//					AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
-//				}
-//				else if(score_team_1 < score_team_2) {
-//					gui_manager.DrawGoalScored(2, "BLUE TEAM WINS");
-//					AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
-//				}
-//			}
-//			
-//		} else 
 		if (is_celebrating && !isTimeUp)
 			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
 		if (isTimeUp) {

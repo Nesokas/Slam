@@ -19,37 +19,10 @@ public class Network_Ball : Ball_Behaviour {
 		base.Start();
 	}
 	
-	void OnCollisionEnter(Collision collider)
-	{
-		if(collider.gameObject.tag == "forcefield") {
-			CourtCollision(collider.contacts[0].point);
-		} else {
-			ReleasePlayers();
-		}
-	}
-	
-//	[RPC]
-	void CourtCollision(Vector3 point)
-	{
-		Forcefield forcefield = GameObject.FindGameObjectWithTag("forcefield").GetComponent<Forcefield>();
-		forcefield.BallCollition(point);
-		int random = Random.Range(0,100);
-		if(random <= 10) {
-			transform.animation["Rolling_Eyes"].wrapMode = WrapMode.Loop;
-			if (!rolling_eyes && !animation.IsPlaying("Tired") && !animation.IsPlaying("rolling_eyes")) {
-				StopCoroutine("PlayAnimation");
-				animation.Stop();
-				rolling_eyes = true;
-				animation_finished = true;
-				StartCoroutine(LoopAnimation("Rolling_Eyes", "Tired", 1));
-			}
-			
-		}
-	}
-	
-
 	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
 	{
+		if(predictor == null)
+			predictor = new Predictor(transform);
 		predictor.OnSerializeNetworkViewBall(stream, info);
 	}
 	
