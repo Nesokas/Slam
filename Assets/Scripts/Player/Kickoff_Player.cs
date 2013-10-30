@@ -13,7 +13,7 @@ public class Kickoff_Player : Player_Behaviour {
 	protected GameObject center_circle_right;
 	protected GameObject[] center_planes;
 	
-	protected Vector3 initial_position;
+	public Vector3 initial_position;
 	protected NetworkPlayer owner;
 	protected GameObject controller_object;
 	
@@ -25,7 +25,6 @@ public class Kickoff_Player : Player_Behaviour {
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
 		
-		Debug.Log("Disable goto center: " + scored_team + " " + team);
 		
 		if (scored_team == 0){
 			if(team == 1){
@@ -87,8 +86,6 @@ public class Kickoff_Player : Player_Behaviour {
 	
 	public void Awake() 
 	{
-		Debug.Log("START PLAYER");
-		
 		NotificationCenter.DefaultCenter.AddObserver(this, "InitializePosition");
 		NotificationCenter.DefaultCenter.AddObserver(this, "ReleasePlayers");
 		NotificationCenter.DefaultCenter.AddObserver(this, "DisableGotoCenter");
