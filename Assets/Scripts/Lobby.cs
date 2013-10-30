@@ -60,6 +60,10 @@ public class Lobby : MonoBehaviour
 	private List<Player> team_1;
 	private List<Player> team_2;
 	
+	private GameObject settings;
+	private Game_Settings game_settings;
+	private Game_Behaviour game_behaviour;
+	
 	private struct SimplePlayer
 	{
 		public string name;
@@ -72,6 +76,11 @@ public class Lobby : MonoBehaviour
 		public NetworkPlayer network_player;
 		public int controller;
 		public bool is_network;
+	}
+	
+	public void setGameBehaviour(Game_Behaviour gb)
+	{
+		game_behaviour = gb;
 	}
 	
 	void InitializeMSF()
@@ -123,6 +132,33 @@ public class Lobby : MonoBehaviour
 		spectating = new List<Player>();
 		team_1 = new List<Player>();
 		team_2 = new List<Player>();
+	}
+	
+	void Start()
+	{
+		settings = GameObject.FindGameObjectWithTag("settings");
+		if (settings != null) {
+			game_settings = settings.GetComponent<Game_Settings>();
+			List<Game_Settings.Player> player_list = game_settings.players;
+			
+			foreach(Game_Settings.Player player in player_list) {
+				Player new_player = new Player();
+				if (player.network_player != null)
+					new_player.network_player = player.network_player;
+				else
+					new_player.controller = player.controller;
+				new_player.player.name = player.name;
+				new_player.player.team = player.team;
+				if (player.team == 1)
+					team_1.Add(new_player);
+				else
+					team_2.Add(new_player);
+			}
+			menu_state = LOBBY;
+		} else {
+			settings = (GameObject)Instantiate(settings_prefab);
+			game_settings = settings.GetComponent<Game_Settings>();
+		}
 	}
 
 	void JoinRoom ()
@@ -273,6 +309,7 @@ public class Lobby : MonoBehaviour
 	
 	void StartNetworkGame()
 	{
+		
 		int players_team_1 = team_1.Count;
 		int players_team_2 = team_2.Count;
 		
@@ -282,9 +319,7 @@ public class Lobby : MonoBehaviour
 		
 		networkView.RPC("LoadSettings", RPCMode.Others);
 		
-		GameObject settings = (GameObject)Instantiate(settings_prefab);
-		Game_Settings game_settings = settings.GetComponent<Game_Settings>();
-		
+		/* Preenche a lista de players (nao os do Game_Behaviour, mas sim outra estrutura a parte) do Game_Settings */
 		for(int i = 0; i < team_1.Count; i++) {
 			Vector3 start_position = new Vector3(0,0,0);
 			SimplePlayer player = team_1[i].player;
@@ -304,7 +339,7 @@ public class Lobby : MonoBehaviour
 			players_team_2--;
 			game_settings.AddNetworkPlayer(player.team, player.name, start_position, team_2[i].network_player);
 		}
-		
+		/*****************************************************************************************************************/
 		game_settings.local_game = false;
 		networkView.RPC("LoadGame", RPCMode.All);
 	}
@@ -319,8 +354,8 @@ public class Lobby : MonoBehaviour
 		float distance_team_1 = court_lenght/(players_team_1+1);
 		float distance_team_2 = court_lenght/(players_team_2+1);
 		
-		GameObject settings = (GameObject)Instantiate(settings_prefab);
-		Game_Settings game_settings = settings.GetComponent<Game_Settings>();
+//		GameObject settings = (GameObject)Instantiate(settings_prefab);
+//		Game_Settings game_settings = settings.GetComponent<Game_Settings>();
 	
 		for(int i = 0; i < team_1.Count; i++) {
 			Vector3 start_position = new Vector3(0,0,0);
@@ -553,6 +588,8 @@ public class Lobby : MonoBehaviour
 					if(!offline_game)
 						GUILayout.FlexibleSpace();
 					if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width))) {
+						if(game_behaviour != null)
+							game_behaviour.isOnLobbyScreen = false;
 						if(!offline_game)
 							StartNetworkGame();
 						else

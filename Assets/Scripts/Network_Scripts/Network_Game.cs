@@ -38,8 +38,6 @@ public class Network_Game : Game_Behaviour {
 //			Network.InitializeServer(32, 8000,false);
 //		}
 		
-		Debug.Log("NETWORK GAME");
-		
 		if(Network.isServer) {
 			ball = (GameObject)Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);
 			ball.transform.name = "Ball";
@@ -67,10 +65,19 @@ public class Network_Game : Game_Behaviour {
 					}
 				}
 			}
+			
+			networkView.RPC("StartGame", RPCMode.All);
 		}
+		
+	}
+	
+	[RPC]
+	void StartGame()
+	{
 		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
 		MovePlayersToStartPositions();
 	}
+	
 	
 	public Texture GetTexture(int id)
 	{

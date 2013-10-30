@@ -13,7 +13,7 @@ public class Kickoff_Player : Player_Behaviour {
 	protected GameObject center_circle_right;
 	protected GameObject[] center_planes;
 	
-	protected Vector3 initial_position;
+	public Vector3 initial_position;
 	protected NetworkPlayer owner;
 	protected GameObject controller_object;
 	
@@ -24,6 +24,8 @@ public class Kickoff_Player : Player_Behaviour {
 		player_base = transform.Find("Base");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
+		
+		
 		if (scored_team == 0){
 			if(team == 1){
 				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
@@ -84,8 +86,6 @@ public class Kickoff_Player : Player_Behaviour {
 	
 	public void Awake() 
 	{
-		Debug.Log("START PLAYER");
-		
 		NotificationCenter.DefaultCenter.AddObserver(this, "InitializePosition");
 		NotificationCenter.DefaultCenter.AddObserver(this, "ReleasePlayers");
 		NotificationCenter.DefaultCenter.AddObserver(this, "DisableGotoCenter");

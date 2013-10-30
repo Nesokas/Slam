@@ -30,7 +30,7 @@ public class Network_Ball : Ball_Behaviour {
 	{
 		base.Update();
 			
-		predictor.Predict(networkView);
+		predictor.PredictBall(networkView);
 		
 		transform.position = predictor.getPredictedTransform().position;
 			

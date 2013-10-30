@@ -64,6 +64,8 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	private bool isTimeUp = false;
 	
+	public bool isOnLobbyScreen = false;
+	
 	public void ScoreTeam(int team)
 	{		
 		if(team == 1) {
@@ -93,7 +95,6 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public virtual void ReleasePlayers()
 	{
-		Debug.Log("releasing players");
 		NotificationCenter.DefaultCenter.PostNotification(this, "ReleasePlayers");	
 	}
 	
@@ -101,7 +102,6 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void StartGameAgain()
 	{
-		Debug.Log("start game again");
 		int winning_team = StopCelebration();
 
 		MovePlayersToStartPositions();
@@ -183,6 +183,7 @@ public class Game_Behaviour : MonoBehaviour {
 		m_camera = GameObject.FindGameObjectWithTag("MainCamera").camera;
 		
 		MovePlayersToStartPositions();
+		
 	}
 
 	// Update is called once per frame
@@ -199,8 +200,12 @@ public class Game_Behaviour : MonoBehaviour {
 		if(is_celebrating)
 			team_scored_message_xpos += (Time.deltaTime * TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER);
 		
-		if (Input.GetKey(KeyCode.Escape))
-	        Application.LoadLevel(0);
+		if (Input.GetKey(KeyCode.Escape)) {
+			if (!isOnLobbyScreen) {
+	        	Application.LoadLevelAdditive("Lobby");
+				isOnLobbyScreen = true;
+			}
+		}
 	}
 	
 	public int StopCelebration()
