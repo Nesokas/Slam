@@ -65,10 +65,6 @@ public class Network_Player: Kickoff_Player {
 		
 			transform.position = predictor.getPredictedTransform().position;
 			transform.rigidbody.velocity = predictor.getPredictedTransform().rigidbody.velocity;
-<<<<<<< HEAD
-=======
-			
->>>>>>> 604aaf10cc53aa8c26f38a078ef1ea7f7e8ddbdf
 		}
 	}
 	
