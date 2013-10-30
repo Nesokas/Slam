@@ -309,7 +309,6 @@ public class Lobby : MonoBehaviour
 	
 	void StartNetworkGame()
 	{
-		
 		int players_team_1 = team_1.Count;
 		int players_team_2 = team_2.Count;
 		
@@ -317,7 +316,7 @@ public class Lobby : MonoBehaviour
 		float distance_team_1 = court_lenght/(players_team_1+1);
 		float distance_team_2 = court_lenght/(players_team_2+1);
 		
-		networkView.RPC("LoadSettings", RPCMode.Others);
+//		networkView.RPC("LoadSettings", RPCMode.Others);
 		
 		/* Preenche a lista de players (nao os do Game_Behaviour, mas sim outra estrutura a parte) do Game_Settings */
 		for(int i = 0; i < team_1.Count; i++) {
