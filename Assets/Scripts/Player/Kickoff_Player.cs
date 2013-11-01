@@ -14,7 +14,6 @@ public class Kickoff_Player : Player_Behaviour {
 	protected GameObject[] center_planes;
 	
 	public Vector3 initial_position;
-	protected NetworkPlayer owner;
 	protected GameObject controller_object;
 	
 	/* Only one team should kickoff, the other cannot go through the midfield circle or opposing side */

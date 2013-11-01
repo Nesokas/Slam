@@ -8,6 +8,7 @@ public class Game_Settings : MonoBehaviour {
 	
 	public List<Player> players;
 	public bool local_game;
+	public bool is_game_running = false;
 	
 	public struct Player
 	{
@@ -38,25 +39,29 @@ public class Game_Settings : MonoBehaviour {
 				
 				players[i] = new_player;
 				
-				GameObject[] players_in_hierarchy = GameObject.FindGameObjectsWithTag("Player");
-				foreach(GameObject player in players_in_hierarchy) {
-					
-					if(player.networkView.owner == network_player) {
-						Network_Player net_player = (Network_Player) player.GetComponent<Network_Player>();
-						net_player.team = team;
-						net_player.initial_position = start_position;
-						net_player.Start();
-						break;
-					}
-						
-				}
+				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, network_player, team, start_position);
 				
 				return;
-			}
-			
+			}	
 		}
-		
 		players.Add(new_player);
+	}
+	
+	[RPC]
+	void UpdateNetworkPlayer(NetworkPlayer network_player, int team, Vector3 start_position)
+	{
+		GameObject[] players_in_hierarchy = GameObject.FindGameObjectsWithTag("Player");
+		foreach(GameObject player in players_in_hierarchy) {
+			Network_Player net_player = (Network_Player) player.GetComponent<Network_Player>();
+			
+			//net_player.owner in this particular case is the client or server's own player
+			if(net_player.owner == network_player) {
+				net_player.team = team;
+				net_player.initial_position = start_position;
+				net_player.Start();
+				break;
+			}
+		}
 	}
 	
 	public void AddLocalPlayer(int team, string name, Vector3 start_position, int controller)

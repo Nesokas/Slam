@@ -5,7 +5,7 @@ public class Network_Player: Kickoff_Player {
 	
 	
 	private Predictor predictor;
-	
+	public NetworkPlayer owner;
 	
 	new void Start()
 	{
