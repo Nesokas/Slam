@@ -138,12 +138,15 @@ public class Lobby : MonoBehaviour
 			
 			foreach(Game_Settings.Player player in player_list) {
 				Player new_player = new Player();
+				
 				if (player.network_player != null)
 					new_player.network_player = player.network_player;
 				else
 					new_player.controller = player.controller;
+				
 				new_player.player.name = player.name;
 				new_player.player.team = player.team;
+				
 				if (player.team == 1)
 					team_1.Add(new_player);
 				else
@@ -407,6 +410,7 @@ public class Lobby : MonoBehaviour
 		Application.LoadLevel("Main_Game");
 	}
 	
+	/* When a new player connects to a lobby, this will handle the logic */
 	void OnPlayerConnected(NetworkPlayer network_player)
 	{
 		Debug.Log("New Player Connected");
@@ -434,6 +438,8 @@ public class Lobby : MonoBehaviour
 		
 		networkView.RPC("AddNetworkPlayer", RPCMode.All, network_player, new_player_name, SPECTATING);
 	}
+	/************************************************************************************/
+	
 	
 	void DrawPlayers(List<Player> players, int team)
 	{
@@ -496,6 +502,7 @@ public class Lobby : MonoBehaviour
 		}
 	}
 	
+	/* When in a lobby the admin moves the player between teams, we use this function*/
 	[RPC]
 	void ChangeNetworkPlayerTeam(NetworkPlayer network_player, int old_team, int new_team)
 	{
