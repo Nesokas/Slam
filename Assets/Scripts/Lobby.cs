@@ -62,7 +62,7 @@ public class Lobby : MonoBehaviour
 	
 	private GameObject settings;
 	private Game_Settings game_settings;
-	private Game_Behaviour game_behaviour;
+	public Game_Behaviour game_behaviour;
 	
 	private struct SimplePlayer
 	{
@@ -76,11 +76,6 @@ public class Lobby : MonoBehaviour
 		public NetworkPlayer network_player;
 		public int controller;
 		public bool is_network;
-	}
-	
-	public void setGameBehaviour(Game_Behaviour gb)
-	{
-		game_behaviour = gb;
 	}
 	
 	void InitializeMSF()
@@ -143,21 +138,21 @@ public class Lobby : MonoBehaviour
 			
 			foreach(Game_Settings.Player player in player_list) {
 				Player new_player = new Player();
+				
 				if (player.network_player != null)
 					new_player.network_player = player.network_player;
 				else
 					new_player.controller = player.controller;
+				
 				new_player.player.name = player.name;
 				new_player.player.team = player.team;
+				
 				if (player.team == 1)
 					team_1.Add(new_player);
 				else
 					team_2.Add(new_player);
 			}
 			menu_state = LOBBY;
-		} else {
-			settings = (GameObject)Instantiate(settings_prefab);
-			game_settings = settings.GetComponent<Game_Settings>();
 		}
 	}
 
@@ -318,6 +313,9 @@ public class Lobby : MonoBehaviour
 		
 //		networkView.RPC("LoadSettings", RPCMode.Others);
 		
+		if(settings == null)
+			networkView.RPC("LoadSettings", RPCMode.All);
+		
 		/* Preenche a lista de players (nao os do Game_Behaviour, mas sim outra estrutura a parte) do Game_Settings */
 		for(int i = 0; i < team_1.Count; i++) {
 			Vector3 start_position = new Vector3(0,0,0);
@@ -340,7 +338,21 @@ public class Lobby : MonoBehaviour
 		}
 		/*****************************************************************************************************************/
 		game_settings.local_game = false;
-		networkView.RPC("LoadGame", RPCMode.All);
+		
+		
+		/* If we click start in the lobby and the game is already running, we'll want to keep the current running game so we can't simply load the scene again */
+		/* instead, we destroy the lobby so we get back in the game */
+		if(game_settings.is_game_running == true) {
+			Debug.Log("GAME_IS_RUNNING");
+			Network.RemoveRPCs(gameObject.networkView.viewID);
+			Destroy(gameObject);
+		}
+		else {
+			Debug.Log("NOT_RUNNING");
+			game_settings.is_game_running = true;
+			networkView.RPC("LoadGame", RPCMode.All);
+		}
+		/********************************************************************************************************************************************************/
 	}
 	
 	void StartLocalGame ()
@@ -382,11 +394,13 @@ public class Lobby : MonoBehaviour
 		Application.LoadLevel("Main_Game");
 	}
 	
+	
+	/* Instantiates settings_prefab (Game_Settings.cs) on clients and server*/
 	[RPC]
 	void LoadSettings()
 	{
-		GameObject settings = (GameObject)Instantiate(settings_prefab);
-		Game_Settings game_settings = settings.GetComponent<Game_Settings>();
+		settings = (GameObject)Instantiate(settings_prefab);
+		game_settings = settings.GetComponent<Game_Settings>();
 		game_settings.local_game = false;
 	}
 	
@@ -396,6 +410,7 @@ public class Lobby : MonoBehaviour
 		Application.LoadLevel("Main_Game");
 	}
 	
+	/* When a new player connects to a lobby, this will handle the logic */
 	void OnPlayerConnected(NetworkPlayer network_player)
 	{
 		Debug.Log("New Player Connected");
@@ -413,7 +428,6 @@ public class Lobby : MonoBehaviour
 	{
 		
 		/******* Initialize new player lists *********/
-		Debug.Log(team_1.Count + " " + team_2.Count + " " + spectating.Count);
 		for(int i = 0; i < team_1.Count; i++)
 			networkView.RPC("AddNetworkPlayer", network_player, team_1[i].network_player, team_1[i].player.name, TEAM_1);
 		for(int i = 0; i < team_2.Count; i++)
@@ -424,6 +438,8 @@ public class Lobby : MonoBehaviour
 		
 		networkView.RPC("AddNetworkPlayer", RPCMode.All, network_player, new_player_name, SPECTATING);
 	}
+	/************************************************************************************/
+	
 	
 	void DrawPlayers(List<Player> players, int team)
 	{
@@ -486,6 +502,7 @@ public class Lobby : MonoBehaviour
 		}
 	}
 	
+	/* When in a lobby the admin moves the player between teams, we use this function*/
 	[RPC]
 	void ChangeNetworkPlayerTeam(NetworkPlayer network_player, int old_team, int new_team)
 	{
@@ -587,8 +604,12 @@ public class Lobby : MonoBehaviour
 					if(!offline_game)
 						GUILayout.FlexibleSpace();
 					if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width))) {
-						if(game_behaviour != null)
+						GameObject gb = GameObject.FindGameObjectWithTag("GameController");
+						
+						if(gb != null){
+							game_behaviour = (Game_Behaviour)gb.GetComponent<Game_Behaviour>();
 							game_behaviour.isOnLobbyScreen = false;
+						}
 						if(!offline_game)
 							StartNetworkGame();
 						else
