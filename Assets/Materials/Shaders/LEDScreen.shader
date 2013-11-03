@@ -19,6 +19,7 @@
 		{
 			CGPROGRAM
 //			#pragma fragmentation ARB_precision_hint_fastest
+			#pragma target 3.0
 			#pragma vertex vert
 			#pragma fragment frag
 			
@@ -103,7 +104,7 @@
 							tex2D(_MainTex, texCoords2) + 
 							tex2D(_MainTex, texCoords3) + 
 							tex2D(_MainTex, texCoords4) + 
-//							tex2D(_MainTex, texCoords5) + 
+							tex2D(_MainTex, texCoords5) + 
 							tex2D(_MainTex, texCoords6) + 
 							tex2D(_MainTex, texCoords7) +
 							tex2D(_MainTex, texCoords8);
