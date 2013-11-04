@@ -1,5 +1,5 @@
 ﻿Shader "Custom/LEDScreen" {
-	Properties 
+	Properties
 	{
 		_MainTex ("Main Texture", 2D) = "white" {}
 		_PixelSize ("Pixel Size", float) = 0
@@ -19,7 +19,6 @@
 		Pass
 		{
 			CGPROGRAM
-//			#pragma fragmentation ARB_precision_hint_fastest
 			#pragma target 3.0
 			#pragma vertex vert
 			#pragma fragment frag
