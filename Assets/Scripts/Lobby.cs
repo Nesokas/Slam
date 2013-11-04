@@ -122,7 +122,7 @@ public class Lobby : MonoBehaviour
 		for(int i = 0; i < toogle_columns.Length; i++)
 			toogle_columns[i] = false;
 		
-		InitializeMSF();
+		InitializeMSF(); //MSF -> Master Server Facilitator
 		
 		spectating = new List<Player>();
 		team_1 = new List<Player>();
@@ -627,7 +627,7 @@ public class Lobby : MonoBehaviour
 		menu_state = MAIN_MENU;
 	}
 
-	void NicknameScreen ()
+	void NicknameScreen()
 	{
 		GUILayout.BeginVertical();
 			GUILayout.FlexibleSpace();
