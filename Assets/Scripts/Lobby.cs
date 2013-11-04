@@ -156,7 +156,7 @@ public class Lobby : MonoBehaviour
 		}
 	}
 
-	void JoinRoom ()
+	void JoinRoom()
 	{
 		// Draw sortable columns
 		GUILayout.BeginHorizontal();
@@ -316,7 +316,7 @@ public class Lobby : MonoBehaviour
 		if(settings == null)
 			networkView.RPC("LoadSettings", RPCMode.All);
 		
-		/* Preenche a lista de players (nao os do Game_Behaviour, mas sim outra estrutura a parte) do Game_Settings */
+		/* Preenche a lista de players do Game_Settings */
 		for(int i = 0; i < team_1.Count; i++) {
 			Vector3 start_position = new Vector3(0,0,0);
 			SimplePlayer player = team_1[i].player;
@@ -413,7 +413,6 @@ public class Lobby : MonoBehaviour
 	/* When a new player connects to a lobby, this will handle the logic */
 	void OnPlayerConnected(NetworkPlayer network_player)
 	{
-		Debug.Log("New Player Connected");
 		networkView.RPC("AskName", network_player);
 	}
 	
@@ -560,7 +559,7 @@ public class Lobby : MonoBehaviour
 		}
 	}
 
-	void LobbyScreen ()
+	void LobbyScreen()
 	{
 		GUILayout.BeginVertical();
 			GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
@@ -676,7 +675,7 @@ public class Lobby : MonoBehaviour
 					
 					switch(tab_selected){
 					case JOIN_TAB:
-						JoinRoom ();
+						JoinRoom();
 						break;
 					case CREATE_TAB:
 						CreateRoom();
