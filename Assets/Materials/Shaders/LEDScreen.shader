@@ -69,19 +69,6 @@
 				return o;
 			}
 			
-			float4 ApplyLuminanceStepping(float4 avgColor)
-			{
-				float sum = avgColor.x + avgColor.y + avgColor.z;
-				float luminance = sum/3.0;
-				float3 ratios = float3(avgColor.x/luminance, avgColor.y/luminance, avgColor.z/luminance);
-				
-				float luminanceStep = 1.0/float(_LuminanceSteps);
-				float luminanceBin = floor(luminance/luminanceStep);
-				float luminanceFactor = luminanceStep * luminanceBin + _LuminanceBoost;
-				
-				return float4(ratios * luminanceFactor, 1.0);
-			}
-			
 			half4 frag(fragmentInput i) : COLOR
 			{
 				float4 avgColor;
@@ -112,7 +99,6 @@
 							tex2D(_MainTex, texCoords8);
 						   
 				avgColor = avgColor/float(9);
-//				avgColor = ApplyLuminanceStepping(avgColor);
 
 				if (avgColor.x < _Threshold)
 					avgColor.x = 0;
