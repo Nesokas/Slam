@@ -1,4 +1,4 @@
-﻿Shader "Custom/LEDScreen" {
+Shader "Custom/LEDScreen" {
 	Properties
 	{
 		_MainTex ("Main Texture", 2D) = "white" {}
