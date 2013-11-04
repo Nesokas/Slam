@@ -65,6 +65,8 @@ public class Game_Behaviour : MonoBehaviour {
 	private bool isTimeUp = false;
 	
 	public bool isOnLobbyScreen = false;
+
+	private LED_Screen led_screen_script;
 	
 	public void ScoreTeam(int team)
 	{		
@@ -179,6 +181,8 @@ public class Game_Behaviour : MonoBehaviour {
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
 		GameObject guiManager = GameObject.FindGameObjectWithTag("GuiManager");
 		gui_manager = guiManager.GetComponent<GUIManager>();
+		GameObject led_screen = GameObject.FindGameObjectWithTag("LedScreen");
+		led_screen_script = led_screen.GetComponent<LED_Screen>();
 		
 		m_camera = GameObject.FindGameObjectWithTag("MainCamera").camera;
 		
@@ -268,7 +272,7 @@ public class Game_Behaviour : MonoBehaviour {
 			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
 		if (isTimeUp) {
 			if (score_team_1 == score_team_2)
-				gui_manager.DrawTieMessage("Golden Goal");
+				led_screen_script.DrawTieMessage();
 			else if (score_team_1 > score_team_2)
 				gui_manager.DrawGoalScored(1, "RED TEAM WINS");
 			else if (score_team_1 < score_team_2)

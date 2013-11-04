@@ -1,7 +1,7 @@
 Shader "Custom/LEDScreen" {
 	Properties
 	{
-		_MainTex ("Main Texture", 2D) = "white" {}
+		_MainTex ("Main Texture", 2D) = "black" {}
 		_PixelSize ("Pixel Size", float) = 0
 		_Threshold ("Threshold", float) = 0
 		_BillboardSize_x ("Billboard Size X", float) = 0
