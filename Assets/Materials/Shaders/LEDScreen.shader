@@ -3,6 +3,7 @@
 	{
 		_MainTex ("Main Texture", 2D) = "white" {}
 		_PixelSize ("Pixel Size", float) = 0
+		_Threshold ("Threshold", float) = 0
 		_BillboardSize_x ("Billboard Size X", float) = 0
 		_BillboardSize_y ("Billboard Size Y", float) = 0
 		_Tolerance ("Tolerance", float) = 0
@@ -35,6 +36,7 @@
 			uniform float _PixelRadius;
 			uniform float _LuminanceSteps;
 			uniform float _LuminanceBoost;
+			uniform float _Threshold;
 			
 			float2 texCoords0;
 			float2 texCoords1;
@@ -74,7 +76,7 @@
 				float3 ratios = float3(avgColor.x/luminance, avgColor.y/luminance, avgColor.z/luminance);
 				
 				float luminanceStep = 1.0/float(_LuminanceSteps);
-				float luminanceBin = ceil(luminance/luminanceStep);
+				float luminanceBin = floor(luminance/luminanceStep);
 				float luminanceFactor = luminanceStep * luminanceBin + _LuminanceBoost;
 				
 				return float4(ratios * luminanceFactor, 1.0);
@@ -111,6 +113,21 @@
 						   
 				avgColor = avgColor/float(9);
 //				avgColor = ApplyLuminanceStepping(avgColor);
+
+				if (avgColor.x < _Threshold)
+					avgColor.x = 0;
+				else
+					avgColor.x = 1;
+					
+				if (avgColor.y < _Threshold)
+					avgColor.y = 0;
+				else
+					avgColor.y = 1;
+					
+				if (avgColor.z < _Threshold)
+					avgColor.z = 0;
+				else
+					avgColor.z = 1;
 				
 				float2 powers = pow(abs(pixelRegionCoords - 0.5), float2(2.0));
 				float radiusSqrd = pow(_PixelRadius, 2.0);
