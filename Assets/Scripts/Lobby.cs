@@ -313,8 +313,10 @@ public class Lobby : MonoBehaviour
 		
 //		networkView.RPC("LoadSettings", RPCMode.Others);
 		
-		if(settings == null)
-			networkView.RPC("LoadSettings", RPCMode.All);
+		if(settings == null) {
+			NetworkViewID viewID = Network.AllocateViewID();
+			networkView.RPC("LoadSettings", RPCMode.All, viewID);
+		}
 		
 		/* Preenche a lista de players do Game_Settings */
 		for(int i = 0; i < team_1.Count; i++) {
@@ -397,11 +399,14 @@ public class Lobby : MonoBehaviour
 	
 	/* Instantiates settings_prefab (Game_Settings.cs) on clients and server*/
 	[RPC]
-	void LoadSettings()
+	void LoadSettings(NetworkViewID viewID)
 	{
 		settings = (GameObject)Instantiate(settings_prefab);
 		game_settings = settings.GetComponent<Game_Settings>();
 		game_settings.local_game = false;
+		
+		NetworkView nView = settings.GetComponent<NetworkView>();
+		nView.viewID = viewID;
 	}
 	
 	[RPC]

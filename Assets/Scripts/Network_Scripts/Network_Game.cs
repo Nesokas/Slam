@@ -1,7 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Network_Game : Game_Behaviour {
+	
+	Dictionary<NetworkPlayer, bool> players_ready;
 
 	protected void OnPlayerDisconnected(NetworkPlayer player) 
 	{
@@ -66,9 +69,33 @@ public class Network_Game : Game_Behaviour {
 				}
 			}
 			
-			networkView.RPC("StartGame", RPCMode.All);
+			players_ready = new Dictionary<NetworkPlayer, bool>();
+			
+			for(int i = 0; i < Network.connections.Length; i++) {
+				players_ready.Add(Network.connections[i], false);
+			}
+		} else {
+			networkView.RPC("ClientReady", RPCMode.Server, Network.player);
 		}
 		
+	}
+	
+	[RPC]
+	void ClientReady(NetworkPlayer network_player)
+	{
+		players_ready[network_player] = true;
+		if(AllPlayersReady())
+			networkView.RPC("StartGame", RPCMode.All);
+	}
+	
+	bool AllPlayersReady()
+	{
+		foreach (var player in players_ready) {
+			if(!player.Value)
+				return false;
+		}
+		
+		return true;
 	}
 	
 	[RPC]
@@ -87,8 +114,7 @@ public class Network_Game : Game_Behaviour {
 	public override void ReleasePlayers()
 	{
 		if(Network.isServer) {
-			networkView.RPC("ReleaseClientPlayers", RPCMode.Others);
-			base.ReleasePlayers();
+			networkView.RPC("ReleaseClientPlayers", RPCMode.All);
 		}
 	}
 	

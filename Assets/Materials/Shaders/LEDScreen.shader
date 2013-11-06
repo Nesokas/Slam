@@ -118,8 +118,7 @@ Shader "Custom/LEDScreen" {
 				float radiusSqrd = pow(_PixelRadius, 2.0);
 				float gradient = smoothstep(radiusSqrd - _Tolerance, radiusSqrd + _Tolerance, powers.x + powers.y);
 
-				return lerp(avgColor, float4(0, 0, 0, 1.0), gradient);
-//				return avgColor;
+				return lerp(avgColor, float4(0.1, 0.1, 0.1, 1.0), gradient);
 			}
 					
 			ENDCG

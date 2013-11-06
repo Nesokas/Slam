@@ -128,7 +128,12 @@ public class Network_Player: Kickoff_Player {
 	
 	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
 	{
-		predictor.OnSerializeNetworkViewPlayer(stream, info);
+		try {
+			predictor.OnSerializeNetworkViewPlayer(stream, info);
+		} catch (System.Exception ex) {
+			predictor = new Predictor(transform);
+			predictor.OnSerializeNetworkViewPlayer(stream, info);
+		}
 	}
 	
 //	new void FixedUpdate()

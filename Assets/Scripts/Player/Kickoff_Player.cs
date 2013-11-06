@@ -19,7 +19,7 @@ public class Kickoff_Player : Player_Behaviour {
 	/* Only one team should kickoff, the other cannot go through the midfield circle or opposing side */
 	public void DisableGotoCenter(NotificationCenter.Notification notification)
 	{
-		int scored_team = (int)notification.data["scored_team"];
+		int scored_team = (int)notification.data["scored_team"];	
 		player_base = transform.Find("Base");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
