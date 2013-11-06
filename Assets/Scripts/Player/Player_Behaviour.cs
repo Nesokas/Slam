@@ -60,7 +60,7 @@ public class Player_Behaviour : MonoBehaviour {
     private float PLAYER_ARROW_HEIGHT = 0.02f;
 	
 	
-	private int goals_scored = 0;
+	private int goals_scored = 2;
 	private bool best_score = false;
 	
 	void VerifyShoot()
@@ -82,7 +82,7 @@ public class Player_Behaviour : MonoBehaviour {
 				
 				Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 				bb.ReleasePlayers();
-				bb.LastPlayerShoot(this.gameObject);
+				bb.SetLastPlayerTouched(this.gameObject);
 			}
 		}
 	}

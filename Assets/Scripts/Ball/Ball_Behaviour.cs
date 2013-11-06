@@ -13,7 +13,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	string[] animationsType2;
 	
 	protected GameObject last_player_touched;
-	protected GameObject last_player_shoot;
+//	protected GameObject last_player_shoot;
 	
 	protected bool is_looking_somewhere;
 	
@@ -50,24 +50,25 @@ public class Ball_Behaviour : MonoBehaviour {
 		}
 	}
 	
+	protected void OnTriggerEnter(Collider collider)
+	{
+		if (collider.gameObject.tag == "colliderShoot")
+			last_player_touched = collider.gameObject.transform.parent.parent.gameObject;
+	}
+	
 	public GameObject GetLastPlayerTouched() 
 	{
 		return last_player_touched;
 	}
 	
-	public GameObject GetLastPlayerShoot()
+	public void SetLastPlayerTouched(GameObject player)
 	{
-		return last_player_shoot;
-	}
-	
-	public void LastPlayerShoot(GameObject player_shoot)
-	{
-		last_player_shoot = player_shoot;
+		last_player_touched = player;
 	}
 	
 	public void OnCollisionExit(Collision collider)
 	{
-		if(collider.gameObject.tag == "Player") 
+		if(collider.gameObject.tag == "Player")
 			last_player_touched = collider.gameObject;
 	}
 	
