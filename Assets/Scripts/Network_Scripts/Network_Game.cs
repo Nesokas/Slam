@@ -10,12 +10,32 @@ public class Network_Game : Game_Behaviour {
 	{
 		Network.RemoveRPCs(player);
 		Network.DestroyPlayerObjects(player);
+		
+		GameObject[] all_players = GameObject.FindGameObjectsWithTag("Player");
+		
+		foreach(GameObject player_obj in all_players){
+			Network_Player net_player = player_obj.GetComponent<Network_Player>();
+			if (net_player.owner == player) {
+				Network.Destroy(player_obj.GetComponent<NetworkView>().viewID);
+				return;
+			}
+		}
 	}
 	
 	protected void OnDisconnectedFromServer(NetworkDisconnection info)
 	{
 		Network.RemoveRPCs(Network.player);
 		Network.DestroyPlayerObjects(Network.player);
+		
+		GameObject[] all_players = GameObject.FindGameObjectsWithTag("Player");
+		
+		foreach(GameObject player_obj in all_players){
+			Network_Player net_player = player_obj.GetComponent<Network_Player>();
+			if (net_player.owner == Network.player) {
+				Network.Destroy(player_obj.GetComponent<NetworkView>().viewID);
+				return;
+			}
+		}
 	}
 	
 	protected override void MovePlayersToStartPositions()
