@@ -96,10 +96,20 @@ public class Player_Behaviour : MonoBehaviour {
 			dash_cooldown =  DASH_COOLDOWN + Time.time;
 			rigidbody.velocity *= DASH_STRENGTH;
 			dash_bar_fill.renderer.material.color = Color.red;
-			dash_smoke.particleEmitter.Emit();
+			
+			// if networkView == null means localplay so we can't make an RPC
+			if (networkView != null)
+				networkView.RPC("EmmitDashSmoke",RPCMode.All);
+			else
+				EmmitDashSmoke();	
 		}
 	}
 	
+	[RPC]
+	void EmmitDashSmoke()
+	{
+		dash_smoke.particleEmitter.Emit();
+	}
 	public void GoalScored()
 	{
 		goals_scored++;
