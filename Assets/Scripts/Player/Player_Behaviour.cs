@@ -39,6 +39,7 @@ public class Player_Behaviour : MonoBehaviour {
 	protected Transform player_base;
 	protected Transform dash_bar;
 	protected Transform dash_bar_fill;
+	protected Transform dash_smoke;
 	protected Transform player_indicator_container;
 	public Vector3 viewport_dash_pos;
 	protected GameObject ball;
@@ -95,9 +96,20 @@ public class Player_Behaviour : MonoBehaviour {
 			dash_cooldown =  DASH_COOLDOWN + Time.time;
 			rigidbody.velocity *= DASH_STRENGTH;
 			dash_bar_fill.renderer.material.color = Color.red;
+			
+			// if networkView == null means localplay so we can't make an RPC
+			if (networkView != null)
+				networkView.RPC("EmmitDashSmoke",RPCMode.All);
+			else
+				EmmitDashSmoke();	
 		}
 	}
 	
+	[RPC]
+	void EmmitDashSmoke()
+	{
+		dash_smoke.particleEmitter.Emit();
+	}
 	public void GoalScored()
 	{
 		goals_scored++;
@@ -223,7 +235,7 @@ public class Player_Behaviour : MonoBehaviour {
 		player_base = transform.Find("Base");
 		dash_bar = transform.Find("Dash_Bar");
 		dash_bar_fill = dash_bar.Find("Dash_Fill");
-		
+		dash_smoke = transform.Find("Dash_Smoke");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
 		Transform court_collider = court_walls.transform.Find("forcefield");
