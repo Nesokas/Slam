@@ -8,6 +8,8 @@ public class Player_Behaviour : MonoBehaviour {
 	public float ACCELERATION = 0.065f;
 	public float MAX_ANIMATION_SPEED = 2f;
 	public float SHOOT_VELOCITY = 9;
+	private int MIN_GOALS_REWARD = 3;  // minimum amount of goals to receive the best goal scorer reward
+	
 	
 	public float increase_speed = 0.1f;
 	private float dash_cooldown;
@@ -54,7 +56,7 @@ public class Player_Behaviour : MonoBehaviour {
 
 	protected PlayerController.Commands commands;
 	
-	private float PLAYER_ARROW_SIZE = 0.012f;
+	private float PLAYER_ARROW_SIZE = 0.015f;
     private float PLAYER_ARROW_HEIGHT = 0.02f;
 	
 	
@@ -110,10 +112,11 @@ public class Player_Behaviour : MonoBehaviour {
 	{
 		dash_smoke.particleEmitter.Emit();
 	}
+	
 	public void GoalScored()
 	{
 		goals_scored++;
-		if(goals_scored >= 3) {
+		if(goals_scored >= MIN_GOALS_REWARD) {
 			best_score = true;
 			
 			GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -372,17 +375,17 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 		
 		y = y - Screen.height*0.03f;
-		if(best_score){
-			x = x - 0.004f*Screen.width;
-			y = y - 0.006f*Screen.height;
-			width = width + 0.007f*Screen.width;
-			height = height + 0.012f*Screen.height;
-		}
+//		if(best_score){
+//			x = x - 0.004f*Screen.width;
+//			y = y - 0.006f*Screen.height;
+//			width = width + 0.007f*Screen.width;
+//			height = height + 0.012f*Screen.height;
+//		}
 		
-		GUI.DrawTexture( new Rect(x, y, width, height - 0.002f*Screen.height), indicator_arrow, ScaleMode.ScaleToFit, true);
+		GUI.DrawTexture( new Rect(x - 0.001f*Screen.width, y - 0.001f*Screen.height, width + 0.002f*Screen.width, height), indicator_arrow, ScaleMode.ScaleToFit, true);
 		
 		if(best_score)
-			GUI.DrawTexture( new Rect(x + 0.0045f*Screen.width, y + 0.002f*Screen.height, width - 0.009f*Screen.width, height - 0.015f*Screen.height), star, ScaleMode.ScaleToFit, true);
+			GUI.DrawTexture( new Rect(x + 0.0016f*Screen.width, y + 0.001f*Screen.height, width - 0.0036f*Screen.width, height - 0.0108f*Screen.height), star, ScaleMode.ScaleToFit, true);
 		
 		// Dash indicator arrow
 		Texture dash_arrow_texture = dash_arrow_fill;
