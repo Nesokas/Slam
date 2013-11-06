@@ -19,10 +19,12 @@ public class CameraMovement : MonoBehaviour
 	
 	void Update()
 	{
-		if (!ball && GameObject.FindGameObjectWithTag("ball")) {
-			ball = GameObject.FindGameObjectWithTag("ball").transform;
-			rel_camera_pos = transform.position - ball.position;
-			rel_camera_pos_mag = rel_camera_pos.magnitude;
+		if (!ball) {
+			if(GameObject.FindGameObjectWithTag("ball")){
+				ball = GameObject.FindGameObjectWithTag("ball").transform;
+				rel_camera_pos = transform.position - ball.position;
+				rel_camera_pos_mag = rel_camera_pos.magnitude;
+			}
 		} else {
 			Vector3 standard_pos = ball.position + rel_camera_pos;
 			Vector3 above_pos = ball.position + Vector3.up * rel_camera_pos_mag;

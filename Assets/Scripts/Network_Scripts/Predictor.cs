@@ -127,14 +127,15 @@ public class Predictor {
 			
 			float distance = Vector3.Distance(latest.pos, predicted_pos);
 			
-			if(distance!=0 && Physics.Raycast(latest.pos, direction, out hit, Mathf.Abs(distance))) {
-			
-				direction = direction*(-1);
-				x = hit.point.x + direction.x*((SphereCollider)observed_transform.collider).radius;
-				y = hit.point.y + direction.y*((SphereCollider)observed_transform.collider).radius;
-				z = hit.point.z + direction.z*((SphereCollider)observed_transform.collider).radius;
-
-				
+			if(distance != 0 && Physics.Raycast(latest.pos, direction, out hit, Mathf.Abs(distance))) {
+				if(hit.collider.gameObject.tag == "court_walls"){
+					direction = direction*(-1);
+					Transform player_base = observed_transform.Find("Base");
+					Transform collider_transform = player_base.Find("Collider");
+					x = hit.point.x + direction.x*((SphereCollider)collider_transform.collider).radius;
+					y = hit.point.y + direction.y*((SphereCollider)collider_transform.collider).radius;
+					z = hit.point.z + direction.z*((SphereCollider)collider_transform.collider).radius;
+				}
 			}
 
 			observed_transform.position =  Vector3.Lerp (observed_transform.position, new Vector3(x,y,z), 0.25f);
