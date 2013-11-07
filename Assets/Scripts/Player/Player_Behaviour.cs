@@ -57,11 +57,18 @@ public class Player_Behaviour : MonoBehaviour {
 	protected PlayerController.Commands commands;
 	
 	private float PLAYER_ARROW_SIZE = 0.015f;
+	private float INIT_PLAYER_STAR_SIZE = 0.5f;
+	private float STAR_SHRINK_SPEED = 1f;
+	private float star_size;
+	
     private float PLAYER_ARROW_HEIGHT = 0.02f;
 	
 	
 	private int goals_scored = 2;
 	private bool best_score = false;
+	private bool is_animating_star = false;
+	
+	private CameraMovement main_camera;
 	
 	void VerifyShoot()
 	{
@@ -117,8 +124,11 @@ public class Player_Behaviour : MonoBehaviour {
 	{
 		goals_scored++;
 		if(goals_scored >= MIN_GOALS_REWARD) {
+			if (best_score == false) {
+				star_size = INIT_PLAYER_STAR_SIZE;
+				is_animating_star = true;
+			}
 			best_score = true;
-			
 			GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 			foreach(GameObject player in players){
 				if(player != this.gameObject){
@@ -230,9 +240,12 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	protected void Start() 
 	{		
+		star_size = INIT_PLAYER_STAR_SIZE;
 		NotificationCenter.DefaultCenter.AddObserver(this, "DoYouHaveMoreGoals");
 		
 		GameObject court_walls = GameObject.FindGameObjectWithTag("court_walls");
+		GameObject main_camera_object = GameObject.FindGameObjectWithTag("MainCamera");
+		main_camera = main_camera_object.GetComponent<CameraMovement>();
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		player_base = transform.Find("Base");
@@ -383,9 +396,20 @@ public class Player_Behaviour : MonoBehaviour {
 //		}
 		
 		GUI.DrawTexture( new Rect(x - 0.001f*Screen.width, y - 0.001f*Screen.height, width + 0.002f*Screen.width, height), indicator_arrow, ScaleMode.ScaleToFit, true);
-		
-		if(best_score)
-			GUI.DrawTexture( new Rect(x + 0.0016f*Screen.width, y + 0.001f*Screen.height, width - 0.0036f*Screen.width, height - 0.0108f*Screen.height), star, ScaleMode.ScaleToFit, true);
+		if(best_score) {
+			if (is_animating_star == true)
+				AnimateStar();
+			if (main_camera.is_shaking)
+				main_camera.ShakeCamera();
+			GUI.DrawTexture( new Rect(
+					x + 0.0016f*Screen.width-(Screen.width*star_size*0.5f), 
+					y + 0.001f*Screen.height-(Screen.height*star_size*0.5f), 
+					width - 0.0036f*Screen.width+(star_size*Screen.width), 
+					height - 0.0108f*Screen.height+(star_size*Screen.height)), 
+				star, 
+				ScaleMode.ScaleToFit, 
+				true);
+		}
 		
 		// Dash indicator arrow
 		Texture dash_arrow_texture = dash_arrow_fill;
@@ -406,6 +430,17 @@ public class Player_Behaviour : MonoBehaviour {
 		GUI.BeginGroup(new Rect (x-(dash_arrow_width/2f), y - (dash_arrow_height/2f) + height*(1f-fill_percent), width + dash_arrow_width, height*fill_percent + dash_arrow_height - 0.002f*Screen.height));
 		GUI.DrawTexture(new Rect(0, -(1f-fill_percent)*height, width + dash_arrow_width, height + dash_arrow_height), dash_arrow_texture);
 		GUI.EndGroup();
+	}
+	
+	private void AnimateStar()
+	{
+		if (star_size <= 0) {
+			star_size = 0;
+			main_camera.ShakeCamera();
+			is_animating_star = false;
+		}
+		else
+			star_size -= STAR_SHRINK_SPEED * Time.deltaTime;
 	}
 
 	// Update is called once per frame
