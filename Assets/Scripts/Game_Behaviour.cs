@@ -251,8 +251,6 @@ public class Game_Behaviour : MonoBehaviour {
 			ball = GameObject.FindGameObjectWithTag("ball");
 		Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 		GameObject last_player_touched = bb.GetLastPlayerTouched();
-		GameObject last_player_shoot = bb.GetLastPlayerShoot();
-	
 		Kickoff_Player pb = last_player_touched.GetComponent<Kickoff_Player>();
 		int player_score_team = pb.GetTeam();
 		if(player_score_team == team_scored)
