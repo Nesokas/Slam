@@ -78,10 +78,10 @@ public class Lobby : MonoBehaviour
 		if(settings == null) {
 			settings = (GameObject)Instantiate(settings_prefab, settings_prefab.transform.position, settings_prefab.transform.rotation);
 			game_settings = settings.GetComponent<Game_Settings>();
-			local_game = true;
+			game_settings.local_game = true;
 		} else {
 			game_settings = settings.GetComponent<Game_Settings>();
-			local_game = game_settings.IsLocalGame();
+			game_settings.local_game = game_settings.IsLocalGame();
 		}
 		
 		if(game_settings.IsLocalGame()) {
