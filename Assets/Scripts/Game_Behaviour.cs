@@ -38,7 +38,7 @@ public class Game_Behaviour : MonoBehaviour {
 	// timer for celebration
 	public float timer_value;
 	
-	protected int scored_team = 0;
+	public  int scored_team = 0;
 	
 	protected int score_team_1 = 0;
 	protected int score_team_2 = 0;
@@ -67,6 +67,7 @@ public class Game_Behaviour : MonoBehaviour {
 	public bool isOnLobbyScreen = false;
 
 	private LED_Screen led_screen_script;
+	public bool is_game_going;
 	
 	public void ScoreTeam(int team)
 	{		
@@ -97,7 +98,8 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	public virtual void ReleasePlayers()
 	{
-		NotificationCenter.DefaultCenter.PostNotification(this, "ReleasePlayers");	
+		NotificationCenter.DefaultCenter.PostNotification(this, "ReleasePlayers");
+		is_game_going = true;
 	}
 	
 	protected virtual void MovePlayersToStartPositions(){}
@@ -108,6 +110,7 @@ public class Game_Behaviour : MonoBehaviour {
 
 		MovePlayersToStartPositions();
 		trigger_timer = false;
+		is_game_going = false;
 	}
 	
 	public void TimeFinished()
@@ -176,6 +179,11 @@ public class Game_Behaviour : MonoBehaviour {
 			players_team_2.Add(player);
 	}
 	
+	public Texture GetTexture(int id)
+	{
+		return player_arrows[id];
+	}
+	
 	protected void Start() 
 	{
 		NotificationCenter.DefaultCenter.AddObserver(this, "OnGoal");
@@ -185,7 +193,7 @@ public class Game_Behaviour : MonoBehaviour {
 		led_screen_script = led_screen.GetComponent<LED_Screen>();
 		
 		m_camera = GameObject.FindGameObjectWithTag("MainCamera").camera;
-		
+		is_game_going = false;
 		MovePlayersToStartPositions();
 		
 	}
@@ -203,13 +211,6 @@ public class Game_Behaviour : MonoBehaviour {
 		
 		if(is_celebrating)
 			team_scored_message_xpos += (Time.deltaTime * TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER);
-		
-		if (Input.GetKey(KeyCode.Escape)) {
-			if (!isOnLobbyScreen) {
-	        	Application.LoadLevelAdditive("Lobby");
-				isOnLobbyScreen = true;
-			}
-		}
 	}
 	
 	public int StopCelebration()

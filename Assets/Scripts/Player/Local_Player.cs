@@ -2,8 +2,10 @@ using UnityEngine;
 using System.Collections;
 
 public class Local_Player : Kickoff_Player {
+	
+	public int controller;
 
-	public void InitializePlayerInfo(int team_num, string player_name, Vector3 position, int input_num, Texture color)
+	public void InitializePlayerInfo(int team_num, string player_name, Vector3 position, int input_num, int texture_id)
 	{
 		team = team_num;
 
@@ -15,10 +17,12 @@ public class Local_Player : Kickoff_Player {
 		initial_position = position;
 		controller_object = (GameObject)Instantiate(player_controller_prefab);
 		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+		controller = input_num;
 		player_controller.setInputNum(input_num);
 		
-		
-		indicator_arrow = color;
+		GameObject game_controller = GameObject.FindGameObjectWithTag("GameController");
+        Local_Game local_game = game_controller.GetComponent<Local_Game>();
+        indicator_arrow = local_game.GetTexture(texture_id);
 	}
 	
 	void StopCelebration()

@@ -39,31 +39,11 @@ public class Local_Game : Game_Behaviour {
 	{
 		ball = (GameObject)Instantiate(ball_prefab, ball_position, transform.rotation);
 		ball.transform.name = "Ball";
-		GameObject settings =  GameObject.FindGameObjectWithTag("settings");
-		
-		/* if running on test mode (skipping lobby) */
-		if(settings == null) {
-			GameObject player = (GameObject)Instantiate(player_prefab, new Vector3(0, 0, 7.12416f), transform.rotation);
-			Local_Player lp = (Local_Player)player.GetComponent<Local_Player>();
-			lp.InitializePlayerInfo(1, "Test", new Vector3(0, 0, 7.12416f), 0, player_arrows[0]);
-		/********************************************/
-		} else {
-			Game_Settings game_settings = settings.GetComponent<Game_Settings>();
-			for(int i = 0; i < game_settings.players.Count; i++) {
-				if(game_settings.players[i].team != 0) {
-					GameObject player = (GameObject)Instantiate(player_prefab, game_settings.players[i].start_position, transform.rotation);
-						
-					Local_Player lp = (Local_Player)player.GetComponent<Local_Player>();
-					lp.InitializePlayerInfo(
-						game_settings.players[i].team, 
-						game_settings.players[i].name, 
-						game_settings.players[i].start_position,
-						game_settings.players[i].controller,
-						player_arrows[i]
-					);
-				}
-			}
-		}
+		GameObject settings =  GameObject.FindGameObjectWithTag("settings");		
+	}
+	
+	public void StartGame()
+	{
 		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
 		MovePlayersToStartPositions();
 	}

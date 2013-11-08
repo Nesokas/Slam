@@ -112,7 +112,7 @@ public class Kickoff_Player : Player_Behaviour {
 		player_base.renderer.material = normal_material;
 	}	
 	
-	void InitializePosition()
+	public void InitializePosition()
 	{
 		transform.position = initial_position;
 	}

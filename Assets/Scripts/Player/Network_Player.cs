@@ -6,6 +6,7 @@ public class Network_Player: Kickoff_Player {
 	
 	private Predictor predictor;
 	public NetworkPlayer owner;
+	int arrow_id;
 	
 	new void Start()
 	{
@@ -16,11 +17,11 @@ public class Network_Player: Kickoff_Player {
 //	Sends player info to every client
 	public void InitializePlayerInfo(NetworkPlayer network_player, int team_num, string player_name, Vector3 position, int textureID)
 	{
-		networkView.RPC("TellInfoToPlayers", RPCMode.All, team_num, player_name, position, network_player, textureID);
+		networkView.RPC("TellInfoToPlayer", RPCMode.All, team_num, player_name, position, network_player, textureID);
 	}
 	
 	[RPC]
-	void TellInfoToPlayers(int team_num, string name, Vector3 position, NetworkPlayer network_player, int textureID)
+	void TellInfoToPlayer(int team_num, string name, Vector3 position, NetworkPlayer network_player, int textureID)
 	{
 		team = team_num;
 		
@@ -36,16 +37,50 @@ public class Network_Player: Kickoff_Player {
 		
 		GameObject game_controller = GameObject.FindGameObjectWithTag("GameController");
         Network_Game network_game = game_controller.GetComponent<Network_Game>();
+		arrow_id = textureID;
         indicator_arrow = network_game.GetTexture(textureID);
+	}
+	
+	public void GetPlayerInfo()
+	{
+		networkView.RPC("RPC_GetPlayerInfo", RPCMode.Server, Network.player);
+	}
+	
+	[RPC]
+	void RPC_GetPlayerInfo(NetworkPlayer network_player)
+	{
+		networkView.RPC("GivePlayerInfo", network_player, team, owner, initial_position, transform.position, arrow_id);
+	}
+	
+	[RPC]
+	void GivePlayerInfo(int player_team, NetworkPlayer net_player, Vector3 start_position, Vector3 actual_position, int texture_id)
+	{
+		team = player_team;
+		owner = net_player;
+		initial_position = start_position;
+		animation.Play("Idle");
+		
+		if(Network.player == net_player) {
+			controller_object = (GameObject)Instantiate(player_controller_prefab);
+			PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+			player_controller.setInputNum(0);
+		}
+		
+		GameObject game_controller = GameObject.FindGameObjectWithTag("GameController");
+        Network_Game network_game = game_controller.GetComponent<Network_Game>();
+		arrow_id = texture_id;
+        indicator_arrow = network_game.GetTexture(texture_id);
+		
+		transform.position = actual_position;
 	}
 	
 	void StopCelebration()
 	{
-		networkView.RPC("RPCStopCelebration", RPCMode.All);
+		networkView.RPC("RPC_StopCelebration", RPCMode.All);
 	}
 	
 	[RPC]
-	void RPCStopCelebration()
+	void RPC_StopCelebration()
 	{
 		ChangeAnimation("Idle");
 	}
@@ -134,6 +169,34 @@ public class Network_Player: Kickoff_Player {
 			predictor = new Predictor(transform);
 			predictor.OnSerializeNetworkViewPlayer(stream, info);
 		}
+	}
+	
+	public void UpdateCollisions(int scored_team)
+	{
+		networkView.RPC("RPC_UpdateCollisions", RPCMode.All, scored_team);
+	}
+	
+	[RPC]
+	void RPC_UpdateCollisions(int scored_team)
+	{
+		/*Make a fake notification to just one player*/
+		NotificationCenter.Notification notification = new NotificationCenter.Notification(this, "");
+		notification.data = new Hashtable();
+		notification.data["scored_team"] = scored_team;
+		
+		DisableGotoCenter(notification);
+		InitializePosition();
+	}
+	
+	public void ReleasePlayer()
+	{
+		networkView.RPC("ReleasePlayers", RPCMode.All);
+	}
+	
+	[RPC]
+	new void ReleasePlayers()
+	{
+		base.ReleasePlayers();
 	}
 	
 //	new void FixedUpdate()
