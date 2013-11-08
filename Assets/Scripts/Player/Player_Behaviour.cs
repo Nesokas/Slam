@@ -433,8 +433,8 @@ public class Player_Behaviour : MonoBehaviour {
 	}
 	
 	private void AnimateStar()
-	{
-		if (star_size <= 0) {
+	{	
+		if (star_size <= 0.05) {
 			star_size = 0;
 			main_camera.ShakeCamera();
 			is_animating_star = false;
