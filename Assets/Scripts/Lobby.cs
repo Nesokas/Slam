@@ -43,6 +43,7 @@ public class Lobby : MonoBehaviour
 
 	private bool local_game;
 	private bool show_lobby;
+	private bool escape_key_pressed;
 	
 	private List<Player> spectating;
 	private List<Player> team_1;
@@ -64,6 +65,7 @@ public class Lobby : MonoBehaviour
 	void Awake()
 	{
 		show_lobby = true;
+		escape_key_pressed = false;
 		
 		team_1_color = 0;
 		team_2_color = 1;
@@ -492,6 +494,9 @@ public class Lobby : MonoBehaviour
 		Network.DestroyPlayerObjects (network_player);
 		
 		networkView.RPC("RemovePlayer", RPCMode.All, network_player);
+
+		if(Network.isServer)
+			MasterServer.UnregisterHost();
 	}
 	
 	[RPC]
@@ -596,7 +601,12 @@ public class Lobby : MonoBehaviour
 	void Update()
 	{
 		if (Input.GetKey(KeyCode.Escape)) {
-			show_lobby = !show_lobby;
+			if(!escape_key_pressed) {
+				show_lobby = !show_lobby;
+				escape_key_pressed = true;
+			}
+		} else {
+			escape_key_pressed = false;
 		}
 	}
 	
