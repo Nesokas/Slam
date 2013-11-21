@@ -118,16 +118,17 @@ public class Lobby : MonoBehaviour
 		Player player = CreatePlayer((string)player_name, team);
 		player.network_player = network_player;
 		player.is_network = true;
+
 		switch(team){
-		case SPECTATING:
-			spectating.Add(player);
-			break;
-		case TEAM_1:
-			team_1.Add(player);
-			break;
-		case TEAM_2:
-			team_2.Add(player);
-			break;
+			case SPECTATING:
+				spectating.Add(player);
+				break;
+			case TEAM_1:
+				team_1.Add(player);
+				break;
+			case TEAM_2:
+				team_2.Add(player);
+				break;
 		}
 	}
 	
@@ -167,7 +168,14 @@ public class Lobby : MonoBehaviour
 			if(player.owner == network_player) {
 				player.InitializePlayerInfo(network_player, team, name, start_position, texture_id);
 				player.Start();
-				player.ReleasePlayers();
+				GameObject gbo = GameObject.FindGameObjectWithTag("GameController");
+				Game_Behaviour gb = gbo.GetComponent<Game_Behaviour>();
+				if (gb.is_game_going) {
+					player.ReleasePlayers();
+				} else {
+					player.DisableGotoCenter(gb.scored_team);
+				}
+				//player.ReleasePlayers();
 				return;
 			}
 		}
@@ -395,12 +403,13 @@ public class Lobby : MonoBehaviour
 			int new_team = SPECTATING;
 			
 			GUILayout.BeginHorizontal();
-				if((team == TEAM_2 || team == SPECTATING) && (local_game || Network.isServer))
+				if((team == TEAM_2 || team == SPECTATING) && (local_game || Network.isServer)) {
 					if(GUILayout.Button("<", GUILayout.MaxWidth(0.03f*Screen.width))) {
 						if(team == SPECTATING)
 							new_team = TEAM_1;
 						change_team = true;
 					}
+				}
 				GUILayout.FlexibleSpace();
 				GUILayout.Label(players[i].name);
 				if(!local_game && players[i].network_player != Network.player) {
@@ -415,6 +424,7 @@ public class Lobby : MonoBehaviour
 					}
 				}
 			GUILayout.EndHorizontal();
+
 			if(change_team) {
 				if(local_game)
 					ChangeLocalPlayerTeam(players[i].controller, team, new_team);
@@ -456,15 +466,15 @@ public class Lobby : MonoBehaviour
 		List<Player> old_player_team = spectating;
 		
 		switch(old_team){
-		case SPECTATING:
-			old_player_team = spectating;
-			break;
-		case TEAM_1:
-			old_player_team = team_1;
-			break;
-		case TEAM_2:
-			old_player_team = team_2;
-			break;
+			case SPECTATING:
+				old_player_team = spectating;
+				break;
+			case TEAM_1:
+				old_player_team = team_1;
+				break;
+			case TEAM_2:
+				old_player_team = team_2;
+				break;
 		}
 		
 		for(int i = 0; i < old_player_team.Count; i++){

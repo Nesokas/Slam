@@ -12,14 +12,12 @@ public class Kickoff_Player : Player_Behaviour {
 	protected GameObject center_circle_left;
 	protected GameObject center_circle_right;
 	protected GameObject[] center_planes;
-	
+
 	public Vector3 initial_position;
 	protected GameObject controller_object;
-	
-	/* Only one team should kickoff, the other cannot go through the midfield circle or opposing side */
-	public void DisableGotoCenter(NotificationCenter.Notification notification)
+
+	public void DisableGotoCenter(int scored_team)
 	{
-		int scored_team = (int)notification.data["scored_team"];	
 		player_base = transform.Find("Base");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
@@ -66,6 +64,13 @@ public class Kickoff_Player : Player_Behaviour {
 			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider, false);
 			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider, false);
 		}
+	}
+	
+	/* Only one team should kickoff, the other cannot go through the midfield circle or opposing side */
+	public void DisableGotoCenter(NotificationCenter.Notification notification)
+	{
+		int scored_team = (int)notification.data["scored_team"];	
+		DisableGotoCenter(scored_team);
 	}
 	
 	public void ReleasePlayers()
