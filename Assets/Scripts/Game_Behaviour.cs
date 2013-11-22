@@ -106,7 +106,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void StartGameAgain()
 	{
-		int winning_team = StopCelebration();
+		StopCelebration();
 
 		MovePlayersToStartPositions();
 		trigger_timer = false;

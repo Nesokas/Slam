@@ -27,7 +27,8 @@ public class Main_Menu : MonoBehaviour
 	
 	/****************************************/
 	
-	public GameObject settings;
+	public GameObject settings_prefab;
+	private GameObject settings;
 	private Game_Settings game_settings;
 	
 	public string[] tabs = new string[] {"Join", "Create", "Favorites", "Settings"};
@@ -92,14 +93,23 @@ public class Main_Menu : MonoBehaviour
 			toogle_columns[i] = false;
 		
 		InitializeMSF(); //MSF -> Master Server Facilitator
-		
+
+		if(GameObject.FindGameObjectWithTag("settings") == null) {
+			settings = (GameObject)Instantiate(settings_prefab);
+		} else {
+			settings = GameObject.FindGameObjectWithTag("settings");
+		}
+
 		game_settings = settings.GetComponent<Game_Settings>();
 		
 		if(game_settings.player_name != "")
 			menu_state = MAIN_MENU;
 	}
 	
-	void Start(){}
+	void Start()
+	{
+
+	}
 
 	void JoinRoom()
 	{
