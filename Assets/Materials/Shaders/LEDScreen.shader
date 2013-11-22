@@ -70,23 +70,37 @@ Shader "Custom/LEDScreen" {
 			
 			half4 frag(fragmentInput i) : COLOR
 			{
+				
+				//will hold our averaged color from our sample points
 				float4 avgColor;
+				
+				//width of "pixel region" in texture coords
 				float2 texCoordsStep = float2(1.0/(float(_BillboardSize_x)/float(_PixelSize)), 1.0/(float(_BillboardSize_y)/float(_PixelSize)));
+				
 				float2 pixelRegionCoords = frac(i.uv/texCoordsStep);
+				
+				//"pixel region" number counting away from base case
 				float2 pixelBin = floor(i.uv/texCoordsStep);
+				
+				//width of "pixel region" divided by 3 (for KERNEL_SIZE = 9, 3x3 square)
 				float2 inPixelStep = texCoordsStep/3.0;
 				float2 inPixelHalfStep = inPixelStep/2.0;
 				
-				texCoords0 = float2(inPixelHalfStep.x, inPixelStep.y*2.0 + inPixelHalfStep.y) + pixelBin * texCoordsStep;
-				texCoords1 = float2(inPixelStep.x + inPixelHalfStep.x, inPixelStep.y*2.0 + inPixelHalfStep.y) + pixelBin * texCoordsStep;
-				texCoords2 = float2(inPixelStep.x*2.0 + inPixelHalfStep.x, inPixelStep.y*2.0 + inPixelHalfStep.y) + pixelBin * texCoordsStep;
-				texCoords3 = float2(inPixelHalfStep.x, inPixelStep.y + inPixelHalfStep.y) + pixelBin * texCoordsStep;
-				texCoords4 = float2(inPixelStep.x + inPixelHalfStep.x, inPixelStep.y + inPixelHalfStep.y) + pixelBin * texCoordsStep;
-				texCoords5 = float2(inPixelStep.x*2.0 + inPixelHalfStep.x, inPixelStep.y + inPixelHalfStep.y) + pixelBin * texCoordsStep;
-				texCoords6 = float2(inPixelHalfStep.x, inPixelHalfStep.y) + pixelBin * texCoordsStep;
-				texCoords7 = float2(inPixelStep.x + inPixelHalfStep.x, inPixelHalfStep.y) + pixelBin * texCoordsStep;
-				texCoords8 = float2(inPixelStep.x*2.0 + inPixelHalfStep.x, inPixelHalfStep.y) + pixelBin * texCoordsStep;
+			    //use offset (pixelBin * texCoordsStep) from base case 
+				// (the lower left corner of billboard) to compute texCoords
+				float2 offset = pixelBin * texCoordsStep;
 				
+				texCoords0 = float2(inPixelHalfStep.x, inPixelStep.y*2.0 + inPixelHalfStep.y) + offset;
+				texCoords1 = float2(inPixelStep.x + inPixelHalfStep.x, inPixelStep.y*2.0 + inPixelHalfStep.y) + offset;
+				texCoords2 = float2(inPixelStep.x*2.0 + inPixelHalfStep.x, inPixelStep.y*2.0 + inPixelHalfStep.y) + offset;
+				texCoords3 = float2(inPixelHalfStep.x, inPixelStep.y + inPixelHalfStep.y) + offset;
+				texCoords4 = float2(inPixelStep.x + inPixelHalfStep.x, inPixelStep.y + inPixelHalfStep.y) + offset;
+				texCoords5 = float2(inPixelStep.x*2.0 + inPixelHalfStep.x, inPixelStep.y + inPixelHalfStep.y) + offset;
+				texCoords6 = float2(inPixelHalfStep.x, inPixelHalfStep.y) + offset;
+				texCoords7 = float2(inPixelStep.x + inPixelHalfStep.x, inPixelHalfStep.y) + offset;
+				texCoords8 = float2(inPixelStep.x*2.0 + inPixelHalfStep.x, inPixelHalfStep.y) + offset;
+				
+				//take average of 9 pixel samples
 				avgColor = tex2D(_MainTex, texCoords0) + 
 							tex2D(_MainTex, texCoords1) + 
 							tex2D(_MainTex, texCoords2) + 
@@ -97,22 +111,22 @@ Shader "Custom/LEDScreen" {
 							tex2D(_MainTex, texCoords7) +
 							tex2D(_MainTex, texCoords8);
 						   
-				avgColor = avgColor/float(9);
+				avgColor = avgColor/float(KERNEL_SIZE);
 
-				if (avgColor.x < _Threshold)
-					avgColor.x = 0;
-				else
-					avgColor.x = 1;
-					
-				if (avgColor.y < _Threshold)
-					avgColor.y = 0;
-				else
-					avgColor.y = 1;
-					
-				if (avgColor.z < _Threshold)
-					avgColor.z = 0;
-				else
-					avgColor.z = 1;
+//				if (avgColor.x < _Threshold)
+//					avgColor.x = 0;
+//				else
+//					avgColor.x = 1;
+//					
+//				if (avgColor.y < _Threshold)
+//					avgColor.y = 0;
+//				else
+//					avgColor.y = 1;
+//			
+//				if (avgColor.z < _Threshold)
+//					avgColor.z = 0;
+//				else
+//					avgColor.z = 1;
 				
 				float2 powers = pow(abs(pixelRegionCoords - 0.5), float2(2.0));
 				float radiusSqrd = pow(_PixelRadius, 2.0);
