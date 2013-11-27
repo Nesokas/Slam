@@ -162,9 +162,11 @@ public class Lobby : MonoBehaviour
 			}
 		}
 	}
-	
-	void UpdateNetworkPlayer(GameObject[] players, Vector3 start_position, NetworkPlayer network_player, int team, string name, int texture_id)
+	[RPC]
+	void UpdateNetworkPlayer(Vector3 start_position, NetworkPlayer network_player, int team, string name, int texture_id)
 	{
+		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
 		foreach(GameObject player_object in players) {
 			Network_Player player = player_object.GetComponent<Network_Player>();
 			if(player.owner == network_player) {
@@ -264,8 +266,7 @@ public class Lobby : MonoBehaviour
 		
 		if(game_manager_object == null)
 			game_manager_object = (GameObject)Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
-		
-		/* Preenche a lista de players do Game_Settings */
+
 		int texture_id = 0;
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		
@@ -278,7 +279,7 @@ public class Lobby : MonoBehaviour
 			if(!IsNetworkPlayerInstanciated(players, team_1[i].network_player))
 				InstanciateNewNetworkPlayer(start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
 			else
-				UpdateNetworkPlayer(players, start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
+				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
 			
 			texture_id++;
 		}
@@ -292,7 +293,7 @@ public class Lobby : MonoBehaviour
 			if(!IsNetworkPlayerInstanciated(players, team_2[i].network_player))
 				InstanciateNewNetworkPlayer(start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
 			else
-				UpdateNetworkPlayer(players, start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
+				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
 			
 			texture_id++;
 		}
