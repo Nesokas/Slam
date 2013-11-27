@@ -8,7 +8,7 @@ public class LED : MonoBehaviour {
 	private Material[] numbers;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		string resource_folder = "Materials/Numbers/";
 
 		if(is_red)
