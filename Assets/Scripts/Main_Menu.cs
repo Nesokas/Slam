@@ -35,7 +35,7 @@ public class Main_Menu : MonoBehaviour
 	
 //	public string[] tabs = new string[] {"Join", "Create", "Favorites", "Settings"};
 	public string[] tabs = new string[] {"Join", "Create"};
-//	public string[] sortable_columns = new string[] {"Room Name", "Court", "Players", "Ping", "Country"};
+	public string[] sortable_columns = new string[] {"Room Name", "Players", "Ping", "Country"};
 	public string[] team_colors = new string[] {"Red", "Blue", "Green"};
 	
 	private int tab_selected;
@@ -91,10 +91,10 @@ public class Main_Menu : MonoBehaviour
 		
 		menu_state = NICKNAME_SCREEN;
 		
-//		toogle_columns = new bool[sortable_columns.Length];
-//		for(int i = 0; i < toogle_columns.Length; i++)
-//			toogle_columns[i] = false;
-//		
+		toogle_columns = new bool[sortable_columns.Length];
+		for(int i = 0; i < toogle_columns.Length; i++)
+			toogle_columns[i] = false;
+		
 		InitializeMSF(); //MSF -> Master Server Facilitator
 
 		if(GameObject.FindGameObjectWithTag("settings") == null) {
@@ -117,14 +117,14 @@ public class Main_Menu : MonoBehaviour
 	void JoinRoom()
 	{
 		// Draw sortable columns
-//		GUILayout.BeginHorizontal();
-//			toogle_columns[0] = GUILayout.Toggle(toogle_columns[0], sortable_columns[0], GUILayout.MinWidth(Screen.width*0.38f));
-//			for(int i = 1; i < sortable_columns.Length; i++)
-//				toogle_columns[i] = GUILayout.Toggle(toogle_columns[i], sortable_columns[i], GUILayout.MaxWidth(Screen.width*0.07f));
-//		GUILayout.EndHorizontal();
+		GUILayout.BeginHorizontal(GUILayout.Width(Screen.width*0.55f));
+			toogle_columns[0] = GUILayout.Toggle(toogle_columns[0], sortable_columns[0], GUILayout.MinWidth(Screen.width*0.3f));
+			for(int i = 1; i < sortable_columns.Length; i++)
+				toogle_columns[i] = GUILayout.Toggle(toogle_columns[i], sortable_columns[i], GUILayout.MaxWidth(Screen.width*0.07f));
+		GUILayout.EndHorizontal();
 		
 		// Draw existing rooms
-		rooms_scroll_position = GUILayout.BeginScrollView(rooms_scroll_position,  GUILayout.Width(Screen.width*0.7f), GUILayout.Height(300));
+		rooms_scroll_position = GUILayout.BeginScrollView(rooms_scroll_position);
 			
 			if (MasterServer.PollHostList().Length != 0) {
 	            HostData[] hostData = MasterServer.PollHostList();
@@ -134,51 +134,67 @@ public class Main_Menu : MonoBehaviour
 	            }
 	            MasterServer.ClearHostList();
 	        }
+			GUILayout.BeginHorizontal("box");
+				GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true), GUILayout.Width(Screen.width*0.55f));
+					GUILayout.BeginVertical();
+						string[] room_names = new string[available_rooms.Count];
+						for(int i = 0; i < available_rooms.Count; i++) {
+							room_names[i] = ((HostData)available_rooms[i]).gameName;
+						}
+						room_selected = GUILayout.SelectionGrid(room_selected, room_names, 1, GUILayout.MinWidth(Screen.width*0.38f), GUILayout.ExpandWidth(true));
+					GUILayout.EndVertical();
+					GUILayout.FlexibleSpace();
+					GUILayout.BeginVertical();
+						total_players_connected = 0;
+						for(int i = 0; i < room_names.Length; i++) {
+							GUILayout.BeginHorizontal();
+								GUILayout.Label(((HostData)available_rooms[i]).gameType, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+								GUILayout.Label(((HostData)available_rooms[i]).connectedPlayers + "/" + ((HostData)available_rooms[i]).playerLimit, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+								Ping player_ping = new Ping(((HostData)available_rooms[i]).ip.ToString());
+								GUILayout.Label(player_ping.time.ToString(), GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+								GUILayout.Label("Country" + i, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+							GUILayout.EndHorizontal();
+							total_players_connected = total_players_connected + 1 + ((HostData)available_rooms[i]).connectedPlayers;
+						}
+					GUILayout.EndVertical();
+				GUILayout.EndHorizontal();
+		GUILayout.BeginVertical();
+		if(GUILayout.Button("Connect")) {
 			
-			GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true), GUILayout.Width(Screen.width*0.6f));
-				GUILayout.BeginVertical();
-					string[] room_names = new string[available_rooms.Count];
-					for(int i = 0; i < available_rooms.Count; i++) {
-						room_names[i] = ((HostData)available_rooms[i]).gameName;
-					}
-					room_selected = GUILayout.SelectionGrid(room_selected, room_names, 1, GUILayout.MinWidth(Screen.width*0.38f), GUILayout.ExpandWidth(true));
-				GUILayout.EndVertical();
-				GUILayout.FlexibleSpace();
-				GUILayout.BeginVertical();
-					total_players_connected = 0;
-					for(int i = 0; i < room_names.Length; i++) {
-						GUILayout.BeginHorizontal();
-							GUILayout.Label(((HostData)available_rooms[i]).gameType, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-							GUILayout.Label(((HostData)available_rooms[i]).connectedPlayers + "/" + ((HostData)available_rooms[i]).playerLimit, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-							Ping player_ping = new Ping(((HostData)available_rooms[i]).ip.ToString());
-							GUILayout.Label(player_ping.time.ToString(), GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-							GUILayout.Label("Country" + i, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-						GUILayout.EndHorizontal();
-						total_players_connected = total_players_connected + 1 + ((HostData)available_rooms[i]).connectedPlayers;
-					}
-				GUILayout.EndVertical();
-			GUILayout.EndHorizontal();
+			game_settings.connected = true;
+			game_settings.connect_to = (HostData)available_rooms[room_selected];
+			
+			Application.LoadLevel("Main_Game");
+		}
+		if(GUILayout.Button ("Refresh")) {
+				MasterServer.ClearHostList();
+				MasterServer.RequestHostList(GAME_TYPE);
+		}
+			
+
+		GUILayout.EndVertical();
+		GUILayout.EndHorizontal();
 		GUILayout.EndScrollView();
 		
 			//Connect and refresh buttons 
-			GUILayout.BeginHorizontal();
-
-				if(GUILayout.Button ("Refresh", GUILayout.Width(BUTTON_SIDE_SIZE))) {
-					MasterServer.ClearHostList();
-	        		MasterServer.RequestHostList(GAME_TYPE);
-				}
-
-				if(GUILayout.Button("Connect", GUILayout.Width(BUTTON_SIDE_SIZE))) {
-					
-					game_settings.connected = true;
-					game_settings.connect_to = (HostData)available_rooms[room_selected];
-					
-					Application.LoadLevel("Main_Game");
-				}
-				GUILayout.FlexibleSpace();
-	//			search = GUILayout.TextField(search, GUILayout.MinWidth(100));
-	//			GUILayout.Button("Search");
-			GUILayout.EndHorizontal();
+//			GUILayout.BeginHorizontal();
+//
+//				if(GUILayout.Button ("Refresh", GUILayout.Width(BUTTON_SIDE_SIZE))) {
+//					MasterServer.ClearHostList();
+//	        		MasterServer.RequestHostList(GAME_TYPE);
+//				}
+//
+//				if(GUILayout.Button("Connect", GUILayout.Width(BUTTON_SIDE_SIZE))) {
+//					
+//					game_settings.connected = true;
+//					game_settings.connect_to = (HostData)available_rooms[room_selected];
+//					
+//					Application.LoadLevel("Main_Game");
+//				}
+//				GUILayout.FlexibleSpace();
+//	//			search = GUILayout.TextField(search, GUILayout.MinWidth(100));
+//	//			GUILayout.Button("Search");
+//			GUILayout.EndHorizontal();
 	}
 	
 	void CreateRoom()
@@ -247,7 +263,7 @@ public class Main_Menu : MonoBehaviour
 
 	void MainMenuScreen ()
 	{
-		GUILayout.BeginArea(new Rect(0,0, Screen.width*0.7f, Screen.height - Screen.height*0.02f));
+		GUILayout.BeginArea(new Rect(0,0, Screen.width*0.98f, Screen.height - Screen.height*0.02f));
 			GUILayout.BeginHorizontal();
 				GUILayout.BeginVertical();
 					// Draw tabs
