@@ -39,16 +39,16 @@ public class ScoreBoard : MonoBehaviour {
 		update_timer = false;
 		time_finished = false;
 		
-		timer_0_min = timer.transform.Find("0_min").GetComponent<LED>();
-		timer_1_min = timer.transform.Find("1_min").GetComponent<LED>();
-		timer_0_seg = timer.transform.Find("0_seg").GetComponent<LED>();
-		timer_1_seg = timer.transform.Find("1_seg").GetComponent<LED>();
+		timer_0_min = timer.transform.Find("Min_Tens").GetComponent<LED>();
+		timer_1_min = timer.transform.Find("Min_Units").GetComponent<LED>();
+		timer_0_seg = timer.transform.Find("Seg_Tens").GetComponent<LED>();
+		timer_1_seg = timer.transform.Find("Seg_Units").GetComponent<LED>();
 		
-		red_0 = red.transform.Find("0").GetComponent<LED>();
-		red_1 = red.transform.Find("1").GetComponent<LED>();
+		red_0 = red.transform.Find("Tens").GetComponent<LED>();
+		red_1 = red.transform.Find("Units").GetComponent<LED>();
 		
-		blue_0 = blue.transform.Find("0").GetComponent<LED>();
-		blue_1 = blue.transform.Find("1").GetComponent<LED>();
+		blue_0 = blue.transform.Find("Tens").GetComponent<LED>();
+		blue_1 = blue.transform.Find("Units").GetComponent<LED>();
 		
 		UpdateTimer();
 	}

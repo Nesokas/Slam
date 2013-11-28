@@ -68,6 +68,21 @@ Shader "Custom/LEDScreen" {
 				return o;
 			}
 			
+			float4 applyLuminanceStepping(float4 in_color)
+			{
+				float sum = in_color.x + in_color.y + in_color.z;
+			 	float luminance = sum/3.0;
+				float3 ratios = float3(in_color.x/luminance, in_color.y/luminance, in_color.z/luminance);
+
+				float luminanceStep = 1.0/float(_LuminanceSteps);
+			 	float luminanceBin = ceil(luminance/luminanceStep);
+			 	float luminanceFactor = luminanceStep * luminanceBin + _LuminanceBoost;
+
+			 	//use ratios * luminanceFactor as our new color so that original color hue is maintained
+			 	return float4(ratios * luminanceFactor,1.0);
+//			 	return in_color;
+			}
+			
 			half4 frag(fragmentInput i) : COLOR
 			{
 				
@@ -112,21 +127,8 @@ Shader "Custom/LEDScreen" {
 							tex2D(_MainTex, texCoords8);
 						   
 				avgColor = avgColor/float(KERNEL_SIZE);
-
-//				if (avgColor.x < _Threshold)
-//					avgColor.x = 0;
-//				else
-//					avgColor.x = 1;
-//					
-//				if (avgColor.y < _Threshold)
-//					avgColor.y = 0;
-//				else
-//					avgColor.y = 1;
-//			
-//				if (avgColor.z < _Threshold)
-//					avgColor.z = 0;
-//				else
-//					avgColor.z = 1;
+				
+				avgColor = applyLuminanceStepping(avgColor);
 				
 				float2 powers = pow(abs(pixelRegionCoords - 0.5), float2(2.0));
 				float radiusSqrd = pow(_PixelRadius, 2.0);
