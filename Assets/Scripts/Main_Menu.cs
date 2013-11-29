@@ -214,7 +214,7 @@ public class Main_Menu : MonoBehaviour
 	void CreateRoom()
 	{
 		GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true));
-		GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true), GUILayout.Width(Screen.width*0.89f));
+		GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true), GUILayout.Width(Screen.width*0.88f));
 				offline_game = GUILayout.Toggle(offline_game, "Offline Game");
 				if (!offline_game) {
 					GUILayout.BeginHorizontal();
