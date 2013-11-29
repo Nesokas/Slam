@@ -18,6 +18,7 @@ public class Main_Menu : MonoBehaviour
 	
 	private const int NICKNAME_SCREEN = 0;
 	private const int MAIN_MENU = 1;
+	private const int STANDARD_MAX_CHARS = 20;
 //	
 //	private const int SPECTATING = 0;
 //	private const int TEAM_1 = 1;
@@ -212,19 +213,23 @@ public class Main_Menu : MonoBehaviour
 	
 	void CreateRoom()
 	{
+		GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true));
 		GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
 			offline_game = GUILayout.Toggle(offline_game, "Offline Game");
 			if (!offline_game){
 				GUILayout.BeginHorizontal();
 					GUILayout.Label("Room Name:", GUILayout.MaxWidth(Screen.width*0.2f));
-					room_name = GUILayout.TextField(room_name);
+					room_name = GUILayout.TextField(room_name, STANDARD_MAX_CHARS, GUILayout.Width(0.14f*Screen.width));
+					GUILayout.FlexibleSpace();
 				GUILayout.EndHorizontal();
 				GUILayout.BeginHorizontal();
 					GUILayout.Label("Password:", GUILayout.MaxWidth(Screen.width*0.2f));
-					password = GUILayout.PasswordField(password, '*');
+			password = GUILayout.PasswordField(password, '*', STANDARD_MAX_CHARS, GUILayout.MinWidth(0.14f*Screen.width));
+					GUILayout.FlexibleSpace();
 				GUILayout.EndHorizontal();
-			}
-			if(GUILayout.Button("Create", GUILayout.ExpandWidth(false))){
+			GUILayout.EndVertical();
+		}
+		  if(GUILayout.Button("Create", GUILayout.Width(100f), GUILayout.Height(50f))){
 				if(!offline_game){
 					bool useNat = !Network.HavePublicAddress();
 					Network.InitializeServer(32, 25002, useNat);
@@ -238,7 +243,7 @@ public class Main_Menu : MonoBehaviour
 				}
 				Application.LoadLevel("Main_Game");
 			}
-		GUILayout.EndVertical();
+		GUILayout.EndHorizontal();
 		
 	}
 
@@ -253,7 +258,7 @@ public class Main_Menu : MonoBehaviour
 					GUILayout.BeginHorizontal();
 						GUILayout.FlexibleSpace();
 						GUILayout.Label("Nickname:", GUILayout.Width(67));
-						game_settings.player_name = GUILayout.TextField(game_settings.player_name, GUILayout.MinWidth(0.2f*Screen.width));
+						game_settings.player_name = GUILayout.TextField(game_settings.player_name, STANDARD_MAX_CHARS, GUILayout.MinWidth(0.2f*Screen.width));
 						GUILayout.FlexibleSpace();
 					GUILayout.EndHorizontal();
 					GUILayout.FlexibleSpace();
