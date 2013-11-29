@@ -214,37 +214,41 @@ public class Main_Menu : MonoBehaviour
 	void CreateRoom()
 	{
 		GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true));
-		GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
-			offline_game = GUILayout.Toggle(offline_game, "Offline Game");
-			if (!offline_game){
-				GUILayout.BeginHorizontal();
-					GUILayout.Label("Room Name:", GUILayout.MaxWidth(Screen.width*0.2f));
-					room_name = GUILayout.TextField(room_name, STANDARD_MAX_CHARS, GUILayout.Width(0.14f*Screen.width));
-					GUILayout.FlexibleSpace();
-				GUILayout.EndHorizontal();
-				GUILayout.BeginHorizontal();
-					GUILayout.Label("Password:", GUILayout.MaxWidth(Screen.width*0.2f));
-			password = GUILayout.PasswordField(password, '*', STANDARD_MAX_CHARS, GUILayout.MinWidth(0.14f*Screen.width));
-					GUILayout.FlexibleSpace();
-				GUILayout.EndHorizontal();
-			GUILayout.EndVertical();
-		}
-		  if(GUILayout.Button("Create", GUILayout.Width(100f), GUILayout.Height(50f))){
-				if(!offline_game){
-					bool useNat = !Network.HavePublicAddress();
-					Network.InitializeServer(32, 25002, useNat);
-				
-					// For now the game type will be "Default"
-					MasterServer.RegisterHost(GAME_TYPE, room_name);
-					
-					game_settings.local_game = false;
-				} else {
-					game_settings.local_game = true;
+		GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true), GUILayout.Width(Screen.width*0.89f));
+				offline_game = GUILayout.Toggle(offline_game, "Offline Game");
+				if (!offline_game) {
+					GUILayout.BeginHorizontal();
+						GUILayout.Label("Room Name:", GUILayout.MaxWidth(Screen.width*0.2f));
+						room_name = GUILayout.TextField(room_name, STANDARD_MAX_CHARS, GUILayout.Width(0.14f*Screen.width));
+						GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
+					GUILayout.BeginHorizontal();
+						GUILayout.Label("Password:", GUILayout.MaxWidth(Screen.width*0.2f));
+						password = GUILayout.PasswordField(password, '*', STANDARD_MAX_CHARS, GUILayout.MinWidth(0.14f*Screen.width));
+						GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
 				}
-				Application.LoadLevel("Main_Game");
-			}
+			GUILayout.EndVertical();
+			GUILayout.BeginVertical();
+				if(GUILayout.Button("Create", GUILayout.Width(100f), GUILayout.Height(50f))){
+					if(!offline_game){
+						bool useNat = !Network.HavePublicAddress();
+						Network.InitializeServer(32, 25002, useNat);
+					
+						// For now the game type will be "Default"
+						MasterServer.RegisterHost(GAME_TYPE, room_name);
+						
+						game_settings.local_game = false;
+					} else {
+						game_settings.local_game = true;
+					}
+					Application.LoadLevel("Main_Game");
+				}
+				GUILayout.FlexibleSpace();
+				if(GUILayout.Button("Back"))
+					menu_state = NICKNAME_SCREEN;
+			GUILayout.EndVertical();
 		GUILayout.EndHorizontal();
-		
 	}
 
 	void NicknameScreen()
