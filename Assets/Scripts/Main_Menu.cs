@@ -197,7 +197,7 @@ public class Main_Menu : MonoBehaviour
             MasterServer.ClearHostList();
         }
 		GUILayout.BeginVertical("box");
-			GUILayout.BeginHorizontal(GUILayout.Width(Screen.width*0.9f));
+			GUILayout.BeginHorizontal(GUILayout.Width(Screen.width*0.85f));
 				DrawRoomListTableHeader();
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
@@ -214,11 +214,11 @@ public class Main_Menu : MonoBehaviour
 	void CreateRoom()
 	{
 		GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true));
-		GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true), GUILayout.Width(Screen.width*0.88f));
+		GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
 				offline_game = GUILayout.Toggle(offline_game, "Offline Game");
 				if (!offline_game) {
 					GUILayout.BeginHorizontal();
-						GUILayout.Label("Room Name:", GUILayout.MaxWidth(Screen.width*0.2f));
+						GUILayout.Label("Room Name:", GUILayout.Width(Screen.width*0.2f));
 						room_name = GUILayout.TextField(room_name, STANDARD_MAX_CHARS, GUILayout.Width(0.14f*Screen.width));
 						GUILayout.FlexibleSpace();
 					GUILayout.EndHorizontal();
@@ -245,7 +245,7 @@ public class Main_Menu : MonoBehaviour
 					Application.LoadLevel("Main_Game");
 				}
 				GUILayout.FlexibleSpace();
-				if(GUILayout.Button("Back"))
+		if(GUILayout.Button("Back", GUILayout.Width(100f)))
 					menu_state = NICKNAME_SCREEN;
 			GUILayout.EndVertical();
 		GUILayout.EndHorizontal();
