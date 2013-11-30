@@ -26,6 +26,7 @@ Shader "Custom/LEDScreen" {
 			#include "UnityCG.cginc"
 			
 			#define KERNEL_SIZE 9
+			#define THRESHOLD 0.04
 			
 			uniform sampler2D _MainTex;
 			uniform float _PixelSize;
@@ -125,7 +126,10 @@ Shader "Custom/LEDScreen" {
 							tex2D(_MainTex, texCoords6) + 
 							tex2D(_MainTex, texCoords7) +
 							tex2D(_MainTex, texCoords8);
-						   
+				
+				if (tex2D(_MainTex, texCoords4).x < THRESHOLD && tex2D(_MainTex, texCoords4).y < THRESHOLD && tex2D(_MainTex, texCoords4).z < THRESHOLD)
+					avgColor = float4(0,0,0,1);
+				
 				avgColor = avgColor/float(KERNEL_SIZE);
 				
 				avgColor = applyLuminanceStepping(avgColor);
