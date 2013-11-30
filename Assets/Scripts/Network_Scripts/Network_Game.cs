@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Network_Game : Game_Behaviour {
-	
+
+	public GameObject chat_prefab;
+
 	Dictionary<NetworkPlayer, bool> players_ready;
 
 	protected void OnPlayerDisconnected(NetworkPlayer player) 
@@ -60,7 +62,9 @@ public class Network_Game : Game_Behaviour {
 		if(Network.isServer) {
 			ball = (GameObject)Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);
 			ball.transform.name = "Ball";
-		}	
+		}
+
+		Instantiate(chat_prefab);
 	}
 	
 	public void ServerStarGame()
