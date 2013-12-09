@@ -8,7 +8,9 @@ public class PlayerController : MonoBehaviour {
 	public const int JOYSTICK_2 = 2;
 	public const int JOYSTICK_3 = 3;
 	public const int JOYSTICK_4 = 4;
-	
+
+	private Game_Settings game_settings;
+
 	public struct Commands 
 	{
 		public float vertical_direction;
@@ -28,22 +30,32 @@ public class PlayerController : MonoBehaviour {
 		commands.horizontal_direction = 0;
 		commands.shoot = 0;
 		commands.dash = 0;
+
+		GameObject settings = GameObject.FindGameObjectWithTag("settings");
+		game_settings = (Game_Settings)settings.GetComponent<Game_Settings>();
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if(input_num == KEYBOARD) {
-			commands.vertical_direction = Input.GetAxis("Vertical");
-			commands.horizontal_direction = Input.GetAxis("Horizontal");
-			commands.shoot = Input.GetAxis("Shoot");
-			commands.dash = Input.GetAxis("Dash");
-		} else {
-			commands.vertical_direction = Input.GetAxis("Vertical_Gamepad_" + input_num);
-			commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num);
-			commands.shoot = Input.GetAxis("Shoot_Gamepad_" + input_num);
-			commands.dash = Input.GetAxis("Dash_Gamepad_" + input_num);
-//			Debug.Log("logging " + "Dash_Gamepad_" + input_num + " " + Input.GetAxis("Dash_Gamepad_" + input_num));
+		if (game_settings.IsLocalGame())
+			if(input_num == KEYBOARD) {
+				commands.vertical_direction = Input.GetAxis("Vertical");
+				commands.horizontal_direction = Input.GetAxis("Horizontal");
+				commands.shoot = Input.GetAxis("Shoot");
+				commands.dash = Input.GetAxis("Dash");
+			} else {
+				commands.vertical_direction = Input.GetAxis("Vertical_Gamepad_" + input_num);
+				commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num);
+				commands.shoot = Input.GetAxis("Shoot_Gamepad_" + input_num);
+				commands.dash = Input.GetAxis("Dash_Gamepad_" + input_num);
+			}
+		else {
+			input_num = 1;
+			commands.vertical_direction = Input.GetAxis("Vertical_Gamepad_" + input_num) + Input.GetAxis("Vertical");
+			commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num) + Input.GetAxis("Horizontal");
+			commands.shoot = Input.GetAxis("Shoot_Gamepad_" + input_num) + Input.GetAxis("Shoot");
+			commands.dash = Input.GetAxis("Dash_Gamepad_" + input_num) + Input.GetAxis("Dash");
 		}
 	}
 	
