@@ -87,9 +87,8 @@ public class Lobby : MonoBehaviour
 		}
 		
 		if(game_settings.IsLocalGame()) {
-			show_lobby = false;
-			AddLocalPlayer(0, "Keyboard", TEAM_1);
-			StartLocalGame();
+			local_game = true;
+
 		} else {
 			networkView.group = 1;
 			Network.SetLevelPrefix(1);
@@ -101,7 +100,13 @@ public class Lobby : MonoBehaviour
 				ConnectToServer();
 			}
 		}
-		
+
+		if (local_game) {
+			AddLocalPlayer(0, "Keyboard", SPECTATING);
+			for (int i = 0; i < Input.GetJoystickNames().Length; i++) {
+				AddLocalPlayer(i+1, "Gamepad " + (i+1), SPECTATING);
+			}
+		}
 	}
 	
 	void Start() {}
@@ -564,6 +569,11 @@ public class Lobby : MonoBehaviour
 					if(is_server)
 						MasterServer.UnregisterHost();
 					BackToMainMenu();
+				}
+				if (local_game) {
+					if(GUILayout.Button("Restart and Refresh", GUILayout.MinWidth(0.15f*Screen.width)))
+						Application.LoadLevel("Main_Game");
+					GUILayout.FlexibleSpace();
 				}
 				if(Network.isServer || local_game){
 					if(!local_game)
