@@ -22,6 +22,7 @@ public class Chat : MonoBehaviour {
 	Game_Settings settings;
 
 	public TimeSpan display_time;
+	public int max_chat_messages;
 
 	// Use this for initialization
 	void Start () 
@@ -33,6 +34,7 @@ public class Chat : MonoBehaviour {
 		settings = settings_object.GetComponent<Game_Settings>();
 
 		last_key_pressed = KeyCode.None;
+		max_chat_messages = 10;
 	}
 
 	// Update is called once per frame
@@ -42,25 +44,33 @@ public class Chat : MonoBehaviour {
 
 		for(int i = 0; i < chat_messages.Count; i++) {
 			if(chat_messages[i].time_received.Add(display_time) >= DateTime.Now.TimeOfDay)
-				display_messages.Add(chat_messages[i]);
+				if(display_messages.Count <= max_chat_messages)
+					display_messages.Add(chat_messages[i]);
 			else
 				break;
 		}
 
-		GUILayout.BeginVertical();
-			for(int i = display_messages.Count - 1; i >= 0; i--) {
-				GUILayout.Label(display_messages[i].sender_name + " says: " + display_messages[i].message);
+		GUILayout.BeginVertical(GUILayout.Height((max_chat_messages+1)*10));
+			for (int i = 0; i < max_chat_messages - display_messages.Count; i++)
+				GUILayout.Space (24);
+			for(int i = 0; i < display_messages.Count; i++) {
+				GUILayout.BeginHorizontal();
+					Color default_color = GUI.color;
+					GUI.color = display_messages[i].sender_color;
+					GUILayout.Label(display_messages[i].sender_name, GUILayout.Height(20), GUILayout.ExpandWidth(false));
+					GUI.color = default_color;
+					GUILayout.Label("says: " + display_messages[i].message, GUILayout.Height(20));
+				GUILayout.EndHorizontal();
 			}
 			if(using_chat) {
 				GUILayout.BeginHorizontal();
 					if(Event.current.keyCode == KeyCode.None && last_key_pressed == KeyCode.Return){
-						Debug.Log("Event triggered");
 						ReturnPressed();
 					}
 
 					GUI.SetNextControlName("chat");
-					input_field = GUILayout.TextField(input_field, 100, GUILayout.MaxWidth(Screen.width*0.3f));
-					if(GUILayout.Button("Send") && input_field != "") {
+					input_field = GUILayout.TextField(input_field, 100, GUILayout.MaxWidth(Screen.width*0.3f), GUILayout.Height(20));
+					if(GUILayout.Button("Send", GUILayout.Height(20)) && input_field != "") {
 						networkView.RPC("SendMessage", RPCMode.All, input_field, settings.player_name, "red");
 						input_field = "";
 					}
