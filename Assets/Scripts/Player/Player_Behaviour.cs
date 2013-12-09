@@ -44,6 +44,8 @@ public class Player_Behaviour : MonoBehaviour {
 	protected Transform dash_smoke;
 	protected Transform player_indicator_container;
 	public Vector3 viewport_dash_pos;
+	protected Transform shoot_effect;
+
 	protected GameObject ball;
 
 	protected bool debug_key_pressed = false;
@@ -81,12 +83,13 @@ public class Player_Behaviour : MonoBehaviour {
 			direction.Normalize();
 
 			if((!gamepad && commands.shoot != 0)){
+
 				ball_collider.rigidbody.velocity += direction * SHOOT_VELOCITY;
 				ball_collision = true;
 				colliding_with_ball = false;
 				debug_hit_remaining_time = debug_hit_time;
 				AudioSource.PlayClipAtPoint(ball_sound, transform.position);
-				
+				shoot_effect.particleSystem.Play();
 				Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 				bb.ReleasePlayers();
 				bb.SetLastPlayerTouched(this.gameObject);
@@ -117,7 +120,8 @@ public class Player_Behaviour : MonoBehaviour {
 	[RPC]
 	void EmmitDashSmoke()
 	{
-		dash_smoke.particleEmitter.Emit();
+//		dash_smoke.particleEmitter.Emit();
+		dash_smoke.particleSystem.Play();
 	}
 	
 	public void GoalScored()
@@ -252,6 +256,7 @@ public class Player_Behaviour : MonoBehaviour {
 		dash_bar = transform.Find("Dash_Bar");
 		dash_bar_fill = dash_bar.Find("Dash_Fill");
 		dash_smoke = transform.Find("Dash_Smoke");
+		shoot_effect = transform.Find("Shoot_Effect");
 		Transform base_collider = player_base.Find("Collider");
 		Transform shoot_collider = player_base.Find("ColliderShoot");
 		Transform court_collider = court_walls.transform.Find("forcefield");
