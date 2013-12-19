@@ -12,6 +12,8 @@ public class Chat : MonoBehaviour {
 		public Color sender_color;
 	};
 
+	public Font chat_font;
+
 	bool using_chat = false;
 	bool first_open_chat = false;
 	string input_field = "";
@@ -37,6 +39,33 @@ public class Chat : MonoBehaviour {
 		max_chat_messages = 10;
 	}
 
+	void DrawOutline(Rect rect, string text, Color color, GUIStyle style)
+	{
+		Color last_color = style.normal.textColor;
+		style.normal.textColor = Color.black;
+		float half_size = 1f;
+
+		rect.x -= half_size;
+		GUI.Label(rect, text, style);
+
+		rect.x += half_size*2;
+		GUI.Label(rect, text, style);
+		
+		rect.x -= half_size;
+		rect.y -= half_size;
+		GUI.Label(rect, text, style);
+		
+		rect.y += half_size*2;
+		GUI.Label(rect, text, style);
+
+		GUI.skin.label.fontStyle = FontStyle.Normal;
+		style.normal.textColor = color;
+		rect.y -= half_size;
+		GUI.Label(rect, text, style);
+
+		style.normal.textColor = last_color;
+	}
+
 	// Update is called once per frame
 	void OnGUI () 
 	{
@@ -49,37 +78,50 @@ public class Chat : MonoBehaviour {
 			else
 				break;
 		}
-
-		GUILayout.BeginVertical(GUILayout.Height((max_chat_messages+1)*10));
-			for (int i = 0; i < max_chat_messages - display_messages.Count; i++)
-				GUILayout.Space (24);
-			for(int i = 0; i < display_messages.Count; i++) {
-				GUILayout.BeginHorizontal();
-					Color default_color = GUI.color;
-					GUI.color = display_messages[i].sender_color;
-					GUILayout.Label(display_messages[i].sender_name, GUILayout.Height(20), GUILayout.ExpandWidth(false));
-					GUI.color = default_color;
-					GUILayout.Label("says: " + display_messages[i].message, GUILayout.Height(20));
-				GUILayout.EndHorizontal();
-			}
-			if(using_chat) {
-				GUILayout.BeginHorizontal();
-					if(Event.current.keyCode == KeyCode.None && last_key_pressed == KeyCode.Return){
-						ReturnPressed();
+		GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			GUILayout.BeginVertical(GUILayout.ExpandHeight(false));
+				GUILayout.FlexibleSpace();
+				float label_height = 24;
+				GUILayout.BeginVertical(GUILayout.Height((max_chat_messages+1)*label_height), GUILayout.ExpandWidth(false));
+					for (int i = 0; i < max_chat_messages - display_messages.Count; i++)
+						GUILayout.Space (label_height);
+					for(int i = 0; i < display_messages.Count; i++) {
+						GUILayout.BeginHorizontal();
+							GUIContent label_text = new GUIContent(display_messages[i].sender_name);
+							GUIStyle label_style = new GUIStyle();
+							label_style.fontSize = 15;
+							label_style.font = chat_font;
+							Rect rect = GUILayoutUtility.GetRect(label_text, label_style, GUILayout.ExpandWidth(false));
+							rect.height = label_height;
+							DrawOutline(rect, display_messages[i].sender_name, display_messages[i].sender_color, label_style);
+							string text = " says: " + display_messages[i].message;
+							label_text = new GUIContent(text);
+							Rect message = GUILayoutUtility.GetRect(label_text, label_style);
+							message.height = label_height;
+							message.x = rect.x + rect.width;
+							DrawOutline(message, text, GUI.color, label_style);
+						GUILayout.EndHorizontal();
 					}
+					if(using_chat) {
+						GUILayout.BeginHorizontal();
+							if(Event.current.type == EventType.KeyUp && Event.current.keyCode == KeyCode.Return){
+								ReturnPressed();
+							}
 
-					GUI.SetNextControlName("chat");
-					input_field = GUILayout.TextField(input_field, 100, GUILayout.MaxWidth(Screen.width*0.3f), GUILayout.Height(20));
-					if(GUILayout.Button("Send", GUILayout.Height(20)) && input_field != "") {
-						networkView.RPC("SendMessage", RPCMode.All, input_field, settings.player_name, "red");
-						input_field = "";
+							GUI.SetNextControlName("chat");
+							input_field = GUILayout.TextField(input_field, 100, GUILayout.MaxWidth(Screen.width*0.3f), GUILayout.Height(20));
+							if(GUILayout.Button("Send", GUILayout.Height(20)) && input_field != "") {
+								networkView.RPC("SendMessage", RPCMode.All, input_field, settings.player_name, "red");
+								input_field = "";
+							}
+						GUILayout.EndHorizontal();
 					}
-				GUILayout.EndHorizontal();
-
-				last_key_pressed = Event.current.keyCode;
-			}
-				
-		GUILayout.EndVertical();
+						
+				GUILayout.EndVertical();
+			GUILayout.EndVertical();
+			GUILayout.FlexibleSpace();
+		GUILayout.EndHorizontal();
 
 		if(first_open_chat) {
 			GUI.FocusControl("chat");
@@ -103,7 +145,6 @@ public class Chat : MonoBehaviour {
 	void Update()
 	{
 		if(Input.GetKeyUp(KeyCode.Return)) {
-			Debug.Log("Enter pressed: " + using_chat);
 			ReturnPressed();
 		}
 
