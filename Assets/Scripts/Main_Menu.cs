@@ -227,10 +227,14 @@ public class Main_Menu : MonoBehaviour
 						password = GUILayout.PasswordField(password, '*', STANDARD_MAX_CHARS, GUILayout.MinWidth(0.14f*Screen.width));
 						GUILayout.FlexibleSpace();
 					GUILayout.EndHorizontal();
+				} else {
+				GUILayout.BeginHorizontal();
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
 				}
 			GUILayout.EndVertical();
 			GUILayout.BeginVertical();
-				if(GUILayout.Button("Create", GUILayout.Width(100f), GUILayout.Height(50f))){
+				if(GUILayout.Button("Create", GUILayout.Width(BUTTON_SIDE_SIZE), GUILayout.Height(50f))){
 					if(!offline_game){
 						bool useNat = !Network.HavePublicAddress();
 						Network.InitializeServer(32, 25002, useNat);
@@ -245,7 +249,7 @@ public class Main_Menu : MonoBehaviour
 					Application.LoadLevel("Main_Game");
 				}
 				GUILayout.FlexibleSpace();
-		if(GUILayout.Button("Back", GUILayout.Width(100f)))
+		if(GUILayout.Button("Back", GUILayout.Width(BUTTON_SIDE_SIZE)))
 					menu_state = NICKNAME_SCREEN;
 			GUILayout.EndVertical();
 		GUILayout.EndHorizontal();
