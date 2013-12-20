@@ -7,6 +7,8 @@ public class Game_Behaviour : MonoBehaviour {
 	// For when a player scores
 	private string GOAL_STR = "GOAL!";
 	private int GOAL_STR_CHAR_WIDTH = 60;
+
+	private bool is_golden_goal_drawn = false;
 	
 	// initial ball position
 	public Vector3 ball_position = new Vector3(0, -0.04788643f, 0);
@@ -211,6 +213,13 @@ public class Game_Behaviour : MonoBehaviour {
 		
 		if(is_celebrating)
 			team_scored_message_xpos += (Time.deltaTime * TEAM_SCORED_MESSAGE_SPEED_MULTIPLIER);
+
+		if (isTimeUp) {
+			if (score_team_1 == score_team_2 && !is_golden_goal_drawn) {
+				led_screen_script.DrawTieMessage();
+				is_golden_goal_drawn = true;
+			}
+		}
 	}
 	
 	public int StopCelebration()
@@ -270,9 +279,12 @@ public class Game_Behaviour : MonoBehaviour {
 		if (is_celebrating && !isTimeUp)
 			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
 		if (isTimeUp) {
-			if (score_team_1 == score_team_2)
-				led_screen_script.DrawTieMessage();
-			else if (score_team_1 > score_team_2)
+//			if (score_team_1 == score_team_2 && !drawn) {
+//				led_screen_script.DrawTieMessage();
+//				drawn = true;
+//				Debug.Log("drawing");
+//			}
+			if (score_team_1 > score_team_2)
 				gui_manager.DrawGoalScored(1, "RED TEAM WINS");
 			else if (score_team_1 < score_team_2)
 				gui_manager.DrawGoalScored(2, "BLUE TEAM WINS");
