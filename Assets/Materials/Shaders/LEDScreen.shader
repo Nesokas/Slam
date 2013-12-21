@@ -10,6 +10,8 @@ Shader "Custom/LEDScreen" {
 		_PixelRadius ("Pixel Radius", float) = 0
 		_LuminanceSteps ("Luminace Steps", float) = 0
 		_LuminanceBoost ("Luminance Boost", float) = 0
+		_DrawColor ("Draw Color", Color) = (0,0,0,1)
+		_Invert ("Invert Colors", float) = 0
 	}
 	
 	SubShader 
@@ -26,7 +28,6 @@ Shader "Custom/LEDScreen" {
 			#include "UnityCG.cginc"
 			
 			#define KERNEL_SIZE 9
-			#define THRESHOLD 0.04
 			
 			uniform sampler2D _MainTex;
 			uniform float _PixelSize;
@@ -37,6 +38,8 @@ Shader "Custom/LEDScreen" {
 			uniform float _LuminanceSteps;
 			uniform float _LuminanceBoost;
 			uniform float _Threshold;
+			uniform float4 _DrawColor;
+			uniform float _Invert;
 			
 			float2 texCoords0;
 			float2 texCoords1;
@@ -126,9 +129,12 @@ Shader "Custom/LEDScreen" {
 							tex2D(_MainTex, texCoords6) + 
 							tex2D(_MainTex, texCoords7) +
 							tex2D(_MainTex, texCoords8);
+							
+				float4 prevAvgColor = avgColor;
 				
-				if (tex2D(_MainTex, texCoords4).x < THRESHOLD && tex2D(_MainTex, texCoords4).y < THRESHOLD && tex2D(_MainTex, texCoords4).z < THRESHOLD)
+				if (tex2D(_MainTex, texCoords4).x < _Threshold && tex2D(_MainTex, texCoords4).y < _Threshold && tex2D(_MainTex, texCoords4).z < _Threshold)
 					avgColor = float4(0,0,0,1);
+				else avgColor = _DrawColor * avgColor;
 				
 				avgColor = avgColor/float(KERNEL_SIZE);
 				
@@ -137,8 +143,17 @@ Shader "Custom/LEDScreen" {
 				float2 powers = pow(abs(pixelRegionCoords - 0.5), float2(2.0));
 				float radiusSqrd = pow(_PixelRadius, 2.0);
 				float gradient = smoothstep(radiusSqrd - _Tolerance, radiusSqrd + _Tolerance, powers.x + powers.y);
+				
+				float4 backColor = float4(0, 0, 0, 1.0);
+				
+				if(_Invert == 1) {
+					if(prevAvgColor.x >= 0.8 && prevAvgColor.y >= 0.8 && prevAvgColor.z >= 0.8)
+						avgColor = float4(0,0,0,1);
+					else avgColor = _DrawColor;
+				}
+				
 
-				return lerp(avgColor, float4(0, 0, 0, 1.0), gradient);
+				return lerp(avgColor, backColor, gradient);
 			}
 					
 			ENDCG
