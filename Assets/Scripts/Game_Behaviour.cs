@@ -30,6 +30,7 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_2;
 	
 	public float timer = 200;
+	public float ENDGAME_TIMER = 300f;
 
 	protected List<GameObject> players_team_1 = new List<GameObject>();
 	protected List<GameObject> players_team_2 = new List<GameObject>();
@@ -90,7 +91,7 @@ public class Game_Behaviour : MonoBehaviour {
 	public void FinishGame()
 	{
 		Destroy(GameObject.FindGameObjectWithTag("settings"));
-		Application.LoadLevel(0);
+		Application.LoadLevel("Main_Game");
 	}
 	
 //	public void setTimeUp(bool val)
@@ -206,7 +207,7 @@ public class Game_Behaviour : MonoBehaviour {
 		if(trigger_timer){
 			if(timer_value > timer && !finish_game)
 				StartGameAgain();
-			else if(timer_value > timer && finish_game)
+			else if(timer_value > ENDGAME_TIMER && finish_game)
 				FinishGame();
 			else timer_value++;
 		}
@@ -238,7 +239,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void OnGoal(NotificationCenter.Notification notification)
 	{		
-		if(!is_celebrating && !isTimeUp){
+		if(!is_celebrating){
 			if((int)notification.data["team"] == 1) {
 				team_scored = 1;
 				score_team_1++;
@@ -252,16 +253,15 @@ public class Game_Behaviour : MonoBehaviour {
 				team_celebrating = 2;
 			}
 			led_screen_script.DrawGoalScored((int)notification.data["team"]);
-//			if (isTimeUp)
-//				finish_game = true;
+			if (isTimeUp)
+				finish_game = true;
 			
 			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			is_celebrating = true;			
 			ScoreBoard scoreboard = GameObject.Find("Score Board").GetComponent<ScoreBoard>();
 			scoreboard.UpdateScore(score_team_1, score_team_2);
 
-		} else if(isTimeUp)
-			finish_game = true;
+		} 
 
 		if(ball == null)
 			ball = GameObject.FindGameObjectWithTag("ball");

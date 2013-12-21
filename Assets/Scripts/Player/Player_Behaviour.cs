@@ -66,7 +66,7 @@ public class Player_Behaviour : MonoBehaviour {
     private float PLAYER_ARROW_HEIGHT = 0.02f;
 	
 	
-	private int goals_scored = 2;
+	private int goals_scored = 0;
 	private bool best_score = false;
 	private bool is_animating_star = false;
 	
