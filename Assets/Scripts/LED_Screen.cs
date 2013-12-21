@@ -19,6 +19,7 @@ public class LED_Screen : MonoBehaviour {
 	{
 		renderer.material.SetFloat("_PixelSize", INITIAL_PIXEL_SIZE);
 		renderer.material.SetTexture("_MainTex", golden_goal_texture);
+		renderer.material.SetColor("_DrawColor", Color.yellow);
 		is_animating_tie_message = true;
 		
 	}
