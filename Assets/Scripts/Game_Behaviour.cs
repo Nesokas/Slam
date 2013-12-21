@@ -220,6 +220,9 @@ public class Game_Behaviour : MonoBehaviour {
 				is_golden_goal_drawn = true;
 			}
 		}
+//		if (is_celebrating && !isTimeUp)
+////			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
+//			led_screen_script.DrawGoalScored(team_scored);
 	}
 	
 	public int StopCelebration()
@@ -235,7 +238,7 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void OnGoal(NotificationCenter.Notification notification)
 	{		
-		if(!is_celebrating){
+		if(!is_celebrating && !isTimeUp){
 			if((int)notification.data["team"] == 1) {
 				team_scored = 1;
 				score_team_1++;
@@ -248,14 +251,18 @@ public class Game_Behaviour : MonoBehaviour {
 				ScoreTeam(2);
 				team_celebrating = 2;
 			}
-			if (isTimeUp)
-				finish_game = true;
+			led_screen_script.DrawGoalScored((int)notification.data["team"]);
+//			if (isTimeUp)
+//				finish_game = true;
 			
 			AudioSource.PlayClipAtPoint(goal_cheer, Vector3.zero);
 			is_celebrating = true;			
 			ScoreBoard scoreboard = GameObject.Find("Score Board").GetComponent<ScoreBoard>();
 			scoreboard.UpdateScore(score_team_1, score_team_2);
-		}
+
+		} else if(isTimeUp)
+			finish_game = true;
+
 		if(ball == null)
 			ball = GameObject.FindGameObjectWithTag("ball");
 		Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
@@ -276,8 +283,8 @@ public class Game_Behaviour : MonoBehaviour {
 	
 	protected void OnGUI()
 	{	
-		if (is_celebrating && !isTimeUp)
-			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
+//		if (is_celebrating && !isTimeUp)
+//			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
 		if (isTimeUp) {
 //			if (score_team_1 == score_team_2 && !drawn) {
 //				led_screen_script.DrawTieMessage();
