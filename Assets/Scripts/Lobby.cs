@@ -53,6 +53,8 @@ public class Lobby : MonoBehaviour
 	private Game_Settings game_settings;
 	private GameObject game_manager_object;
 
+
+
 	private struct Player
 	{
 		public string name;
