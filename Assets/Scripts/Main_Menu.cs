@@ -55,6 +55,9 @@ public class Main_Menu : MonoBehaviour
 	private Vector2 rooms_scroll_position;
 	
 	private ArrayList available_rooms;
+
+	public GUIStyle main_menu_style;
+
 	void InitializeMSF()
 	{
 		IPHostEntry host;

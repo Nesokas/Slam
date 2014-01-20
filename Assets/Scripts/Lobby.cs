@@ -54,7 +54,7 @@ public class Lobby : MonoBehaviour
 	private GameObject settings;
 	private Game_Settings game_settings;
 	private GameObject game_manager_object;
-
+	
 	public GameObject[] heros;
 	private int lobby_state;
 

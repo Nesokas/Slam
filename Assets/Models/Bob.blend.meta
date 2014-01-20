@@ -1,21 +1,58 @@
 fileFormatVersion: 2
-guid: 9df9f3108864a4e67b0124d68990b0d1
+guid: 0a4bb1b63a6b8ab4f88272aa4eecc0af
 ModelImporter:
   serializedVersion: 15
   fileIDToRecycleName:
-    100000: Eyes
-    100002: //RootNode
-    400000: Eyes
-    400002: //RootNode
-    2300000: Eyes
-    2300002: //RootNode
-    3300000: Eyes
-    3300002: //RootNode
-    4300000: Base
-    4300002: Eyes
+    100000: antena_base
+    100002: antena_higher
+    100004: antena_lower
+    100006: antena_mid
+    100008: Armature
+    100010: Armature_001
+    100012: Base
+    100014: Base_0
+    100016: //RootNode
+    100018: Bone
+    100020: Bulb
+    100022: bulb
+    100024: Eyes
+    100026: Goggles
+    100028: Head
+    100030: IK_Antena
+    100032: Sphere_000
+    400000: antena_base
+    400002: antena_higher
+    400004: antena_lower
+    400006: antena_mid
+    400008: Armature
+    400010: Armature_001
+    400012: Base
+    400014: Base_0
+    400016: //RootNode
+    400018: Bone
+    400020: Bulb
+    400022: bulb
+    400024: Eyes
+    400026: Goggles
+    400028: Head
+    400030: IK_Antena
+    400032: Sphere_000
+    2300000: Sphere_000
+    3300000: Sphere_000
+    4300000: Eyes
+    4300002: Sphere_000
+    4300004: Goggles
+    4300006: Bulb
+    4300008: Base
     7400000: Default Take
+    7400002: Celebrate
+    7400004: Idle
+    7400006: Sad
     9500000: //RootNode
-    11100000: //RootNode
+    13700000: Base
+    13700002: Bulb
+    13700004: Eyes
+    13700006: Goggles
   materials:
     importMaterials: 1
     materialName: 0
@@ -23,33 +60,14 @@ ModelImporter:
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
+    optimizeGameObjects: 0
     animationCompression: 1
     animationRotationError: .5
     animationPositionError: .5
     animationScaleError: .5
     animationWrapMode: 0
-    clipAnimations:
-    - name: Default Take
-      takeName: Default Take
-      firstFrame: 0
-      lastFrame: 119
-      wrapMode: 2
-      orientationOffsetY: 0
-      level: 0
-      cycleOffset: 0
-      loop: 0
-      loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
-      heightFromFeet: 0
-      mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
-      transformMask: []
+    extraExposedTransformPaths: []
+    clipAnimations: []
     isReadable: 1
   meshes:
     lODScreenPercentages: []
@@ -76,7 +94,6 @@ ModelImporter:
   humanDescription:
     human: []
     skeleton: []
-    handles: []
     armTwist: .5
     foreArmTwist: .5
     upperLegTwist: .5
@@ -86,6 +103,5 @@ ModelImporter:
     feetSpacing: 0
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  additionalBone: 1
-  animationType: 1
+  animationType: 2
   userData: 
