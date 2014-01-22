@@ -64,7 +64,7 @@ public class Lobby : MonoBehaviour
 		public int team;
 		public NetworkPlayer network_player;
 		public int controller;
-		public bool is_nectdtwork;
+		public bool is_network;
 
 		public int hero;
 		public bool ready;
