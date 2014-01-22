@@ -25,6 +25,8 @@ public class Lobby : MonoBehaviour
 	private const int TEAM_2 = 2;
 	
 	private const string GAME_TYPE = "Default";
+
+	private enum lobby_states {team_selection, hero_selection};
 	
 	/****************************************/
 	
@@ -52,8 +54,9 @@ public class Lobby : MonoBehaviour
 	private GameObject settings;
 	private Game_Settings game_settings;
 	private GameObject game_manager_object;
-
-
+	
+	public GameObject[] heros;
+	private int lobby_state;
 
 	private struct Player
 	{
@@ -61,13 +64,17 @@ public class Lobby : MonoBehaviour
 		public int team;
 		public NetworkPlayer network_player;
 		public int controller;
-		public bool is_network;
+		public bool is_nectdtwork;
+
+		public int hero;
+		public bool ready;
 	}
 	
 	void Awake()
 	{
 		show_lobby = true;
 		escape_key_pressed = false;
+		lobby_state = (int)lobby_states.team_selection;
 		
 		team_1_color = 0;
 		team_2_color = 1;
@@ -601,12 +608,25 @@ public class Lobby : MonoBehaviour
 	{
 		Application.LoadLevel("Main_Menu");
 	}
+
+	void HeroScreen()
+	{
+
+	}
 	
 	void OnGUI()
 	{	
 		if(show_lobby) {
 			GUILayout.BeginArea(new Rect(Screen.width*0.01f, Screen.height*0.01f, Screen.width - Screen.width*0.02f, Screen.height - Screen.height*0.02f));
+			switch (lobby_state)
+			{
+			case (int)lobby_states.team_selection:
 				LobbyScreen();
+				break;
+			case (int)lobby_states.hero_selection:
+				HeroScreen();
+				break;
+			}
 			GUILayout.EndArea();
 		}
 	}
