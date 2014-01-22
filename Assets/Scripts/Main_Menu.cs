@@ -62,7 +62,7 @@ public class Main_Menu : MonoBehaviour
 	{
 		IPHostEntry host;
 		
-		host = Dns.GetHostEntry("magicbit.no-ip.biz");
+		host = Dns.GetHostEntry("soccerpucks.com");
 		string ip = host.AddressList[0].ToString();
 		
 		MasterServer.ipAddress = ip;
