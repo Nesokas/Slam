@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 0a4bb1b63a6b8ab4f88272aa4eecc0af
 ModelImporter:
-  serializedVersion: 16
+  serializedVersion: 15
   fileIDToRecycleName:
     100000: antena_base
     100002: antena_higher
@@ -84,7 +84,7 @@ ModelImporter:
       takeName: Default Take
       firstFrame: -1
       lastFrame: 40
-      wrapMode: 0
+      wrapMode: 2
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -347,5 +347,4 @@ ModelImporter:
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 1
-  additionalBone: 0
   userData: 
