@@ -53,7 +53,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	protected void OnTriggerEnter(Collider collider)
 	{
 		if (collider.gameObject.tag == "colliderShoot")
-			last_player_touched = collider.gameObject.transform.parent.parent.gameObject;
+			last_player_touched = collider.gameObject.transform.parent.gameObject;
 	}
 	
 	public GameObject GetLastPlayerTouched() 

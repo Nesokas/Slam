@@ -252,13 +252,13 @@ public class Player_Behaviour : MonoBehaviour {
 		main_camera = main_camera_object.GetComponent<CameraMovement>();
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-		player_base = transform.Find("Base");
+		player_base = transform.Find("Mesh").Find("Base");
 		dash_bar = transform.Find("Dash_Bar");
 		dash_bar_fill = dash_bar.Find("Dash_Fill");
 		dash_smoke = transform.Find("Dash_Smoke");
 		shoot_effect = transform.Find("Shoot_Effect");
-		Transform base_collider = player_base.Find("Collider");
-		Transform shoot_collider = player_base.Find("ColliderShoot");
+		Transform base_collider = transform.Find("Collider");
+		Transform shoot_collider = transform.Find("ColliderShoot");
 		Transform court_collider = court_walls.transform.Find("forcefield");
 		Physics.IgnoreCollision(court_collider.collider, base_collider.collider);
 		Physics.IgnoreCollision(court_collider.collider, shoot_collider.collider);
@@ -267,8 +267,9 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 
 		for (int i = 0; i < players.Length; i++) {
-			Transform other_player_base = players[i].transform.Find("Base");
-			Transform other_player_shoot_collider = other_player_base.transform.Find("ColliderShoot");
+			Transform other_player_mesh = players[i].transform.Find("Mesh");
+			Transform other_player_base = other_player_mesh.Find("Base");
+			Transform other_player_shoot_collider = players[i].transform.Find("ColliderShoot");
 			if(other_player_shoot_collider.collider != shoot_collider.collider) {
 				Physics.IgnoreCollision(other_player_shoot_collider.collider, shoot_collider.collider);
 				Physics.IgnoreCollision(other_player_shoot_collider.collider, base_collider.collider);
@@ -453,7 +454,7 @@ public class Player_Behaviour : MonoBehaviour {
 	{
 		/* TODO: Uma forma mais inteligente de fazer isto */
 		if (player_base == null)
-			player_base = transform.Find("Base");
+			player_base = transform.Find("Mesh").Find("Base");
 		/***************************************************/
 		
 		if (dash_bar_fill == null)

@@ -20,9 +20,9 @@ public class Kickoff_Player : Player_Behaviour {
 
 	public void DisableGotoCenter(int scored_team)
 	{
-		player_base = transform.Find("Base");
-		Transform base_collider = player_base.Find("Collider");
-		Transform shoot_collider = player_base.Find("ColliderShoot");
+		player_base = transform.Find("Mesh").Find("Base");
+		Transform base_collider = transform.Find("Collider");
+		Transform shoot_collider = transform.Find("ColliderShoot");
 		
 		
 		if (scored_team == 0){
@@ -77,9 +77,9 @@ public class Kickoff_Player : Player_Behaviour {
 	
 	public void ReleasePlayers()
 	{
-		player_base = transform.Find("Base");
-		Transform base_collider = player_base.Find("Collider");
-		Transform shoot_collider = player_base.Find("ColliderShoot");
+		player_base = transform.Find("Mesh").Find("Base");
+		Transform base_collider = transform.Find("Collider");
+		Transform shoot_collider = transform.Find("ColliderShoot");
 		for (int i = 0; i < center_planes.Length; i++) {
 			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider);
 			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider);
@@ -102,7 +102,7 @@ public class Kickoff_Player : Player_Behaviour {
 		center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
 		center_circle_right = GameObject.FindGameObjectWithTag("center-circle-right");
 		
-		player_base = transform.Find("Base");
+		player_base = transform.Find("Mesh").Find("Base");
 		base.Awake();
 	}
 	
