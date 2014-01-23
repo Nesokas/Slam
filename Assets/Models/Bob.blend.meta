@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 0a4bb1b63a6b8ab4f88272aa4eecc0af
 ModelImporter:
-  serializedVersion: 15
+  serializedVersion: 16
   fileIDToRecycleName:
     100000: antena_base
     100002: antena_higher
@@ -20,6 +20,8 @@ ModelImporter:
     100028: Head
     100030: IK_Antena
     100032: Sphere_000
+    100034: Eye_L
+    100036: Eye_R
     400000: antena_base
     400002: antena_higher
     400004: antena_lower
@@ -37,22 +39,31 @@ ModelImporter:
     400028: Head
     400030: IK_Antena
     400032: Sphere_000
+    400034: Eye_L
+    400036: Eye_R
     2300000: Sphere_000
+    2300002: Eye_R
     3300000: Sphere_000
+    3300002: Eye_R
     4300000: Eyes
     4300002: Sphere_000
     4300004: Goggles
     4300006: Bulb
     4300008: Base
+    4300010: Eye_L
+    4300012: Eye_R
     7400000: Default Take
     7400002: Celebrate
     7400004: Idle
     7400006: Sad
     9500000: //RootNode
+    11100000: //RootNode
     13700000: Base
     13700002: Bulb
     13700004: Eyes
     13700006: Goggles
+    13700008: Eye_L
+    13700010: Sphere_000
   materials:
     importMaterials: 1
     materialName: 0
@@ -67,7 +78,239 @@ ModelImporter:
     animationScaleError: .5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Default Take
+      takeName: Default Take
+      firstFrame: -1
+      lastFrame: 40
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Bone
+        weight: 1
+      - path: Armature/Bone/Base_0
+        weight: 1
+      - path: Armature/Bone/Base_0/Head
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher/bulb
+        weight: 1
+      - path: Armature/IK_Antena
+        weight: 1
+      - path: Base
+        weight: 1
+      - path: Bulb
+        weight: 1
+      - path: Eyes
+        weight: 1
+      - path: Goggles
+        weight: 1
+      - path: Sphere_000
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Celebrate
+      takeName: Celebrate
+      firstFrame: -1
+      lastFrame: 46
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Bone
+        weight: 1
+      - path: Armature/Bone/Base_0
+        weight: 1
+      - path: Armature/Bone/Base_0/Head
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher/bulb
+        weight: 1
+      - path: Armature/IK_Antena
+        weight: 1
+      - path: Base
+        weight: 1
+      - path: Bulb
+        weight: 1
+      - path: Eyes
+        weight: 1
+      - path: Goggles
+        weight: 1
+      - path: Sphere_000
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Idle
+      takeName: Idle
+      firstFrame: -1
+      lastFrame: 39
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Bone
+        weight: 1
+      - path: Armature/Bone/Base_0
+        weight: 1
+      - path: Armature/Bone/Base_0/Head
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher/bulb
+        weight: 1
+      - path: Armature/IK_Antena
+        weight: 1
+      - path: Base
+        weight: 1
+      - path: Bulb
+        weight: 1
+      - path: Eyes
+        weight: 1
+      - path: Goggles
+        weight: 1
+      - path: Sphere_000
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Sad
+      takeName: Sad
+      firstFrame: -1
+      lastFrame: 29
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Bone
+        weight: 1
+      - path: Armature/Bone/Base_0
+        weight: 1
+      - path: Armature/Bone/Base_0/Head
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher
+        weight: 1
+      - path: Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher/bulb
+        weight: 1
+      - path: Armature/IK_Antena
+        weight: 1
+      - path: Base
+        weight: 1
+      - path: Bulb
+        weight: 1
+      - path: Eyes
+        weight: 1
+      - path: Goggles
+        weight: 1
+      - path: Sphere_000
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
     isReadable: 1
   meshes:
     lODScreenPercentages: []
@@ -103,5 +346,6 @@ ModelImporter:
     feetSpacing: 0
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 1
+  additionalBone: 0
   userData: 
