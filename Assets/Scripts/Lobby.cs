@@ -32,12 +32,12 @@ public class Lobby : MonoBehaviour
 	
 	public GameObject settings_prefab;
 	public GameObject local_player_prefab;
+	public GameObject hero_selection_prefab;
 	public GameObject net_player_prefab;
 	public GameObject local_game_prefab;
 	public GameObject net_game_prefab;
 	public GameObject court_start_position_team_1;
 	public GameObject court_start_position_team_2;
-	
 	public string[] team_colors = new string[] {"Red", "Blue", "Green"};
 
 	private int team_1_color;
@@ -54,8 +54,7 @@ public class Lobby : MonoBehaviour
 	private GameObject settings;
 	private Game_Settings game_settings;
 	private GameObject game_manager_object;
-	
-	public GameObject[] heros;
+
 	private int lobby_state;
 
 	private struct Player
@@ -237,7 +236,7 @@ public class Lobby : MonoBehaviour
 		foreach(GameObject player_object in players) {
 			Local_Player player = player_object.GetComponent<Local_Player>();
 			if(player.controller == controller) {
-				player.InitializePlayerInfo(team, name, start_position, controller, texture_id);
+//				player.InitializePlayerInfo(team, name, start_position, controller, texture_id);
 				player.Start();
 				player.ReleasePlayers();
 				return;
@@ -268,7 +267,8 @@ public class Lobby : MonoBehaviour
 		Local_Player lp = (Local_Player)player.GetComponent<Local_Player>();
 		lp.InitializePlayerInfo(team, name, start_position, controller, texture_id);
 	}
-	
+
+
 	void StartNetworkGame()
 	{
 		int players_team_1 = team_1.Count;
@@ -336,7 +336,7 @@ public class Lobby : MonoBehaviour
 		float court_lenght = court_start_position_team_1.transform.position.x*(-2);
 		float distance_team_1 = court_lenght/(players_team_1+1);
 		float distance_team_2 = court_lenght/(players_team_2+1);
-		
+
 		if(game_manager_object == null)
 			game_manager_object = (GameObject)Instantiate(local_game_prefab, Vector3.zero, transform.rotation);
 		
@@ -594,17 +594,49 @@ public class Lobby : MonoBehaviour
 					if(!local_game)
 						GUILayout.FlexibleSpace();
 					if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width))) {
-						if(!local_game)
-							StartNetworkGame();
+						if(local_game)
+					//							StartLocalGame();
+							HeroSelectScreen();
 						else
-							StartLocalGame();
+							StartNetworkGame();
+
 					}
 				}
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 		GUILayout.EndVertical();
 	}
-	
+
+	void HeroSelectScreen()
+	{
+		GameObject hero_selection = (GameObject)Instantiate(hero_selection_prefab, Vector3.zero, transform.rotation);
+		foreach(Camera cam in Camera.allCameras)
+			if (cam.name == "LobbyCamera")
+				cam.enabled = false;
+		show_lobby = false;
+		int i = 1;
+			
+		for (int j = 0; j < team_1.Count; j++) {
+			Hero_Selection hero_script = hero_selection.transform.Find("Hero_"+i).GetComponent<Hero_Selection>();
+			hero_script.InitializePlayerController(team_1[j].controller);
+			i++;
+		}
+
+		for (int j=0; j < team_2.Count; j++) {
+			Hero_Selection hero_script = hero_selection.transform.Find("Hero_"+i).GetComponent<Hero_Selection>();
+			hero_script.InitializePlayerController(team_2[j].controller);
+			i++;
+		}
+	}
+
+	void InstantiateSelectHero(Vector3 start_position, int team, string name, int controller, int texture_id)
+	{
+		GameObject hero_selection = (GameObject)Instantiate(local_player_prefab, start_position, transform.rotation);
+		
+		//		Local_Player lp = (Local_Player)player.GetComponent<Local_Player>();
+		//		lp.InitializePlayerInfo(team, name, start_position, controller, texture_id);
+	}
+
 	void OnDisconnectedFromServer(NetworkDisconnection info)
 	{
 		Application.LoadLevel("Main_Menu");
@@ -613,11 +645,6 @@ public class Lobby : MonoBehaviour
 	void BackToMainMenu()
 	{
 		Application.LoadLevel("Main_Menu");
-	}
-
-	void HeroScreen()
-	{
-
 	}
 
 	string testStatus = "Testing network connection capabilities.";
@@ -641,7 +668,7 @@ public class Lobby : MonoBehaviour
 				LobbyScreen();
 				break;
 			case (int)lobby_states.hero_selection:
-				HeroScreen();
+//				HeroScreen();
 				break;
 			}
 			GUILayout.EndArea();

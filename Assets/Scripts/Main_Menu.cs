@@ -249,7 +249,7 @@ public class Main_Menu : MonoBehaviour
 					} else {
 						game_settings.local_game = true;
 					}
-					Application.LoadLevel("Main_Game");
+					Application.LoadLevel("Pre_Game_Lobby");
 				}
 				GUILayout.FlexibleSpace();
 		if(GUILayout.Button("Back", GUILayout.Width(BUTTON_SIDE_SIZE)))

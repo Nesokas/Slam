@@ -14,6 +14,13 @@ public class Hero_Selection : MonoBehaviour {
 	private GameObject[] hero_instances;
 	private int rotations;
 
+	int team;
+	Vector3 initial_position;
+	private GameObject controller_object;
+	int texture_id;
+	public GameObject player_controller_prefab;
+	protected PlayerController.Commands commands;
+
 	void Start () 
 	{
 		num_heroes = heroes.Length;
@@ -28,8 +35,6 @@ public class Hero_Selection : MonoBehaviour {
 			else heroes_positions[i] = 0;
 		}
 
-
-
 		hero_instances = new GameObject[heroes.Length];
 
 		for(int i = 0; i < heroes.Length; i++) {
@@ -43,7 +48,19 @@ public class Hero_Selection : MonoBehaviour {
 		}
 
 		rotations = 0;
+
 	}
+
+	public void InitializePlayerController(int input_num)
+	{
+		
+		controller_object = (GameObject)Instantiate(player_controller_prefab);
+		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+		player_controller.setInputNum(input_num);
+		commands = player_controller.GetCommands();
+	
+	}
+
 
 	Vector3 CirclePosition(int k, int num_positions)
 	{
@@ -92,19 +109,26 @@ public class Hero_Selection : MonoBehaviour {
 		Debug.Log(values);
 	}
 
+	void UpdateCommands()
+	{
+		if (controller_object != null) {
+		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+		commands = player_controller.GetCommands();
+		}
+	}
+
 	void Update () 
 	{
-		if(Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D)) {
-			Debug.Log(heroes_positions[1]);
-			if(Input.GetKeyUp(KeyCode.A) && heroes_positions[1] == 1) {
-				rotations--;
-				ShiftLeft();
-			} else if (Input.GetKeyUp(KeyCode.D) && heroes_positions[heroes_positions.Length - 1] == 1) {
-				rotations++;
-				ShiftRight();
-			}
-
-			InvokeRepeating("Rotate", 0, 0.01f);
+		if(commands.horizontal_direction < 0 && heroes_positions[1] == 1) {
+			rotations--;
+			ShiftLeft();
+		} else if (commands.horizontal_direction > 0 && heroes_positions[heroes_positions.Length - 1] == 1) {
+			rotations++;
+			ShiftRight();
 		}
+
+		InvokeRepeating("Rotate", 0, 0.01f);
+
+		UpdateCommands();
 	}
 }

@@ -4,10 +4,6 @@ using System.Collections;
 public class PlayerController : MonoBehaviour {
 	
 	public const int KEYBOARD = 0;
-	public const int JOYSTICK_1 = 1;
-	public const int JOYSTICK_2 = 2;
-	public const int JOYSTICK_3 = 3;
-	public const int JOYSTICK_4 = 4;
 
 	private Game_Settings game_settings;
 
