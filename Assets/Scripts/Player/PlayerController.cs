@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
 		public float horizontal_direction;
 		public float shoot;
 		public float dash;
+		public float enter;
 	}
 	
 	public Commands commands;
@@ -40,11 +41,13 @@ public class PlayerController : MonoBehaviour {
 				commands.horizontal_direction = Input.GetAxis("Horizontal");
 				commands.shoot = Input.GetAxis("Shoot");
 				commands.dash = Input.GetAxis("Dash");
+				commands.enter = Input.GetAxis("Shoot");
 			} else {
 				commands.vertical_direction = Input.GetAxis("Vertical_Gamepad_" + input_num);
 				commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num);
 				commands.shoot = Input.GetAxis("Shoot_Gamepad_" + input_num);
 				commands.dash = Input.GetAxis("Dash_Gamepad_" + input_num);
+				commands.enter = Input.GetAxis("Shoot_Gamepad_" + input_num);
 			}
 		else {
 			input_num = 1;

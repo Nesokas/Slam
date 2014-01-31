@@ -56,6 +56,7 @@ public class Lobby : MonoBehaviour
 	private GameObject game_manager_object;
 
 	private int lobby_state;
+	private int players_ready = 0;
 
 	private struct Player
 	{
@@ -617,25 +618,33 @@ public class Lobby : MonoBehaviour
 		int i = 1;
 			
 		for (int j = 0; j < team_1.Count; j++) {
-			Hero_Selection hero_script = hero_selection.transform.Find("Hero_"+i).GetComponent<Hero_Selection>();
-			hero_script.InitializePlayerController(team_1[j].controller);
+			Hero_Selection hero_script = hero_selection.transform.Find("team_1_"+i).GetComponent<Hero_Selection>();
+			hero_script.InitializePlayer(TEAM_1,team_1[j].name, i-1, team_1[j].controller, this);
 			i++;
 		}
 
 		for (int j=0; j < team_2.Count; j++) {
-			Hero_Selection hero_script = hero_selection.transform.Find("Hero_"+i).GetComponent<Hero_Selection>();
-			hero_script.InitializePlayerController(team_2[j].controller);
+			Hero_Selection hero_script = hero_selection.transform.Find("team_2_"+i).GetComponent<Hero_Selection>();
+			hero_script.InitializePlayer(TEAM_2,team_2[j].name, i-1, team_2[j].controller, this);
 			i++;
 		}
 	}
 
-	void InstantiateSelectHero(Vector3 start_position, int team, string name, int controller, int texture_id)
+	public void PlayerReady()
 	{
-		GameObject hero_selection = (GameObject)Instantiate(local_player_prefab, start_position, transform.rotation);
-		
-		//		Local_Player lp = (Local_Player)player.GetComponent<Local_Player>();
-		//		lp.InitializePlayerInfo(team, name, start_position, controller, texture_id);
+		players_ready++;
+		if (players_ready == (team_1.Count + team_2.Count))
+			Application.LoadLevel("Main_Game");
 	}
+
+
+//	void InstantiateSelectHero(Vector3 start_position, int team, string name, int controller, int texture_id)
+//	{
+//		GameObject hero_selection = (GameObject)Instantiate(local_player_prefab, start_position, transform.rotation);
+//		
+//		//		Local_Player lp = (Local_Player)player.GetComponent<Local_Player>();
+//		//		lp.InitializePlayerInfo(team, name, start_position, controller, texture_id);
+//	}
 
 	void OnDisconnectedFromServer(NetworkDisconnection info)
 	{
@@ -779,6 +788,8 @@ public class Lobby : MonoBehaviour
 		} else {
 			escape_key_pressed = false;
 		}
+
+
 	}
 	
 }

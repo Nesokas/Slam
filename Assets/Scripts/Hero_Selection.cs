@@ -13,16 +13,35 @@ public class Hero_Selection : MonoBehaviour {
 									// (relevant when the number of heroes is less than the min_hero_circle variable)
 	private GameObject[] hero_instances;
 	private int rotations;
+	public GameObject player_controller_prefab;
+	private GameObject controller_object;
+	private Transform ready_light;
+
+	private Player player;
+
+	private Lobby lobby;
+
+	private Game_Settings game_settings;
+
+	public struct Player {
+		public Hero hero;
+		public string player_name;
+		public int controller;
+		public int texture_id;
+		public int team;
+	}
 
 	int team;
 	Vector3 initial_position;
-	private GameObject controller_object;
+
 	int texture_id;
-	public GameObject player_controller_prefab;
+
 	protected PlayerController.Commands commands;
 
 	void Start () 
 	{
+		game_settings = GameObject.Find("Settings(Clone)").GetComponent<Game_Settings>();
+
 		num_heroes = heroes.Length;
 		if(num_heroes < min_hero_circle) {
 			num_heroes = min_hero_circle;
@@ -34,7 +53,7 @@ public class Hero_Selection : MonoBehaviour {
 				heroes_positions[i] = 1;
 			else heroes_positions[i] = 0;
 		}
-
+		
 		hero_instances = new GameObject[heroes.Length];
 
 		for(int i = 0; i < heroes.Length; i++) {
@@ -49,16 +68,25 @@ public class Hero_Selection : MonoBehaviour {
 
 		rotations = 0;
 
+		ready_light = transform.Find("ready_led").Find("Light");
+
 	}
 
-	public void InitializePlayerController(int input_num)
+	public void InitializePlayer(int team, string name, int texture_id, int input_num, Lobby lobby)
 	{
-		
+		player = new Player();
+		player.player_name = name;
+		player.texture_id = texture_id;
+		player.team = team;
+		player.player_name = name;
+
 		controller_object = (GameObject)Instantiate(player_controller_prefab);
 		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
 		player_controller.setInputNum(input_num);
 		commands = player_controller.GetCommands();
-	
+		transform.Find("ready_led").Find("Light").renderer.material.color = Color.red;
+		this.lobby = lobby;
+		
 	}
 
 
@@ -112,8 +140,8 @@ public class Hero_Selection : MonoBehaviour {
 	void UpdateCommands()
 	{
 		if (controller_object != null) {
-		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
-		commands = player_controller.GetCommands();
+			PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+			commands = player_controller.GetCommands();
 		}
 	}
 
@@ -122,12 +150,19 @@ public class Hero_Selection : MonoBehaviour {
 		if(commands.horizontal_direction < 0 && heroes_positions[1] == 1) {
 			rotations--;
 			ShiftLeft();
+			InvokeRepeating("Rotate", 0, 0.01f);
 		} else if (commands.horizontal_direction > 0 && heroes_positions[heroes_positions.Length - 1] == 1) {
 			rotations++;
 			ShiftRight();
+			InvokeRepeating("Rotate", 0, 0.01f);
+		} else if (commands.enter == 1) {
+			ready_light.renderer.material.color = Color.green;
+			((Light)ready_light.parent.Find("Halo").GetComponent<Light>()).color = Color.green;
+			game_settings.AddPlayer(player);
+			lobby.PlayerReady();
 		}
 
-		InvokeRepeating("Rotate", 0, 0.01f);
+
 
 		UpdateCommands();
 	}
