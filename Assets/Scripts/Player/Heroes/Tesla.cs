@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Tesla : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
+public class Tesla : Hero {
 	
+	
+	public Tesla()
+	{
+		hero_prefab = Resources.LoadAssetAtPath("Assets/Models/Prefab/Heroes/Tesla.prefab", typeof (GameObject)) as GameObject;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
+	public override void UsePower()
+	{
 	}
 }

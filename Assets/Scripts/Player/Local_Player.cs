@@ -5,15 +5,15 @@ public class Local_Player : Kickoff_Player {
 	
 	public int controller;
 
-	public void InitializePlayerInfo(int team_num, string player_name, Vector3 position, int input_num, int texture_id)
+	public void InitializePlayerInfo(int team_num, string player_name, Vector3 position, int input_num, int texture_id, int hero_index)
 	{
 		team = team_num;
 
-//		Player_Name name_component = transform.Find("Player_name").transform.GetComponent<Player_Name>();
-//		name_component.m_camera = (Camera)GameObject.FindGameObjectWithTag("MainCamera").camera;
-//		name_component.ChangeName(player_name);
-		
-		animation.Play("Idle");
+		InstantiateHero(hero_index);
+
+		Transform player_mesh = transform.Find("Mesh");
+		player_base = player_mesh.Find("Base");
+		player_mesh.animation.Play("Idle");
 		initial_position = position;
 		controller_object = (GameObject)Instantiate(player_controller_prefab);
 		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
@@ -23,6 +23,20 @@ public class Local_Player : Kickoff_Player {
 		GameObject game_controller = GameObject.FindGameObjectWithTag("GameController");
         Local_Game local_game = game_controller.GetComponent<Local_Game>();
         indicator_arrow = local_game.GetTexture(texture_id);
+	}
+
+	private void InstantiateHero(int hero_index)
+	{
+		switch(hero_index) {
+		case 0:
+			hero = new Sam();
+			break;
+		case 1:
+			hero = new Tesla();
+			break;
+		}
+		hero.InstantiateMesh(this.transform);
+		Debug.Log(hero_index);
 	}
 	
 	void StopCelebration()

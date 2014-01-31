@@ -41,6 +41,7 @@ public class Game_Settings : MonoBehaviour {
 			team_2_count++;
 
 		players_list.Add(player);
+		
 	}
 
 }

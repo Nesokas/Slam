@@ -24,7 +24,7 @@ public class Hero_Selection : MonoBehaviour {
 	private Game_Settings game_settings;
 
 	public struct Player {
-		public Hero hero;
+		public int hero_index;
 		public string player_name;
 		public int controller;
 		public int texture_id;
@@ -100,7 +100,7 @@ public class Hero_Selection : MonoBehaviour {
 	void Rotate()
 	{
 		for(int i = 0; i < hero_instances.Length; i++) {
-			Vector3 final_position = CirclePosition(i + rotations, num_heroes);
+			Vector3 final_position = CirclePosition(i - rotations, num_heroes);
 			hero_instances[i].transform.localPosition = Vector3.Lerp(hero_instances[i].transform.localPosition,
 			                                                          final_position,
 			                                                          0.1f);
@@ -148,22 +148,22 @@ public class Hero_Selection : MonoBehaviour {
 	void Update () 
 	{
 		if(commands.horizontal_direction < 0 && heroes_positions[1] == 1) {
-			rotations--;
+			rotations++;
 			ShiftLeft();
 			InvokeRepeating("Rotate", 0, 0.01f);
 		} else if (commands.horizontal_direction > 0 && heroes_positions[heroes_positions.Length - 1] == 1) {
-			rotations++;
+			rotations--;
 			ShiftRight();
 			InvokeRepeating("Rotate", 0, 0.01f);
 		} else if (commands.enter == 1) {
 			ready_light.renderer.material.color = Color.green;
 			((Light)ready_light.parent.Find("Halo").GetComponent<Light>()).color = Color.green;
+
+			player.hero_index = rotations;
 			game_settings.AddPlayer(player);
 			lobby.PlayerReady();
 		}
-
-
-
+	
 		UpdateCommands();
 	}
 }

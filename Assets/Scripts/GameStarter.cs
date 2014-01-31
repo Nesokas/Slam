@@ -41,9 +41,16 @@ public class GameStarter : MonoBehaviour {
 	private void StartLocalGame()
 	{
 		Instantiate(local_game_prefab, Vector3.zero, transform.rotation);
-		
+
 		foreach (Hero_Selection.Player player in game_settings.players_list) {
-			InstantiateNewLocalPlayer(CalculatePosition(player.team), player.team, player.player_name, player.controller, player.texture_id);
+			Debug.Log(player.hero_index);
+			InstantiateNewLocalPlayer(CalculatePosition(player.team), 
+			                          player.team, 
+			                          player.player_name, 
+			                          player.controller, 
+			                          player.texture_id, 
+			                          player.hero_index
+			                         );
 		}
 	}
 
@@ -72,12 +79,12 @@ public class GameStarter : MonoBehaviour {
 		return start_position;
 	}
 
-	private void InstantiateNewLocalPlayer(Vector3 start_position, int team, string name, int controller, int texture_id)
+	private void InstantiateNewLocalPlayer(Vector3 start_position, int team, string name, int controller, int texture_id, int hero_index)
 	{
 		GameObject player = (GameObject)Instantiate(local_player_prefab, start_position, transform.rotation);
 		
-		Local_Player lp = (Local_Player)player.GetComponent<Local_Player>();
-		lp.InitializePlayerInfo(team, name, start_position, controller, texture_id);
+		Local_Player local_player = (Local_Player)player.GetComponent<Local_Player>();
+		local_player.InitializePlayerInfo(team, name, start_position, controller, texture_id, hero_index);
 	}
 
 	// Update is called once per frame

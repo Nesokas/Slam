@@ -16,12 +16,13 @@ public class Kickoff_Player : Player_Behaviour {
 	public Vector3 initial_position;
 	protected GameObject controller_object;
 
+	protected Hero hero;
+
 	public void DisableGotoCenter(int scored_team)
 	{
 		player_base = transform.Find("Mesh").Find("Base");
 		Transform base_collider = transform.Find("Collider");
 		Transform shoot_collider = transform.Find("ColliderShoot");
-		
 		
 		if (scored_team == 0){
 			if(team == 1){
@@ -99,8 +100,7 @@ public class Kickoff_Player : Player_Behaviour {
 		center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 		center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
 		center_circle_right = GameObject.FindGameObjectWithTag("center-circle-right");
-		
-		player_base = transform.Find("Mesh").Find("Base");
+
 		base.Awake();
 	}
 	

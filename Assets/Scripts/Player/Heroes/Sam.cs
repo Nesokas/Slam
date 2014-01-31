@@ -3,13 +3,13 @@ using System.Collections;
 
 public class Sam : Hero {
 
-	// Use this for initialization
-	void Start () {
-	
+
+	public Sam()
+	{
+		hero_prefab = Resources.LoadAssetAtPath("Assets/Models/Prefab/Heroes/Sam.prefab", typeof (GameObject)) as GameObject;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	public override void UsePower()
+	{
 	}
 }

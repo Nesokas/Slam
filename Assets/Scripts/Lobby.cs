@@ -266,7 +266,7 @@ public class Lobby : MonoBehaviour
 		GameObject player = (GameObject)Instantiate(local_player_prefab, start_position, transform.rotation);
 						
 		Local_Player lp = (Local_Player)player.GetComponent<Local_Player>();
-		lp.InitializePlayerInfo(team, name, start_position, controller, texture_id);
+		lp.InitializePlayerInfo(team, name, start_position, controller, texture_id, 0);
 	}
 
 
