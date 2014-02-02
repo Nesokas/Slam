@@ -36,8 +36,10 @@ public class Lobby : MonoBehaviour
 	public GameObject net_player_prefab;
 	public GameObject local_game_prefab;
 	public GameObject net_game_prefab;
-	public GameObject court_start_position_team_1;
-	public GameObject court_start_position_team_2;
+	private GameObject court_start_position_team_1;
+	private GameObject court_start_position_team_2;
+	public GameObject choose_hero_prefab;
+
 	public string[] team_colors = new string[] {"Red", "Blue", "Green"};
 
 	private int team_1_color;
@@ -610,23 +612,48 @@ public class Lobby : MonoBehaviour
 
 	void HeroSelectScreen()
 	{
-		GameObject hero_selection = (GameObject)Instantiate(hero_selection_prefab, Vector3.zero, transform.rotation);
-		foreach(Camera cam in Camera.allCameras)
-			if (cam.name == "LobbyCamera")
-				cam.enabled = false;
+		//GameObject hero_selection = (GameObject)Instantiate(hero_selection_prefab, Vector3.zero, transform.rotation);
 		show_lobby = false;
-		int i = 1;
-			
-		for (int j = 0; j < team_1.Count; j++) {
-			Hero_Selection hero_script = hero_selection.transform.Find("team_1_"+i).GetComponent<Hero_Selection>();
-			hero_script.InitializePlayer(TEAM_1,team_1[j].name, i-1, team_1[j].controller, this);
-			i++;
-		}
 
-		for (int j=0; j < team_2.Count; j++) {
-			Hero_Selection hero_script = hero_selection.transform.Find("team_2_"+i).GetComponent<Hero_Selection>();
-			hero_script.InitializePlayer(TEAM_2,team_2[j].name, i-1, team_2[j].controller, this);
-			i++;
+		int total_players_team_1 = team_1.Count;
+		int total_players_team_2 = team_2.Count;
+
+		int player_number = 0;
+
+		for(int i = 0; i < 4; i++) {
+
+			float team = i % 2f;
+
+			GameObject choose_hero = (GameObject)Instantiate(choose_hero_prefab);
+			Camera choose_hero_camera = choose_hero.transform.Find("Main Camera").GetComponent<Camera>();
+
+			Vector3 new_choose_hero_position = new Vector3(choose_hero.transform.position.x,
+			                                               choose_hero.transform.position.y + 30*i,
+			                                               choose_hero.transform.position.z
+			                                              );
+			choose_hero.transform.position = new_choose_hero_position;
+			choose_hero_camera.camera.rect = new Rect(0.05f + (0.5f * team), 0.55f - (0.5f * player_number), 0.4f, 0.4f);
+
+			choose_hero.transform.name = "team_" + (team + 1) + "_" + (player_number + 1);
+
+			Hero_Selection hero_script = choose_hero.GetComponent<Hero_Selection>();
+
+			if((team + 1) == 1 && total_players_team_1 != 0) {
+				hero_script.InitializePlayer(TEAM_1, team_1[player_number].name, i, team_1[player_number].controller, this);
+				total_players_team_1--;
+			} else if((team + 1) == 2 && total_players_team_2 != 0) {
+				hero_script.InitializePlayer(TEAM_2, team_2[player_number].name, i, team_2[player_number].controller, this);
+				total_players_team_2--;
+			} else {
+				GameObject lights = choose_hero.transform.Find("Lights").gameObject;
+				lights.SetActive(false);
+
+				GameObject halo = choose_hero.transform.Find("ready_led").Find("Halo").gameObject;
+				halo.SetActive(false);
+				hero_script.SetTeam((int)team + 1);
+			}
+
+			player_number += (i%2);
 		}
 	}
 

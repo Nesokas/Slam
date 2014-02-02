@@ -7,6 +7,9 @@ public class Hero_Selection : MonoBehaviour {
 	public float radius = 5f;
 	public GameObject[] heroes;
 
+	public Material team_1_material;
+	public Material team_2_material;
+
 	private int poistion = 0;
 	private int num_heroes;
 	private int[] heroes_positions; // heroes positions that are ocupied in the circle 
@@ -22,6 +25,7 @@ public class Hero_Selection : MonoBehaviour {
 	private Lobby lobby;
 
 	private Game_Settings game_settings;
+	private bool disable_keys = false;
 
 	public struct Player {
 		public int hero_index;
@@ -35,6 +39,7 @@ public class Hero_Selection : MonoBehaviour {
 	Vector3 initial_position;
 
 	int texture_id;
+	bool change_color = false;
 
 	protected PlayerController.Commands commands;
 
@@ -79,6 +84,7 @@ public class Hero_Selection : MonoBehaviour {
 		player.texture_id = texture_id;
 		player.team = team;
 		player.player_name = name;
+		player.controller = input_num;
 
 		controller_object = (GameObject)Instantiate(player_controller_prefab);
 		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
@@ -86,7 +92,17 @@ public class Hero_Selection : MonoBehaviour {
 		commands = player_controller.GetCommands();
 		transform.Find("ready_led").Find("Light").renderer.material.color = Color.red;
 		this.lobby = lobby;
+
+		change_color = true;
 		
+	}
+
+	public void SetTeam(int team)
+	{
+		player = new Player();
+		player.team = team;
+
+		change_color = true;
 	}
 
 
@@ -128,13 +144,6 @@ public class Hero_Selection : MonoBehaviour {
 			heroes_positions[i] = heroes_positions[i-1];
 		
 		heroes_positions[0] = last_value;
-
-		string values = "";
-		
-		for(int i = 0; i < heroes_positions.Length; i++)
-			values += " " + heroes_positions[i] + ",";
-		
-		Debug.Log(values);
 	}
 
 	void UpdateCommands()
@@ -147,23 +156,46 @@ public class Hero_Selection : MonoBehaviour {
 
 	void Update () 
 	{
-		if(commands.horizontal_direction < 0 && heroes_positions[1] == 1) {
-			rotations++;
-			ShiftLeft();
-			InvokeRepeating("Rotate", 0, 0.01f);
-		} else if (commands.horizontal_direction > 0 && heroes_positions[heroes_positions.Length - 1] == 1) {
-			rotations--;
-			ShiftRight();
-			InvokeRepeating("Rotate", 0, 0.01f);
-		} else if (commands.enter == 1) {
-			ready_light.renderer.material.color = Color.green;
-			((Light)ready_light.parent.Find("Halo").GetComponent<Light>()).color = Color.green;
+		if(change_color) {
 
-			player.hero_index = rotations;
-			game_settings.AddPlayer(player);
-			lobby.PlayerReady();
+			Transform heroes = transform.Find("Heroes");
+			
+			foreach(Transform hero in heroes) {
+				
+				Transform hero_base = hero.Find("Base");
+				
+				if(player.team == 1)
+					hero_base.renderer.material = team_1_material;
+				else
+					hero_base.renderer.material = team_2_material;
+			}
+
+			change_color = false;
 		}
-	
-		UpdateCommands();
+
+		if(! disable_keys) {
+			if(commands.horizontal_direction < 0 && heroes_positions[1] == 1) {
+				rotations++;
+				ShiftLeft();
+				InvokeRepeating("Rotate", 0, 0.01f);
+			} else if (commands.horizontal_direction > 0 && heroes_positions[heroes_positions.Length - 1] == 1) {
+				rotations--;
+				ShiftRight();
+				InvokeRepeating("Rotate", 0, 0.01f);
+			} else if (commands.enter == 1) {
+				ready_light.renderer.material.color = Color.green;
+				((Light)ready_light.parent.Find("Halo").GetComponent<Light>()).color = Color.green;
+
+				player.hero_index = rotations;
+				game_settings.AddPlayer(player);
+				disable_keys = true;
+
+				Debug.Log("player ready: " + player.player_name);
+
+				lobby.PlayerReady();
+			}
+		
+			UpdateCommands();
+		}
 	}
 }
