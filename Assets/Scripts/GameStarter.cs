@@ -43,7 +43,6 @@ public class GameStarter : MonoBehaviour {
 		Instantiate(local_game_prefab, Vector3.zero, transform.rotation);
 
 		foreach (Hero_Selection.Player player in game_settings.players_list) {
-			Debug.Log(player.hero_index);
 			InstantiateNewLocalPlayer(CalculatePosition(player.team), 
 			                          player.team, 
 			                          player.player_name, 

@@ -36,7 +36,6 @@ public class Local_Player : Kickoff_Player {
 			break;
 		}
 		hero.InstantiateMesh(this.transform);
-		Debug.Log(hero_index);
 	}
 	
 	void StopCelebration()
