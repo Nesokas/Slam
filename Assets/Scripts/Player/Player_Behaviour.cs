@@ -3,8 +3,7 @@ using System.Collections;
 
 public class Player_Behaviour : MonoBehaviour {
 	
-	private float DASH_COOLDOWN = 12f;
-	private float DASH_STRENGTH = 2f;
+	private float POWER_COOLDOWN = 12f;
 	public float ACCELERATION = 0.065f;
 	public float MAX_ANIMATION_SPEED = 2f;
 	public float SHOOT_VELOCITY = 9;
@@ -12,7 +11,7 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	
 	public float increase_speed = 0.1f;
-	private float dash_cooldown;
+	private float power_cooldown;
 
 	public Vector3 velocity = Vector3.zero;
 	public Vector3 normalized_velocity = Vector3.zero;
@@ -39,8 +38,8 @@ public class Player_Behaviour : MonoBehaviour {
 	protected bool colliding_with_ball = false;
 	protected Collider ball_collider;
 	protected Transform player_base;
-	protected Transform dash_bar;
-	protected Transform dash_bar_fill;
+	protected Transform power_bar;
+	public Transform power_bar_fill;
 	protected Transform dash_smoke;
 	protected Transform player_indicator_container;
 	public Vector3 viewport_dash_pos;
@@ -69,6 +68,8 @@ public class Player_Behaviour : MonoBehaviour {
 	private int goals_scored = 0;
 	private bool best_score = false;
 	private bool is_animating_star = false;
+
+	protected Hero hero;
 	
 	private CameraMovement main_camera;
 	
@@ -99,29 +100,41 @@ public class Player_Behaviour : MonoBehaviour {
 	
 	protected virtual void VerifyDash()
 	{
-		Dash(commands.dash, commands.horizontal_direction, commands.vertical_direction);
+		hero.UsePower(commands);
+//		Dash(commands.dash, commands.horizontal_direction, commands.vertical_direction);
 	}
 	
 	protected void Dash(float dash, float horizontal_direction, float vertical_direction)
 	{		
-		if (dash != 0 && (Time.time > dash_cooldown) && (horizontal_direction != 0 || vertical_direction != 0)) {
-			dash_cooldown =  DASH_COOLDOWN + Time.time;
-			rigidbody.velocity *= DASH_STRENGTH;
-			dash_bar_fill.renderer.material.color = Color.red;
-			
-			// if networkView == null means localplay so we can't make an RPC
-			if (networkView != null)
-				networkView.RPC("EmmitDashSmoke",RPCMode.All);
-			else
-				EmmitDashSmoke();	
-		}
+//		if (dash != 0 && (Time.time > dash_cooldown) && (horizontal_direction != 0 || vertical_direction != 0)) {
+//			dash_cooldown =  DASH_COOLDOWN + Time.time;
+//			rigidbody.velocity *= DASH_STRENGTH;
+//			resetPowerBar();
+//
+//			// if networkView == null means localplay so we can't make an RPC
+//			if (networkView != null)
+//				networkView.RPC("EmmitDashSmoke",RPCMode.All);
+//			else
+//				EmmitDashSmoke();	
+//		}
+	}
+
+	public void resetPowerBar()
+	{
+		power_cooldown = POWER_COOLDOWN+Time.time;
+//		dash_bar_fill.renderer.material.color = Color.red;
+	}
+
+	public void setDashCooldown(float power_cooldown)
+	{
+		POWER_COOLDOWN = power_cooldown;
 	}
 	
 	[RPC]
 	void EmmitDashSmoke()
 	{
 //		dash_smoke.particleEmitter.Emit();
-		dash_smoke.particleSystem.Play();
+//		dash_smoke.particleSystem.Play();
 	}
 	
 	public void GoalScored()
@@ -253,9 +266,9 @@ public class Player_Behaviour : MonoBehaviour {
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		player_base = transform.Find("Mesh").Find("Base");
-		dash_bar = transform.Find("Dash_Bar");
-		dash_bar_fill = dash_bar.Find("Dash_Fill");
-		dash_smoke = transform.Find("Dash_Smoke");
+		power_bar = transform.Find("Power_Bar");
+		power_bar_fill = power_bar.Find("Power_Fill");
+//		dash_smoke = transform.Find("Dash_Smoke");
 		shoot_effect = transform.Find("Shoot_Effect");
 		Transform base_collider = transform.Find("Collider");
 		Transform shoot_collider = transform.Find("ColliderShoot");
@@ -325,7 +338,7 @@ public class Player_Behaviour : MonoBehaviour {
 		float width=0;
 		float height=0;
 		
-		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(dash_bar.position);
+		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(power_bar.position);
 		float player_x = (float)System.Math.Round((double)player_indicator_position.x, 3);
 		float player_y = (float)System.Math.Round((double)player_indicator_position.y, 3);
 		
@@ -419,15 +432,15 @@ public class Player_Behaviour : MonoBehaviour {
 		
 		// Dash indicator arrow
 		Texture dash_arrow_texture = dash_arrow_fill;
-		float current_value = DASH_COOLDOWN - (dash_cooldown-Time.time);
+		float current_value = POWER_COOLDOWN - (power_cooldown-Time.time);
 		
 		if (current_value < 0) {
-			current_value = DASH_COOLDOWN;
-		}else if (current_value > DASH_COOLDOWN) {
-			current_value = DASH_COOLDOWN;
+			current_value = POWER_COOLDOWN;
+		}else if (current_value > POWER_COOLDOWN) {
+			current_value = POWER_COOLDOWN;
 			dash_arrow_texture = dash_arrow_full;
 		}
-		float fill_percent = current_value/DASH_COOLDOWN;
+		float fill_percent = current_value/POWER_COOLDOWN;
 		
 		float dash_arrow_width = 0.005f * Screen.width;
 		float dash_arrow_height = 0.004f * Screen.height;
@@ -457,11 +470,11 @@ public class Player_Behaviour : MonoBehaviour {
 			player_base = transform.Find("Mesh").Find("Base");
 		/***************************************************/
 		
-		if (dash_bar_fill == null)
-			dash_bar_fill = transform.Find("Dash_Fill");
+		if (power_bar_fill == null)
+			power_bar_fill = transform.Find("Dash_Fill");
 		
-		dash_bar.rotation = Quaternion.Euler(0,180f,0);
-		viewport_dash_pos = Camera.main.WorldToViewportPoint(dash_bar.position);
+		power_bar.rotation = Quaternion.Euler(0,180f,0);
+		viewport_dash_pos = Camera.main.WorldToViewportPoint(power_bar.position);
 		
 //		Debug.Log(Camera.main.WorldToViewportPoint(dash_bar.position));
 		

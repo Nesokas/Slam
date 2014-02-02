@@ -9,7 +9,11 @@ public class Tesla : Hero {
 		hero_prefab = Resources.LoadAssetAtPath("Assets/Models/Prefab/Heroes/Tesla.prefab", typeof (GameObject)) as GameObject;
 	}
 	
-	public override void UsePower()
+	public override void UsePower(PlayerController.Commands commands)
+	{
+	}
+
+	public override void Start()
 	{
 	}
 }

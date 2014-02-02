@@ -29,13 +29,14 @@ public class Local_Player : Kickoff_Player {
 	{
 		switch(hero_index) {
 		case 0:
-			hero = new Sam();
+			hero = new Sam(this);
 			break;
 		case 1:
 			hero = new Tesla();
 			break;
 		}
 		hero.InstantiateMesh(this.transform);
+		hero.Start();
 		Debug.Log(hero_index);
 	}
 	

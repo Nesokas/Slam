@@ -5,8 +5,11 @@ public abstract class Hero {
 
 	protected GameObject hero_prefab;
 
-	public abstract void UsePower();
-	 
+	public abstract void UsePower(PlayerController.Commands commands);
+	protected float dash_cooldown;
+
+	public abstract void Start();
+
 	public void InstantiateMesh(Transform player)
 	{
 		GameObject hero = (GameObject)MonoBehaviour.Instantiate(hero_prefab);

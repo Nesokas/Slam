@@ -16,7 +16,7 @@ public class Kickoff_Player : Player_Behaviour {
 	public Vector3 initial_position;
 	protected GameObject controller_object;
 
-	protected Hero hero;
+
 
 	public void DisableGotoCenter(int scored_team)
 	{
