@@ -121,8 +121,10 @@ public class Hero_Selection : MonoBehaviour {
 			                                                          final_position,
 			                                                          0.1f);
 
-			if(hero_instances[i].transform.localPosition == final_position)
+			if(hero_instances[i].transform.localPosition == final_position){
 				CancelInvoke("Rotate");
+				lobby.HeroChanged(rotations);
+			}
 		}
 	}
 
