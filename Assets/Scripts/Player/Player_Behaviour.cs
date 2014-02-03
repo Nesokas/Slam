@@ -8,7 +8,7 @@ public class Player_Behaviour : MonoBehaviour {
 	public float MAX_ANIMATION_SPEED = 2f;
 	public float SHOOT_VELOCITY = 9;
 	private int MIN_GOALS_REWARD = 3;  // minimum amount of goals to receive the best goal scorer reward
-	
+	public Transform player_mesh;
 	
 	public float increase_speed = 0.1f;
 	private float power_cooldown;
@@ -244,19 +244,20 @@ public class Player_Behaviour : MonoBehaviour {
 	{
 		switch (animation_to_play){
 			case "Idle":
-				animation.CrossFade("Idle", 0.3f);
+				player_mesh.animation.CrossFade("Idle", 0.3f);
 				break;
 			case "Celebrate":
-				animation.CrossFade("Celebrate", 0.3f);
+				player_mesh.animation.CrossFade("Celebrate", 0.3f);
 				break;
 			case "Sad":
-				animation.CrossFade("Sad", 0.3f);
+				player_mesh.animation.CrossFade("Sad", 0.3f);
 				break;
 		}
 	}
 	
 	protected void Start() 
-	{		
+	{	
+		player_mesh = transform.Find("Mesh");
 		star_size = INIT_PLAYER_STAR_SIZE;
 		NotificationCenter.DefaultCenter.AddObserver(this, "DoYouHaveMoreGoals");
 		
