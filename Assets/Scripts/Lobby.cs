@@ -676,7 +676,6 @@ public class Lobby : MonoBehaviour
 
 				Transform heroes = other_hero_choices.transform.Find("Heroes");
 				foreach(Transform hero in heroes) {
-					Debug.Log("hdajdhak");
 					Transform hero_base = hero.Find("Base");
 					hero_base.renderer.material = team_2_material;
 				}
@@ -701,9 +700,9 @@ public class Lobby : MonoBehaviour
 		Material team_color;
 
 		if(self_player.team == 1) {
-			hero_script.InitializePlayer(TEAM_1, self_player.name, 0, 0, this);
+			hero_script.InitializeNetworkPlayer(TEAM_1, self_player.name, 0, Network.player, this);
 		} else {
-			hero_script.InitializePlayer(TEAM_2, self_player.name, 0, 0, this);
+			hero_script.InitializeNetworkPlayer(TEAM_2, self_player.name, 0, Network.player, this);
 		}
 	}
 
@@ -756,10 +755,10 @@ public class Lobby : MonoBehaviour
 			Hero_Selection hero_script = choose_hero.GetComponent<Hero_Selection>();
 
 			if((team + 1) == 1 && total_players_team_1 != 0) {
-				hero_script.InitializePlayer(TEAM_1, team_1[player_number].name, i, team_1[player_number].controller, this);
+				hero_script.InitializeLocalPlayer(TEAM_1, team_1[player_number].name, i, team_1[player_number].controller, this);
 				total_players_team_1--;
 			} else if((team + 1) == 2 && total_players_team_2 != 0) {
-				hero_script.InitializePlayer(TEAM_2, team_2[player_number].name, i, team_2[player_number].controller, this);
+				hero_script.InitializeLocalPlayer(TEAM_2, team_2[player_number].name, i, team_2[player_number].controller, this);
 				total_players_team_2--;
 			} else {
 				GameObject lights = choose_hero.transform.Find("Lights").gameObject;
@@ -774,11 +773,55 @@ public class Lobby : MonoBehaviour
 		}
 	}
 
-	public void PlayerReady()
+	public void PlayerReady(Hero_Selection.Player player)
 	{
+		if(local_game) {
+			players_ready++;
+			game_settings.AddPlayer(player);
+
+			if (players_ready == (team_1.Count + team_2.Count))
+				Application.LoadLevel("Main_Game");
+
+		} else {
+			networkView.RPC("RPC_PlayerReady", RPCMode.All, Network.player, player.texture_id);
+		}
+	}
+
+	[RPC]
+	void RPC_PlayerReady(NetworkPlayer network_player, int texture_id) {
+
 		players_ready++;
-		if (players_ready == (team_1.Count + team_2.Count))
-			Application.LoadLevel("Main_Game");
+
+		List<Player> allPlayers = new List<Player>(team_1);
+		allPlayers.AddRange(team_2);
+		
+		for(int i = 0; i < allPlayers.Count; i++){
+			if(allPlayers[i].network_player == network_player){
+				Hero_Selection.Player player = new Hero_Selection.Player();
+				OtherHeroChoices other = allPlayers[i].hero_choosen.GetComponent<OtherHeroChoices>();
+
+				player.hero_index = other.hero_index;
+				player.player_name = allPlayers[i].name;
+				player.team = allPlayers[i].team;
+				player.texture_id = texture_id;
+				player.network_player = allPlayers[i].network_player;
+
+				if(Network.isServer) {
+					game_settings.AddPlayer(player);
+				}
+				break;
+			}
+		}
+	
+		if (Network.isServer && players_ready == (team_1.Count + team_2.Count))
+			networkView.RPC("StartGame", RPCMode.All);
+
+	}
+
+	[RPC]
+	void StartGame()
+	{
+		Application.LoadLevel("Main_Game");
 	}
 
 
