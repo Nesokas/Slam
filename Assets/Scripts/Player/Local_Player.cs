@@ -32,7 +32,7 @@ public class Local_Player : Kickoff_Player {
 			hero = new Sam(this);
 			break;
 		case 1:
-			hero = new Tesla(this);
+			hero = new Tesla(this, ball);
 			break;
 		}
 		hero.InstantiateMesh(this.transform);

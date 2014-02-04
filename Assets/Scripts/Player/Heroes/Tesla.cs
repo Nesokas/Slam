@@ -5,17 +5,18 @@ public class Tesla : Hero {
 
 	private Transform magnet;
 	private Player_Behaviour player;
+	private GameObject ball;
 	
-	public Tesla(Player_Behaviour player)
+	public Tesla(Player_Behaviour player, GameObject ball)
 	{
 		hero_prefab = Resources.LoadAssetAtPath("Assets/Models/Prefab/Heroes/Tesla.prefab", typeof (GameObject)) as GameObject;
 		this.player = player;
+		this.ball = ball;
 	}
 	
 	public override void UsePower(PlayerController.Commands commands)
 	{
 		if (commands.dash != 0 && (Time.time > dash_cooldown)) {
-			Debug.Log ("magnet");
 			DrawMagnet();
 		}
 	}
