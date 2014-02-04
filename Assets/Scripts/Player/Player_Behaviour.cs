@@ -97,6 +97,11 @@ public class Player_Behaviour : MonoBehaviour {
 			}
 		}
 	}
+
+	public bool IsCollidingWithBall()
+	{
+		return colliding_with_ball;
+	}
 	
 	protected virtual void VerifyDash()
 	{
@@ -179,7 +184,7 @@ public class Player_Behaviour : MonoBehaviour {
 	protected void OnTriggerEnter (Collider collider) 
 	{
 	    if(collider.gameObject.tag == "ball") {
-			colliding_with_ball = true;
+//			colliding_with_ball = true;
 			ball_collider = collider;
 		}
 	}
@@ -491,8 +496,8 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 		
 		IncreaseSpeed();
-		VerifyShoot();
 		VerifyDash();
+		VerifyShoot();
 		UpdatePlayerIndicator();
 		UpdateRotation();
 		UpdateAnimationSpeed();
