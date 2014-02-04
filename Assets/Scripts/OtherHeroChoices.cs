@@ -6,6 +6,7 @@ public class OtherHeroChoices : MonoBehaviour {
 	public GameObject[] heroes;
 	public Material team_1_material;
 	public Material team_2_material;
+	public int hero_index;
 
 	private GameObject[] hero_instances;
 
@@ -13,6 +14,7 @@ public class OtherHeroChoices : MonoBehaviour {
 	void Awake () {
 
 		hero_instances = new GameObject[heroes.Length];
+		hero_index = 0;
 
 		Transform heroes_transform = transform.Find("Heroes");
 
@@ -58,5 +60,6 @@ public class OtherHeroChoices : MonoBehaviour {
 		hero_instances[hero_index].SetActive(true);
 		hero_instances[hero_index].transform.animation.Play("Idle");
 		hero_instances[hero_index].transform.animation["Idle"].time = Random.Range(0.0f, hero_instances[hero_index].transform.animation["Idle"].length);
+		this.hero_index = hero_index;
 	}
 }

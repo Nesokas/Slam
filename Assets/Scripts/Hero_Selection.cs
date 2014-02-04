@@ -27,12 +27,16 @@ public class Hero_Selection : MonoBehaviour {
 	private Game_Settings game_settings;
 	private bool disable_keys = false;
 
+	private PlayerController player_controller;
+
 	public struct Player {
 		public int hero_index;
 		public string player_name;
-		public int controller;
 		public int texture_id;
 		public int team;
+
+		public int controller; // used for local games
+		public NetworkPlayer network_player; // used for network games
 	}
 
 	int team;
@@ -46,6 +50,7 @@ public class Hero_Selection : MonoBehaviour {
 	void Start () 
 	{
 		game_settings = GameObject.Find("Settings(Clone)").GetComponent<Game_Settings>();
+		player_controller = null;
 
 		num_heroes = heroes.Length;
 		if(num_heroes < min_hero_circle) {
@@ -77,24 +82,42 @@ public class Hero_Selection : MonoBehaviour {
 
 	}
 
-	public void InitializePlayer(int team, string name, int texture_id, int input_num, Lobby lobby)
+	public void InitializeLocalPlayer(int team, string name, int texture_id, int input_num, Lobby lobby) 
 	{
-		player = new Player();
-		player.player_name = name;
-		player.texture_id = texture_id;
-		player.team = team;
-		player.player_name = name;
+		player = InitializePlayer(team, name, texture_id, lobby);
 		player.controller = input_num;
+
+		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+		player_controller.setInputNum(input_num);
+	}
+
+	public void InitializeNetworkPlayer(int team, string name, int texture_id, NetworkPlayer network_player, Lobby lobby)
+	{
+		player = InitializePlayer(team, name, texture_id, lobby);
+		player.network_player = network_player;
+
+		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+		player_controller.setInputNum(0);
+	}
+
+	public Player InitializePlayer(int team, string name, int texture_id, Lobby lobby)
+	{
+		Player new_player = new Player();
+		new_player.player_name = name;
+		new_player.texture_id = texture_id;
+		new_player.team = team;
+		new_player.player_name = name;
 
 		controller_object = (GameObject)Instantiate(player_controller_prefab);
 		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
-		player_controller.setInputNum(input_num);
+
 		commands = player_controller.GetCommands();
 		transform.Find("ready_led").Find("Light").renderer.material.color = Color.red;
 		this.lobby = lobby;
 
 		change_color = true;
-		
+
+		return new_player;		
 	}
 
 	public void SetTeam(int team)
@@ -150,10 +173,11 @@ public class Hero_Selection : MonoBehaviour {
 
 	void UpdateCommands()
 	{
-		if (controller_object != null) {
-			PlayerController player_controller = controller_object.GetComponent<PlayerController>();
-			commands = player_controller.GetCommands();
+		if (player_controller == null) {
+			 player_controller = controller_object.GetComponent<PlayerController>();
 		}
+
+		commands = player_controller.GetCommands();
 	}
 
 	void Update () 
@@ -189,12 +213,10 @@ public class Hero_Selection : MonoBehaviour {
 				((Light)ready_light.parent.Find("Halo").GetComponent<Light>()).color = Color.green;
 
 				player.hero_index = rotations;
-				game_settings.AddPlayer(player);
 				disable_keys = true;
 
-				Debug.Log("player ready: " + player.player_name);
-
-				lobby.PlayerReady();
+				Debug.Log("Player Ready");
+				lobby.PlayerReady(player);
 			}
 		
 			UpdateCommands();
