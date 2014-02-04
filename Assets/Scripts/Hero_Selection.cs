@@ -173,11 +173,13 @@ public class Hero_Selection : MonoBehaviour {
 
 	void UpdateCommands()
 	{
-		if (player_controller == null) {
-			 player_controller = controller_object.GetComponent<PlayerController>();
-		}
+		if(controller_object != null) {
+			if (player_controller == null) {
+				 player_controller = controller_object.GetComponent<PlayerController>();
+			}
 
-		commands = player_controller.GetCommands();
+			commands = player_controller.GetCommands();
+		}
 	}
 
 	void Update () 
