@@ -174,7 +174,7 @@ public class Main_Menu : MonoBehaviour
 		if(GUILayout.Button("Connect", GUILayout.Width(100f), GUILayout.Height(50f))) {
 			game_settings.connected = true;
 			game_settings.connect_to = (HostData)available_rooms[room_selected];
-			Application.LoadLevel("Main_Game");
+			Application.LoadLevel("Pre_Game_Lobby");
 		}
 		GUILayout.FlexibleSpace();
 		if(GUILayout.Button ("Refresh")) {

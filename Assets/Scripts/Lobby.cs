@@ -39,6 +39,10 @@ public class Lobby : MonoBehaviour
 	private GameObject court_start_position_team_1;
 	private GameObject court_start_position_team_2;
 	public GameObject choose_hero_prefab;
+	public GameObject other_hero_choices_prefab;
+
+	public Material team_1_material;
+	public Material team_2_material;
 
 	public string[] team_colors = new string[] {"Red", "Blue", "Green"};
 
@@ -60,6 +64,8 @@ public class Lobby : MonoBehaviour
 	private int lobby_state;
 	private int players_ready = 0;
 
+	private Camera[] other_choices_cameras;
+
 	private struct Player
 	{
 		public string name;
@@ -70,8 +76,11 @@ public class Lobby : MonoBehaviour
 
 		public int hero;
 		public bool ready;
+		public GameObject hero_choosen;
 	}
-	
+
+	private Player self_player;
+
 	void Awake()
 	{
 		show_lobby = true;
@@ -148,6 +157,9 @@ public class Lobby : MonoBehaviour
 				team_2.Add(player);
 				break;
 		}
+
+		if(network_player == Network.player)
+			self_player = player;
 	}
 	
 	void AddLocalPlayer(int controller, string player_name, int team=0) 
@@ -598,11 +610,9 @@ public class Lobby : MonoBehaviour
 						GUILayout.FlexibleSpace();
 					if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width))) {
 						if(local_game)
-					//							StartLocalGame();
-							HeroSelectScreen();
+							LocalHeroSelectScreen();
 						else
-							StartNetworkGame();
-
+							networkView.RPC("NetworkHeroSelectScreen", RPCMode.All);
 					}
 				}
 			GUILayout.FlexibleSpace();
@@ -610,9 +620,116 @@ public class Lobby : MonoBehaviour
 		GUILayout.EndVertical();
 	}
 
-	void HeroSelectScreen()
+	void HeroScreen()
 	{
-		//GameObject hero_selection = (GameObject)Instantiate(hero_selection_prefab, Vector3.zero, transform.rotation);
+		for(int i = 0; i < 4; i++) {
+			Camera other_hero_camera = other_choices_cameras[i];
+			GUI.Box(new Rect(other_hero_camera.pixelRect.x, 
+			                 Screen.height - other_hero_camera.pixelRect.yMax, 
+			                 other_hero_camera.pixelWidth, 
+			                 other_hero_camera.pixelHeight), 
+			        "") ;
+		}
+	}
+
+	[RPC]
+	void NetworkHeroSelectScreen()
+	{
+		show_lobby = false;
+		lobby_state = (int)lobby_states.hero_selection;
+
+		int total_players_team_1 = team_1.Count;
+		int total_players_team_2 = team_2.Count;
+
+		int team = 1;
+		other_choices_cameras = new Camera[4];
+
+		for(int i = 0; i < 4; i++) {
+
+			GameObject other_hero_choices = (GameObject)Instantiate(other_hero_choices_prefab);
+			Vector3 new_position = new Vector3(other_hero_choices.transform.position.x,
+			                                   other_hero_choices.transform.position.y + 10*i,
+			                                   other_hero_choices.transform.position.z
+			                                  );
+
+			other_hero_choices.transform.position = new_position;
+
+			Camera other_hero_camera = other_hero_choices.transform.Find("Camera").GetComponent<Camera>();
+			other_hero_camera.camera.rect = new Rect(0.2f + ((i%2) * 0.15f) + ((team - 1) * 0.35f), 0.80f, 0.1f, 0.15f);
+
+			other_choices_cameras[i] = other_hero_camera;
+
+			if(team == TEAM_1 && total_players_team_1 != 0) {
+
+				Transform heroes = other_hero_choices.transform.Find("Heroes");
+				foreach(Transform hero in heroes) {
+					Transform hero_base = hero.Find("Base");
+					hero_base.renderer.material = team_1_material;
+				}
+				total_players_team_1--;
+
+				Player temp = team_1[i];
+				temp.hero_choosen = other_hero_choices;
+				team_1[i] = temp;
+
+			} else if(team == TEAM_2 && total_players_team_2 != 0){
+
+				Transform heroes = other_hero_choices.transform.Find("Heroes");
+				foreach(Transform hero in heroes) {
+					Debug.Log("hdajdhak");
+					Transform hero_base = hero.Find("Base");
+					hero_base.renderer.material = team_2_material;
+				}
+				total_players_team_2--;
+
+				Player temp = team_2[i%2];
+				temp.hero_choosen = other_hero_choices;
+				team_2[i%2] = temp;
+
+			} else {
+				other_hero_camera.cullingMask = 0;
+			}
+
+			team += i % 2;
+		}
+
+		GameObject choose_hero = (GameObject)Instantiate(choose_hero_prefab);
+		Camera choose_hero_camera = choose_hero.transform.Find("Main Camera").GetComponent<Camera>();
+		choose_hero_camera.camera.rect = new Rect(0.2f, 0.1f, 0.6f, 0.6f);
+
+		Hero_Selection hero_script = choose_hero.GetComponent<Hero_Selection>();
+		Material team_color;
+
+		if(self_player.team == 1) {
+			hero_script.InitializePlayer(TEAM_1, self_player.name, 0, 0, this);
+		} else {
+			hero_script.InitializePlayer(TEAM_2, self_player.name, 0, 0, this);
+		}
+	}
+
+	public void HeroChanged(int hero_index)
+	{
+		if(!local_game){
+			networkView.RPC("RPC_HeroChanged", RPCMode.All, hero_index, Network.player);
+		}
+	}
+
+	[RPC]
+	void RPC_HeroChanged(int hero_index, NetworkPlayer network_player)
+	{
+		List<Player> allPlayers = new List<Player>(team_1);
+		allPlayers.AddRange(team_2);
+
+		for(int i = 0; i < allPlayers.Count; i++){
+			if(allPlayers[i].network_player == network_player){
+				OtherHeroChoices other = allPlayers[i].hero_choosen.GetComponent<OtherHeroChoices>();
+				other.ChangeHero(hero_index);
+			}
+		}
+	}
+
+	void LocalHeroSelectScreen()
+	{
 		show_lobby = false;
 
 		int total_players_team_1 = team_1.Count;
@@ -704,7 +821,7 @@ public class Lobby : MonoBehaviour
 				LobbyScreen();
 				break;
 			case (int)lobby_states.hero_selection:
-//				HeroScreen();
+				HeroScreen();
 				break;
 			}
 			GUILayout.EndArea();
