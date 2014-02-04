@@ -40,6 +40,7 @@ public class Lobby : MonoBehaviour
 	private GameObject court_start_position_team_2;
 	public GameObject choose_hero_prefab;
 	public GameObject other_hero_choices_prefab;
+	public GameObject network_loading_prefab;
 
 	public Material team_1_material;
 	public Material team_2_material;
@@ -190,28 +191,6 @@ public class Lobby : MonoBehaviour
 			}
 		}
 	}
-	[RPC]
-	void UpdateNetworkPlayer(Vector3 start_position, NetworkPlayer network_player, int team, string name, int texture_id)
-	{
-		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-
-		foreach(GameObject player_object in players) {
-			Network_Player player = player_object.GetComponent<Network_Player>();
-			if(player.owner == network_player) {
-				player.InitializePlayerInfo(network_player, team, name, start_position, texture_id);
-				player.Start();
-				GameObject gbo = GameObject.FindGameObjectWithTag("GameController");
-				Game_Behaviour gb = gbo.GetComponent<Game_Behaviour>();
-				if (gb.is_game_going) {
-					player.ReleasePlayers();
-				} else {
-					player.DisableGotoCenter(gb.scored_team);
-				}
-				//player.ReleasePlayers();
-				return;
-			}
-		}
-	}
 	
 	bool IsNetworkPlayerInstanciated(GameObject[] players, NetworkPlayer network_player)
 	{
@@ -264,7 +243,7 @@ public class Lobby : MonoBehaviour
 		GameObject player = (GameObject)Network.Instantiate(net_player_prefab, start_position, transform.rotation, 0);
 						
 		Network_Player np = (Network_Player)player.GetComponent<Network_Player>();
-		np.InitializePlayerInfo(network_player, team, name, start_position, texture_id);
+		np.InitializePlayerInfo(network_player, team, name, start_position, texture_id, 0);
 		np.Start();
 		
 		Network_Game net_game = game_manager_object.GetComponent<Network_Game>();
@@ -397,8 +376,7 @@ public class Lobby : MonoBehaviour
 	void ConnectToServer()
 	{
 		show_lobby = true;
-		game_settings.connect_to.useNat = true;
-		Network.Connect(game_settings.connect_to.guid);
+		Network.Connect(game_settings.connect_to.ip, game_settings.connect_to.port);
 	}
 	
 	void OnConnectedToServer()
@@ -813,15 +791,20 @@ public class Lobby : MonoBehaviour
 			}
 		}
 	
-		if (Network.isServer && players_ready == (team_1.Count + team_2.Count))
+		if (Network.isServer && players_ready == (team_1.Count + team_2.Count)) {
+			Network.Instantiate(network_loading_prefab, 
+			                    network_loading_prefab.transform.position,
+			                    network_loading_prefab.transform.rotation,
+			                    0);
 			networkView.RPC("StartGame", RPCMode.All);
+		}
 
 	}
 
 	[RPC]
 	void StartGame()
 	{
-		Application.LoadLevel("Main_Game");
+		Application.LoadLevel("Network_Loading");
 	}
 
 
