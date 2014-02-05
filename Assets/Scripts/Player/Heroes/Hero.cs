@@ -10,6 +10,8 @@ public abstract class Hero {
 
 	public abstract void Start();
 
+	public abstract void EmmitPowerFX(string type = "none");
+
 	public void InstantiateMesh(Transform player)
 	{
 		GameObject hero = (GameObject)MonoBehaviour.Instantiate(hero_prefab);

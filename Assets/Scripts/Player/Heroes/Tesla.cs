@@ -15,6 +15,8 @@ public class Tesla : Hero {
 
 	private float last_power_key = 0f;
 
+	private PlayerController.Commands commands;
+
 	public Tesla(Player_Behaviour player)
 	{
 		hero_prefab = Resources.Load<GameObject>("Heroes/Tesla");
@@ -26,6 +28,8 @@ public class Tesla : Hero {
 	
 	public override void UsePower(PlayerController.Commands commands)
 	{
+		this.commands = commands;
+
 		if(ball == null)
 			ball = GameObject.FindWithTag("ball");
 
@@ -35,7 +39,7 @@ public class Tesla : Hero {
 				is_using_power = true;
 				player.setPowerActivatedTimer(POWER_TIMER);
 				ball_pos = ball.transform.position;
-				DrawMagnet();
+				player.networkView.RPC("EmmitPowerFX",RPCMode.All, "power_up");
 			} else if (is_using_power) {
 				StopPower();
 			} 
@@ -61,27 +65,24 @@ public class Tesla : Hero {
 		original_position = player.transform.position;
 	}
 
+	public override void EmmitPowerFX(string type = "none")
+	{
+		if(type == "power_up")
+			magnet.particleSystem.Play();
+		if(type == "power_down")
+			magnet.particleSystem.Stop();
+	}
+
 	private void StopPower()
 	{
 		is_using_power = false;
 		if(player.IsCollidingWithBall())
 			ball.transform.rigidbody.velocity = player.rigidbody.velocity;
-		EraseMagnet();
+		player.networkView.RPC("EmmitPowerFX",RPCMode.All, "power_down");
 		player.setPowerActivatedTimer(0f);
 		player.resetPowerBar();
 	}
 
-	[RPC]
-	void DrawMagnet()
-	{
-		magnet.particleSystem.Play();
-	}
-
-	[RPC]
-	void EraseMagnet()
-	{
-		magnet.particleSystem.Stop();
-	}
 	public override void Start()
 	{
 		magnet = player.transform.Find("Mesh").Find("Base").Find("Magnet");
