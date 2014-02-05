@@ -90,5 +90,17 @@ public class Crowd : MonoBehaviour {
 				child.gameObject.SetActive(activate_crowd);
 			}
 		}
+
+		if(Input.GetKeyUp(KeyCode.N)) {
+			foreach(Transform child in transform) {
+				child.localScale = Vector3.one;
+			}
+		}
+
+		if(Input.GetKeyUp(KeyCode.K)) {
+			foreach(Transform child in transform) {
+				child.animation.Stop();
+			}
+		}
 	}
 }
