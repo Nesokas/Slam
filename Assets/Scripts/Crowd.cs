@@ -43,9 +43,23 @@ public class Crowd : MonoBehaviour {
 			hero_base.renderer.material = team_material;
 			all_fans.Add(fan.gameObject);
 
+			if(hero_to_instanciate.name == "Tesla")
+				DeactivateTeslaEffects(hero_object.gameObject);
+
 			Fan_Behaviour fan_behaviour = fan.GetComponent<Fan_Behaviour>();
 			fan_behaviour.HeroStarted(center);
 		}
+	}
+
+	void DeactivateTeslaEffects(GameObject tesla)
+	{
+		// Deactivate Sparkles
+		GameObject sparkles = tesla.transform.Find("Bulb").GetChild(0).gameObject;
+		sparkles.SetActive(false);
+
+		// Deactivate Magnet
+		GameObject magnet = tesla.transform.Find("Base/Magnet").gameObject;
+		magnet.SetActive(false);
 	}
 	
 	void Update() 
