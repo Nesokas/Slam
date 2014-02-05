@@ -126,5 +126,20 @@ public class Kickoff_Player : Player_Behaviour {
 	{
 		return team;
 	}
+
+	protected void InstantiateHero(int hero_index)
+	{
+		switch(hero_index) {
+		case 0:
+			hero = new Sam(this);
+			break;
+		case 1:
+			hero = new Tesla(this);
+			break;
+		}
+		hero.InstantiateMesh(this.transform);
+		
+		hero.Start();
+	}
 	
 }

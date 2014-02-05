@@ -25,21 +25,6 @@ public class Local_Player : Kickoff_Player {
         indicator_arrow = local_game.GetTexture(texture_id);
 	}
 
-	private void InstantiateHero(int hero_index)
-	{
-		switch(hero_index) {
-		case 0:
-			hero = new Sam(this);
-			break;
-		case 1:
-			hero = new Tesla(this);
-			break;
-		}
-		hero.InstantiateMesh(this.transform);
-
-		hero.Start();
-	}
-	
 	void StopCelebration()
 	{
 		ChangeAnimation("Idle");

@@ -15,19 +15,24 @@ public class Network_Player: Kickoff_Player {
 	}
 	
 //	Sends player info to every client
-	public void InitializePlayerInfo(NetworkPlayer network_player, int team_num, string player_name, Vector3 position, int textureID)
+	public void InitializePlayerInfo(NetworkPlayer network_player, int team_num, string player_name, Vector3 position, int textureID, int hero_index)
 	{
-		networkView.RPC("TellInfoToPlayer", RPCMode.All, team_num, player_name, position, network_player, textureID);
+		networkView.RPC("TellInfoToPlayer", RPCMode.All, team_num, player_name, position, network_player, textureID, hero_index);
 	}
 	
 	[RPC]
-	void TellInfoToPlayer(int team_num, string name, Vector3 position, NetworkPlayer network_player, int textureID)
+	void TellInfoToPlayer(int team_num, string name, Vector3 position, NetworkPlayer network_player, int textureID, int hero_index)
 	{
 		team = team_num;
 		
 		owner = network_player;
+
+		InstantiateHero(hero_index);
 		
-		animation.Play("Idle");
+		Transform player_mesh = transform.Find("Mesh");
+		player_base = player_mesh.Find("Base");
+		player_mesh.animation.Play("Idle");
+
 		initial_position = position;
 		if(Network.player == network_player) {
 			controller_object = (GameObject)Instantiate(player_controller_prefab);
@@ -40,7 +45,7 @@ public class Network_Player: Kickoff_Player {
 		arrow_id = textureID;
         indicator_arrow = network_game.GetTexture(textureID);
 	}
-	
+
 	public void GetPlayerInfo()
 	{
 		networkView.RPC("RPC_GetPlayerInfo", RPCMode.Server, Network.player);

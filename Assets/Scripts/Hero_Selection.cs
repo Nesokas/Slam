@@ -217,7 +217,6 @@ public class Hero_Selection : MonoBehaviour {
 				player.hero_index = rotations;
 				disable_keys = true;
 
-				Debug.Log("Player Ready");
 				lobby.PlayerReady(player);
 			}
 		
