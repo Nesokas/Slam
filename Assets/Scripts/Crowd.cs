@@ -12,10 +12,13 @@ public class Crowd : MonoBehaviour {
 	
 
 	private List<GameObject> all_fans;
+	private List<GameObject> teslas;
+	private bool activate_crowd = true;
 
 	void Start()
 	{
 		all_fans = new List<GameObject>();
+		teslas = new List<GameObject>();
 
 		Material team_material;
 
@@ -43,8 +46,10 @@ public class Crowd : MonoBehaviour {
 			hero_base.renderer.material = team_material;
 			all_fans.Add(fan.gameObject);
 
-			if(hero_to_instanciate.name == "Tesla")
+			if(hero_to_instanciate.name == "Tesla") {
 				DeactivateTeslaEffects(hero_object.gameObject);
+				teslas.Add(hero_object.gameObject);
+			}
 
 			Fan_Behaviour fan_behaviour = fan.GetComponent<Fan_Behaviour>();
 			fan_behaviour.HeroStarted(center);
@@ -54,8 +59,8 @@ public class Crowd : MonoBehaviour {
 	void DeactivateTeslaEffects(GameObject tesla)
 	{
 		// Deactivate Sparkles
-		GameObject sparkles = tesla.transform.Find("Bulb").GetChild(0).gameObject;
-		sparkles.SetActive(false);
+		//GameObject sparkles = tesla.transform.Find("Bulb").GetChild(0).gameObject;
+		//sparkles.SetActive(false);
 
 		// Deactivate Magnet
 		GameObject magnet = tesla.transform.Find("Base/Magnet").gameObject;
@@ -70,6 +75,20 @@ public class Crowd : MonoBehaviour {
 			
 			Fan_Behaviour fan_behaviour = fan.GetComponent<Fan_Behaviour>();
 			StartCoroutine(fan_behaviour.Celebrate());
+		}
+
+		if(Input.GetKeyUp(KeyCode.Comma)) {
+			foreach(GameObject tesla in teslas) {
+				GameObject sparkles = tesla.transform.Find("Bulb").GetChild(0).gameObject;
+				sparkles.SetActive(false);
+			}
+		}
+
+		if(Input.GetKeyDown(KeyCode.M)) {
+			activate_crowd = !activate_crowd;
+			foreach(Transform child in transform) {
+				child.gameObject.SetActive(activate_crowd);
+			}
 		}
 	}
 }
