@@ -3,17 +3,48 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Crowd : MonoBehaviour {
+
+	public GameObject center;
+	public int team;
+	public GameObject[] heroes;
+	public Material team_1_material;
+	public Material team_2_material;
 	
+
 	private List<GameObject> all_fans;
-	
+
 	void Start()
 	{
 		all_fans = new List<GameObject>();
+
+		Material team_material;
+
+		if(team == 1)
+			team_material = team_1_material;
+		else
+			team_material = team_2_material;
 			
-		foreach(Transform child in transform) {
-			if(child.parent == transform) {
-				all_fans.Add(child.gameObject);
-			}
+		foreach(Transform fan in transform) {
+
+			GameObject hero_to_instanciate = heroes[Random.Range(0, heroes.Length)];
+
+			GameObject hero = (GameObject)Instantiate(hero_to_instanciate);
+			hero.transform.parent = fan;
+			hero.transform.localPosition = Vector3.zero;
+			hero.transform.localScale = Vector3.one;
+			hero.transform.localRotation = Quaternion.Euler(0, 180, 0);
+
+			hero.animation.Play("Idle");
+			hero.transform.animation["Idle"].time = Random.Range(0.0f, hero.transform.animation["Idle"].length);
+
+			Transform hero_object = fan.Find(hero_to_instanciate.name + "(Clone)");
+			Transform hero_base = hero_object.Find("Base");
+
+			hero_base.renderer.material = team_material;
+			all_fans.Add(fan.gameObject);
+
+			Fan_Behaviour fan_behaviour = fan.GetComponent<Fan_Behaviour>();
+			fan_behaviour.HeroStarted(center);
 		}
 	}
 	

@@ -50,7 +50,8 @@ public class GameStarter : MonoBehaviour {
 	{
 		Instantiate(local_game_prefab, Vector3.zero, transform.rotation);
 
-		foreach (Hero_Selection.Player player in game_settings.players_list) {
+		for (int i = 0; i < game_settings.players_list.Count; i++) {
+			Hero_Selection.Player player = game_settings.players_list[i];
 			InstantiateNewLocalPlayer(CalculatePosition(player.team), 
 			                          player.team, 
 			                          player.player_name, 
@@ -131,13 +132,8 @@ public class GameStarter : MonoBehaviour {
 	private void InstantiateNewLocalPlayer(Vector3 start_position, int team, string name, int controller, int texture_id, int hero_index)
 	{
 		GameObject player = (GameObject)Instantiate(local_player_prefab, start_position, transform.rotation);
-		
+
 		Local_Player local_player = (Local_Player)player.GetComponent<Local_Player>();
 		local_player.InitializePlayerInfo(team, name, start_position, controller, texture_id, hero_index);
-	}
-
-	// Update is called once per frame
-	void Update () {
-	
 	}
 }

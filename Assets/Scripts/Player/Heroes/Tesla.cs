@@ -14,7 +14,7 @@ public class Tesla : Hero {
 
 	public Tesla(Player_Behaviour player)
 	{
-		hero_prefab = Resources.LoadAssetAtPath("Assets/Models/Prefab/Heroes/Tesla.prefab", typeof (GameObject)) as GameObject;
+		hero_prefab = Resources.Load<GameObject>("Heroes/Tesla");
 		this.player = player;
 		is_using_power = false;
 		power_displacement = Vector3.zero;

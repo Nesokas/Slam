@@ -4,21 +4,30 @@ using System.Collections;
 public class Fan_Behaviour : MonoBehaviour {
 	
 	public int team;
+	private GameObject center;
 	private GameObject ball;
 	private bool celebration_period = false;
 	private string play_animation;
 	private bool was_sad;
+	private Transform hero;
 	
 	void Awake()
 	{
 		NotificationCenter.DefaultCenter.AddObserver(this, "StopCelebration");
 		NotificationCenter.DefaultCenter.AddObserver(this, "ChangeReaction");
-		transform.animation.Stop();
+		//hero.animation.Stop();
 	}
-	
+
 	void StopCelebration()
 	{
 		celebration_period = false;
+	}
+
+	public void HeroStarted(GameObject center)
+	{
+		hero = transform.GetChild(0);
+		hero.animation.Stop();
+		this.center = center;
 	}
 	
 	void ChangeReaction(NotificationCenter.Notification notification)
@@ -32,10 +41,16 @@ public class Fan_Behaviour : MonoBehaviour {
 	
 	void UpdateRotation()
 	{
-		if(!ball)
+		GameObject look_to = ball;
+		if(!ball){
 			ball = GameObject.FindGameObjectWithTag("ball");
-		else {
-			var rotation = Quaternion.LookRotation(ball.transform.position - transform.position);
+
+			if(!ball) {
+				look_to = center;
+			}
+
+		} else {
+			var rotation = Quaternion.LookRotation(transform.position - look_to.transform.position);
 		    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1000);
 		}
 	}
@@ -44,15 +59,15 @@ public class Fan_Behaviour : MonoBehaviour {
 	void Update () {
 		UpdateRotation();
 		if(celebration_period){
-			if(!transform.animation.IsPlaying(play_animation)){
+			if(!hero.animation.IsPlaying(play_animation)){
 				int random = Random.Range(0, 30);
 				if (random == 0){
-					transform.animation.CrossFade(play_animation, 0.2f);
+					hero.animation.CrossFade(play_animation, 0.2f);
 				}
 			}
-		} else if(!transform.animation.IsPlaying("Idle")) {
-			transform.animation.CrossFade("Idle",0.5f);
-			transform.animation["Idle"].time = Random.Range(0, transform.animation["Idle"].length);
+		} else if(!hero.animation.IsPlaying("Idle")) {
+			hero.animation.CrossFade("Idle",0.5f);
+			hero.animation["Idle"].time = Random.Range(0, hero.animation["Idle"].length);
 		}
 		
 	}
@@ -60,9 +75,9 @@ public class Fan_Behaviour : MonoBehaviour {
 	public IEnumerator Celebrate()
 	{
 		if(!celebration_period) {
-			transform.animation.CrossFade("Celebrate", 1f);
-			yield return new WaitForSeconds(Random.Range(transform.animation["Celebrate"].length*8f, transform.animation["Celebrate"].length*16f));
-			transform.animation.CrossFade("Idle", 0.5f);
+			hero.animation.CrossFade("Celebrate", 1f);
+			yield return new WaitForSeconds(Random.Range(hero.animation["Celebrate"].length*8f, hero.animation["Celebrate"].length*16f));
+			hero.animation.CrossFade("Idle", 0.5f);
 		}
 	}
 }
