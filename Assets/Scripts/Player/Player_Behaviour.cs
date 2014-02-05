@@ -134,7 +134,6 @@ public class Player_Behaviour : MonoBehaviour {
 	{
 		power_cooldown = POWER_COOLDOWN+Time.time;
 		is_cooldown_over = false;
-//		dash_bar_fill.renderer.material.color = Color.red;
 	}
 
 	public void setDashCooldown(float power_cooldown)

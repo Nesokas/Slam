@@ -13,7 +13,7 @@ public class Tesla : Hero {
 	private float POWER_TIMER = 2f;
 	private float POWER_COOLDOWN = 16f;
 
-	private float last_dash;
+	private float last_power_key = 0f;
 
 	public Tesla(Player_Behaviour player)
 	{
@@ -29,19 +29,18 @@ public class Tesla : Hero {
 		if(ball == null)
 			ball = GameObject.FindWithTag("ball");
 
-		if(last_dash != commands.dash) {
-
-			if (commands.dash != 0 && player.IsCooldownOver() && !is_using_power) {
+		if(IsPowerKeyDown(commands.dash)) {
+			if (player.IsCooldownOver() && !is_using_power) {
 				power_cooldown = POWER_COOLDOWN + Time.time;
-//				player.resetPowerBar();
 				is_using_power = true;
 				player.setPowerActivatedTimer(POWER_TIMER);
 				ball_pos = ball.transform.position;
 				DrawMagnet();
-			} else if (commands.dash != 0 && is_using_power) {
+			} else if (is_using_power) {
 				StopPower();
 			} 
 		}
+
 		if(player.IsPowerTimerOver()) {
 			StopPower();
 			
@@ -60,14 +59,13 @@ public class Tesla : Hero {
 		}
 		
 		original_position = player.transform.position;
-		last_dash = commands.dash;
-
 	}
 
 	private void StopPower()
 	{
 		is_using_power = false;
-		ball.transform.rigidbody.velocity = player.rigidbody.velocity;
+		if(player.IsCollidingWithBall())
+			ball.transform.rigidbody.velocity = player.rigidbody.velocity;
 		EraseMagnet();
 		player.setPowerActivatedTimer(0f);
 		player.resetPowerBar();
@@ -88,5 +86,19 @@ public class Tesla : Hero {
 	{
 		magnet = player.transform.Find("Mesh").Find("Base").Find("Magnet");
 		magnet.particleSystem.Stop();
+	}
+
+	bool IsPowerKeyDown(float power_key)
+	{
+		bool is_down = true;
+
+		if(last_power_key != power_key && power_key == 1)
+			is_down = true;
+		else
+			is_down = false;
+
+		last_power_key = power_key;
+
+		return is_down;
 	}
 }
