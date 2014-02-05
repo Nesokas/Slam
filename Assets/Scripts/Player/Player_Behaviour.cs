@@ -109,26 +109,11 @@ public class Player_Behaviour : MonoBehaviour {
 		return colliding_with_ball;
 	}
 	
-	protected virtual void VerifyDash()
+	protected virtual void VerifyPower()
 	{
 		hero.UsePower(commands);
-//		Dash(commands.dash, commands.horizontal_direction, commands.vertical_direction);
 	}
-	
-	protected void Dash(float dash, float horizontal_direction, float vertical_direction)
-	{		
-//		if (dash != 0 && (Time.time > dash_cooldown) && (horizontal_direction != 0 || vertical_direction != 0)) {
-//			dash_cooldown =  DASH_COOLDOWN + Time.time;
-//			rigidbody.velocity *= DASH_STRENGTH;
-//			resetPowerBar();
-//
-//			// if networkView == null means localplay so we can't make an RPC
-//			if (networkView != null)
-//				networkView.RPC("EmmitDashSmoke",RPCMode.All);
-//			else
-//				EmmitDashSmoke();	
-//		}
-	}
+
 
 	public void resetPowerBar()
 	{
@@ -141,12 +126,12 @@ public class Player_Behaviour : MonoBehaviour {
 		POWER_COOLDOWN = power_cooldown;
 	}
 	
-	[RPC]
-	void EmmitDashSmoke()
-	{
+//	[RPC]
+//	void EmmitDashSmoke()
+//	{
 //		dash_smoke.particleEmitter.Emit();
 //		dash_smoke.particleSystem.Play();
-	}
+//	}
 	
 	public void GoalScored()
 	{
@@ -538,7 +523,7 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 		
 		IncreaseSpeed();
-		VerifyDash();
+		VerifyPower();
 		VerifyShoot();
 		UpdatePlayerIndicator();
 		UpdateRotation();

@@ -151,19 +151,19 @@ public class Network_Player: Kickoff_Player {
 		ChangeAnimation(reaction);
 	}
 	
-	override protected void VerifyDash()
+	override protected void VerifyPower()
 	{
 		if (Network.isServer){
-			networkView.RPC("UpdateServerDash", RPCMode.Others, commands.dash, commands.horizontal_direction, commands.vertical_direction);
-			Dash(commands.dash, commands.horizontal_direction, commands.vertical_direction);
+			networkView.RPC("UpdateServerPower", RPCMode.Others, commands.dash, commands.horizontal_direction, commands.vertical_direction);
+			hero.UsePower(commands);
 		}
 	}
 	
 	[RPC]
-	void UpdateServerDash(float dash, float horizontal_direction, float vertical_direction)
+	void UpdateServerPower(float dash, float horizontal_direction, float vertical_direction)
 	{
 		commands.dash = dash;
-		Dash(dash, horizontal_direction, vertical_direction);
+		hero.UsePower(commands);
 	}
 	
 	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
@@ -204,11 +204,11 @@ public class Network_Player: Kickoff_Player {
 		base.ReleasePlayers();
 	}
 	
-//	new void FixedUpdate()
-//	{
-//		base.FixedUpdate();
-//		
-//	}
+	[RPC]
+	void EmmitPowerFX(string type = "none")
+	{
+		hero.EmmitPowerFX(type);
+	}
 	
 
 }
