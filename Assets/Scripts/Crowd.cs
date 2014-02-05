@@ -60,11 +60,11 @@ public class Crowd : MonoBehaviour {
 	{
 		// Deactivate Sparkles
 		//GameObject sparkles = tesla.transform.Find("Bulb").GetChild(0).gameObject;
-		//sparkles.SetActive(false);
+		//Destroy(sparkles);
 
 		// Deactivate Magnet
 		GameObject magnet = tesla.transform.Find("Base/Magnet").gameObject;
-		magnet.SetActive(false);
+		Destroy(magnet);
 	}
 	
 	void Update() 
@@ -77,29 +77,10 @@ public class Crowd : MonoBehaviour {
 			StartCoroutine(fan_behaviour.Celebrate());
 		}
 
-		if(Input.GetKeyUp(KeyCode.Comma)) {
-			foreach(GameObject tesla in teslas) {
-				GameObject sparkles = tesla.transform.Find("Bulb").GetChild(0).gameObject;
-				sparkles.SetActive(false);
-			}
-		}
-
 		if(Input.GetKeyDown(KeyCode.M)) {
 			activate_crowd = !activate_crowd;
 			foreach(Transform child in transform) {
 				child.gameObject.SetActive(activate_crowd);
-			}
-		}
-
-		if(Input.GetKeyUp(KeyCode.N)) {
-			foreach(Transform child in transform) {
-				child.localScale = Vector3.one;
-			}
-		}
-
-		if(Input.GetKeyUp(KeyCode.K)) {
-			foreach(Transform child in transform) {
-				child.animation.Stop();
 			}
 		}
 	}

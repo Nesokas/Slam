@@ -39,7 +39,10 @@ public class Tesla : Hero {
 				is_using_power = true;
 				player.setPowerActivatedTimer(POWER_TIMER);
 				ball_pos = ball.transform.position;
-				player.networkView.RPC("EmmitPowerFX",RPCMode.All, "power_up");
+				if (player.networkView != null)
+					player.networkView.RPC("EmmitPowerFX",RPCMode.All, "power_up");
+				else
+					EmmitPowerFX("power_up");
 			} else if (is_using_power) {
 				StopPower();
 			} 
@@ -78,7 +81,10 @@ public class Tesla : Hero {
 		is_using_power = false;
 		if(player.IsCollidingWithBall())
 			ball.transform.rigidbody.velocity = player.rigidbody.velocity;
-		player.networkView.RPC("EmmitPowerFX",RPCMode.All, "power_down");
+		if (player.networkView != null)
+			player.networkView.RPC("EmmitPowerFX",RPCMode.All, "power_down");
+		else
+			EmmitPowerFX("power_down");
 		player.setPowerActivatedTimer(0f);
 		player.resetPowerBar();
 	}
