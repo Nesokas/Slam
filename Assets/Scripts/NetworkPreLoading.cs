@@ -8,7 +8,8 @@ public class NetworkPreLoading : MonoBehaviour {
 		GameObject loading = GameObject.Find("NetworkLoading(Clone)");
 		NetworkLoading network_loading = loading.GetComponent<NetworkLoading>();
 
-		network_loading.StartLoading();
+		Debug.Log("Pre Loading");
+		StartCoroutine(network_loading.StartLoading());
 	}
 	
 	// Update is called once per frame

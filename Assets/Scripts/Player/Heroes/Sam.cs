@@ -5,8 +5,8 @@ public class Sam : Hero {
 	
 	private Transform dash_smoke;
 	private Transform dash_bar_fill;
-	private float DASH_COOLDOWN = 1f;
-	private float DASH_STRENGTH = 12f;
+	private float DASH_COOLDOWN = 12f;
+	private float DASH_STRENGTH = 2f;
 	private float last_dash;
 
 	public Sam(Player_Behaviour player)
