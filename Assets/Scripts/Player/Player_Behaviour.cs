@@ -72,6 +72,12 @@ public class Player_Behaviour : MonoBehaviour {
 	protected Hero hero;
 	
 	private CameraMovement main_camera;
+
+	private float power_activated_timer;
+	private float POWER_ACTIVATED_TIMER;
+
+	private bool is_cooldown_over = true;
+	private bool is_power_activated_timer_over = false;
 	
 	void VerifyShoot()
 	{
@@ -127,6 +133,7 @@ public class Player_Behaviour : MonoBehaviour {
 	public void resetPowerBar()
 	{
 		power_cooldown = POWER_COOLDOWN+Time.time;
+		is_cooldown_over = false;
 //		dash_bar_fill.renderer.material.color = Color.red;
 	}
 
@@ -336,7 +343,10 @@ public class Player_Behaviour : MonoBehaviour {
 	public Texture dash_arrow_full;
 	public Texture dash_arrow_fill;
 	public Texture star;
-	
+	private Texture dash_arrow_texture;
+	private float current_power_value;
+	private float fill_percent;
+
 	void OnGUI()
 	{
 		float x=0;
@@ -435,19 +445,35 @@ public class Player_Behaviour : MonoBehaviour {
 				ScaleMode.ScaleToFit, 
 				true);
 		}
-		
-		// Dash indicator arrow
-		Texture dash_arrow_texture = dash_arrow_fill;
-		float current_value = POWER_COOLDOWN - (power_cooldown-Time.time);
-		
-		if (current_value < 0) {
-			current_value = POWER_COOLDOWN;
-		}else if (current_value > POWER_COOLDOWN) {
-			current_value = POWER_COOLDOWN;
+
+		if (POWER_ACTIVATED_TIMER == 0f) {
+			dash_arrow_texture = dash_arrow_fill;
+			is_cooldown_over = false;
+			current_power_value = POWER_COOLDOWN - (power_cooldown-Time.time);
+
+		} else {
 			dash_arrow_texture = dash_arrow_full;
+			current_power_value = power_activated_timer - Time.time;
+
 		}
-		float fill_percent = current_value/POWER_COOLDOWN;
+
+		if (current_power_value < 0) {
+			current_power_value = 0;
+			is_power_activated_timer_over = true;
+
+		}else if (current_power_value > POWER_COOLDOWN) {
+			current_power_value = POWER_COOLDOWN;
+			dash_arrow_texture = dash_arrow_full;
+			is_cooldown_over = true;
+		}
+
+		if (POWER_ACTIVATED_TIMER == 0f) {
+			fill_percent = current_power_value/POWER_COOLDOWN;
+		} else {
+			fill_percent = current_power_value/POWER_ACTIVATED_TIMER;
+		}
 		
+
 		float dash_arrow_width = 0.005f * Screen.width;
 		float dash_arrow_height = 0.004f * Screen.height;
 		
@@ -455,6 +481,23 @@ public class Player_Behaviour : MonoBehaviour {
 		GUI.BeginGroup(new Rect (x-(dash_arrow_width/2f), y - (dash_arrow_height/2f) + height*(1f-fill_percent), width + dash_arrow_width, height*fill_percent + dash_arrow_height - 0.002f*Screen.height));
 		GUI.DrawTexture(new Rect(0, -(1f-fill_percent)*height, width + dash_arrow_width, height + dash_arrow_height), dash_arrow_texture);
 		GUI.EndGroup();
+	}
+
+	public bool IsCooldownOver()
+	{
+		return is_cooldown_over;
+	}
+
+	public bool IsPowerTimerOver()
+	{
+		return is_power_activated_timer_over;
+	}
+
+	public void setPowerActivatedTimer(float value)
+	{
+		power_activated_timer = value + Time.time;
+		POWER_ACTIVATED_TIMER = value;
+		is_power_activated_timer_over = false;
 	}
 	
 	private void AnimateStar()

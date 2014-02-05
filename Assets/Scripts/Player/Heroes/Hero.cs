@@ -4,9 +4,9 @@ using System.Collections;
 public abstract class Hero {
 
 	protected GameObject hero_prefab;
-
+	protected Player_Behaviour player;
 	public abstract void UsePower(PlayerController.Commands commands);
-	protected float dash_cooldown;
+	protected float power_cooldown;
 
 	public abstract void Start();
 
@@ -19,6 +19,11 @@ public abstract class Hero {
 		hero.transform.localScale = Vector3.one;
 
 		hero.transform.name = "Mesh";
+	}
+
+	public bool IsCooldownOver()
+	{
+		return player.IsCooldownOver();
 	}
 
 }
