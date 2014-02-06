@@ -62,8 +62,10 @@ public class Main_Menu : MonoBehaviour
 	{
 		IPHostEntry host;
 		
-		host = Dns.GetHostEntry("soccerpucks.com");
-		string ip = host.AddressList[0].ToString();
+//		host = Dns.GetHostEntry("soccerpucks.com");
+//		string ip = host.AddressList[0].ToString();
+
+		string ip = "85.240.134.173";
 		
 		MasterServer.ipAddress = ip;
 		MasterServer.port = 23466;
