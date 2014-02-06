@@ -117,7 +117,6 @@ public class Lobby : MonoBehaviour
 			if(Network.isServer)
 				AddNetworkPlayer(Network.player, game_settings.player_name, SPECTATING);
 			else{
-				Debug.Log("Connect to server");
 				ConnectToServer();
 			}
 		}
@@ -376,7 +375,7 @@ public class Lobby : MonoBehaviour
 	void ConnectToServer()
 	{
 		show_lobby = true;
-		Network.Connect(game_settings.connect_to.ip, game_settings.connect_to.port);
+		Network.Connect(game_settings.connect_to.guid);
 	}
 	
 	void OnConnectedToServer()
