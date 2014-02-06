@@ -240,7 +240,7 @@ public class Main_Menu : MonoBehaviour
 				if(GUILayout.Button("Create", GUILayout.Width(BUTTON_SIDE_SIZE), GUILayout.Height(50f))){
 					if(!offline_game){
 						bool useNat = !Network.HavePublicAddress();
-						Network.InitializeServer(32, 25002, useNat);
+						Network.InitializeServer(32, 25002, false);
 					
 						// For now the game type will be "Default"
 						MasterServer.RegisterHost(GAME_TYPE, room_name);
