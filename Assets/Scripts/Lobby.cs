@@ -375,7 +375,7 @@ public class Lobby : MonoBehaviour
 	void ConnectToServer()
 	{
 		show_lobby = true;
-		Network.Connect(game_settings.connect_to.ip, game_settings.connect_to.port);
+		Network.Connect(game_settings.connect_to.guid);
 	}
 	
 	void OnConnectedToServer()
