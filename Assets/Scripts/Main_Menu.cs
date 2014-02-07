@@ -54,38 +54,39 @@ public class Main_Menu : MonoBehaviour
 	
 	private Vector2 rooms_scroll_position;
 	
-	private ArrayList available_rooms;
+	private RoomInfo[] available_rooms;
 
 	public GUIStyle main_menu_style;
 
 	void InitializeMSF()
 	{
-		IPHostEntry host;
-		
-		host = Dns.GetHostEntry("soccerpucks.com");
-		string ip = host.AddressList[0].ToString();
-		
-		MasterServer.ipAddress = ip;
-		MasterServer.port = 23466;
-		
-		Network.natFacilitatorIP = ip;
-		Network.natFacilitatorPort = 50005;
-		
-		MasterServer.ClearHostList();
-	    MasterServer.RequestHostList(GAME_TYPE);
-		MasterServer.updateRate = 2;
-		
-		HostData[] hostData = MasterServer.PollHostList();
-		room_selection = new bool[hostData.Length];
-		for(int i = 0; i < room_selection.Length; i++)
-			room_selection[i] = false;
+//		IPHostEntry host;
+//		
+//		host = Dns.GetHostEntry("soccerpucks.com");
+//		string ip = host.AddressList[0].ToString();
+//		
+//		MasterServer.ipAddress = ip;
+//		MasterServer.port = 23466;
+//		
+//		Network.natFacilitatorIP = ip;
+//		Network.natFacilitatorPort = 50005;
+//		
+//		MasterServer.ClearHostList();
+//	    MasterServer.RequestHostList(GAME_TYPE);
+//		MasterServer.updateRate = 2;
+//		
+//		HostData[] hostData = MasterServer.PollHostList();
+//		room_selection = new bool[hostData.Length];
+//		for(int i = 0; i < room_selection.Length; i++)
+//			room_selection[i] = false;
+		PhotonNetwork.ConnectUsingSettings("0.1");
 	}
 	
 	void Awake()
 	{
 		tab_selected = 0;
 		room_selected = 0;
-		available_rooms = new ArrayList();
+		available_rooms = PhotonNetwork.GetRoomList();
 		offline_game = false;
 		
 		room_name = "";
@@ -128,28 +129,33 @@ public class Main_Menu : MonoBehaviour
 
 	private void DrawRoomListNameField()
 	{
+		//RoomInfo[] rooms = PhotonNetwork.GetRoomList();
+		string[] room_names = new string[available_rooms.Length];
 
-			string[] room_names = new string[available_rooms.Count];
-			for(int i = 0; i < available_rooms.Count; i++) {
-				room_names[i] = ((HostData)available_rooms[i]).gameName;
-			}
-			room_selected = GUILayout.SelectionGrid(room_selected, room_names, 1, GUILayout.MinWidth(Screen.width*0.38f), GUILayout.ExpandWidth(true));
+
+		for(int i = 0; i < available_rooms.Length; i++) {
+			room_names[i] = available_rooms[i].name;
+		}
+
+		room_selected = GUILayout.SelectionGrid(room_selected, room_names, 1, GUILayout.MinWidth(Screen.width*0.38f), GUILayout.ExpandWidth(true));
 
 	}
 
 	private void DrawRoomListInfoFields()
 	{
-		string[] room_names = new string[available_rooms.Count];
+		string[] room_names = new string[available_rooms.Length];
 		total_players_connected = 0;
-		for(int i = 0; i < room_names.Length; i++) {
+		//RoomInfo[] rooms = PhotonNetwork.GetRoomList();
+
+		for(int i = 0; i < available_rooms.Length; i++) {
 			GUILayout.BeginHorizontal();
-			GUILayout.Label(((HostData)available_rooms[i]).gameType, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-			GUILayout.Label(((HostData)available_rooms[i]).connectedPlayers + "/" + ((HostData)available_rooms[i]).playerLimit, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-			Ping player_ping = new Ping(((HostData)available_rooms[i]).ip.ToString());
-			GUILayout.Label(player_ping.time.ToString(), GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-			GUILayout.Label("Country" + i, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+//			GUILayout.Label(((HostData)available_rooms[i]).gameType, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+			GUILayout.Label(available_rooms[i].playerCount + "/" + available_rooms[i].maxPlayers, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+//			Ping player_ping = new Ping(((HostData)available_rooms[i]).ip.ToString());
+//			GUILayout.Label(player_ping.time.ToString(), GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+//			GUILayout.Label("Country" + i, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
 			GUILayout.EndHorizontal();
-			total_players_connected = total_players_connected + 1 + ((HostData)available_rooms[i]).connectedPlayers;
+			total_players_connected = total_players_connected + 1 + available_rooms[i].playerCount;
 		}
 	}
 
@@ -172,14 +178,18 @@ public class Main_Menu : MonoBehaviour
 	private void DrawActionSidebar()
 	{
 		if(GUILayout.Button("Connect", GUILayout.Width(100f), GUILayout.Height(50f))) {
-			game_settings.connected = true;
-			game_settings.connect_to = (HostData)available_rooms[room_selected];
-			Application.LoadLevel("Pre_Game_Lobby");
+			Debug.Log(room_selected + " -> " + available_rooms.Length);
+			if(available_rooms.Length != 0) {
+				game_settings.connected = true;
+				game_settings.room_name = available_rooms[room_selected].name;
+				Application.LoadLevel("Pre_Game_Lobby");
+			}
 		}
 		GUILayout.FlexibleSpace();
 		if(GUILayout.Button ("Refresh")) {
-			MasterServer.ClearHostList();
-			MasterServer.RequestHostList(GAME_TYPE);
+			//MasterServer.ClearHostList();
+			//MasterServer.RequestHostList(GAME_TYPE);
+			available_rooms = PhotonNetwork.GetRoomList();
 		}
 		for (int i = 0; i < 75; i++)
 			GUILayout.FlexibleSpace();
@@ -191,14 +201,14 @@ public class Main_Menu : MonoBehaviour
 	void JoinRoom()
 	{
 		// Draw existing rooms
-		if (MasterServer.PollHostList().Length != 0) {
-            HostData[] hostData = MasterServer.PollHostList();
-			available_rooms = new ArrayList();
-            for (int i = 0; i < hostData.Length; i++) {
-				available_rooms.Add(hostData[i]);
-            }
-            MasterServer.ClearHostList();
-        }
+//		if (MasterServer.PollHostList().Length != 0) {
+//            HostData[] hostData = MasterServer.PollHostList();
+//			available_rooms = new ArrayList();
+//            for (int i = 0; i < hostData.Length; i++) {
+//				available_rooms.Add(hostData[i]);
+//            }
+//            MasterServer.ClearHostList();
+//        }
 		GUILayout.BeginVertical("box");
 			GUILayout.BeginHorizontal(GUILayout.Width(Screen.width*0.85f));
 				DrawRoomListTableHeader();
@@ -239,13 +249,18 @@ public class Main_Menu : MonoBehaviour
 			GUILayout.BeginVertical();
 				if(GUILayout.Button("Create", GUILayout.Width(BUTTON_SIDE_SIZE), GUILayout.Height(50f))){
 					if(!offline_game){
-						bool useNat = !Network.HavePublicAddress();
-						Network.InitializeServer(32, 25002, useNat);
-					
-						// For now the game type will be "Default"
-						MasterServer.RegisterHost(GAME_TYPE, room_name);
+//						bool useNat = !Network.HavePublicAddress();
+//						Network.InitializeServer(32, 25002, useNat);
+//					
+//						// For now the game type will be "Default"
+//						MasterServer.RegisterHost(GAME_TYPE, room_name);
+
+						PhotonNetwork.CreateRoom(room_name);
 						
 						game_settings.local_game = false;
+						game_settings.is_game_creator = true;
+						game_settings.game_creator = PhotonNetwork.player;
+
 					} else {
 						game_settings.local_game = true;
 					}

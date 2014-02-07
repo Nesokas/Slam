@@ -82,18 +82,18 @@ public class GameStarter : MonoBehaviour {
 				team_2_total--;
 			}
 
-			InstantiateNewNetworkPlayer(start_position, player.network_player, player.team, player.player_name, texture_id, player.hero_index);
+			InstantiateNewNetworkPlayer(start_position, player.photon_player, player.team, player.player_name, texture_id, player.hero_index);
 			
 			texture_id++;
 		}
 	}
 
-	void InstantiateNewNetworkPlayer(Vector3 start_position, NetworkPlayer network_player, int team, string name, int texture_id, int hero_index) 
+	void InstantiateNewNetworkPlayer(Vector3 start_position, PhotonPlayer photon_player, int team, string name, int texture_id, int hero_index) 
 	{
-		GameObject player = (GameObject)Network.Instantiate(net_player_prefab, start_position, transform.rotation, 0);
+		GameObject player = PhotonNetwork.Instantiate("Prefab/Network_Player", start_position, transform.rotation, 0);
 		
 		Network_Player np = (Network_Player)player.GetComponent<Network_Player>();
-		np.InitializePlayerInfo(network_player, team, name, start_position, texture_id, hero_index);
+		np.InitializePlayerInfo(photon_player, team, name, start_position, texture_id, hero_index);
 		np.Start();
 		
 		Network_Game net_game = game_manager_object.GetComponent<Network_Game>();

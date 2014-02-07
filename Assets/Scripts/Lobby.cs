@@ -66,12 +66,13 @@ public class Lobby : MonoBehaviour
 	private int players_ready = 0;
 
 	private Camera[] other_choices_cameras;
+	private PhotonView photonView;
 
 	private struct Player
 	{
 		public string name;
 		public int team;
-		public NetworkPlayer network_player;
+		public PhotonPlayer photon_player;
 		public int controller;
 		public bool is_network;
 
@@ -109,13 +110,12 @@ public class Lobby : MonoBehaviour
 		
 		if(game_settings.IsLocalGame()) {
 			local_game = true;
-
 		} else {
-			networkView.group = 1;
-			Network.SetLevelPrefix(1);
-			
-			if(Network.isServer)
-				AddNetworkPlayer(Network.player, game_settings.player_name, SPECTATING);
+//			networkView.group = 1;
+//			Network.SetLevelPrefix(1);
+			photonView = PhotonView.Get(this);
+			if(game_settings.is_game_creator)
+				AddNetworkPlayer(PhotonNetwork.player, game_settings.player_name, SPECTATING);
 			else{
 				ConnectToServer();
 			}
@@ -140,10 +140,10 @@ public class Lobby : MonoBehaviour
 	}
 	
 	[RPC]
-	void AddNetworkPlayer (NetworkPlayer network_player, string player_name, int team = SPECTATING)
+	void AddNetworkPlayer (PhotonPlayer photon_player, string player_name, int team = SPECTATING)
 	{
 		Player player = CreatePlayer((string)player_name, team);
-		player.network_player = network_player;
+		player.photon_player = photon_player;
 		player.is_network = true;
 
 		switch(team){
@@ -158,7 +158,7 @@ public class Lobby : MonoBehaviour
 				break;
 		}
 
-		if(network_player == Network.player)
+		if(photon_player == PhotonNetwork.player)
 			self_player = player;
 	}
 	
@@ -180,22 +180,22 @@ public class Lobby : MonoBehaviour
 		}
 	}
 	
-	void DestroyNetworkPlayer(GameObject[] players, NetworkPlayer network_player)
+	void DestroyNetworkPlayer(GameObject[] players, PhotonPlayer photon_player)
 	{
 		foreach(GameObject player_object in players) {
 			Network_Player player = player_object.GetComponent<Network_Player>();
-			if(player.owner == network_player) {
+			if(player.owner == photon_player) {
 				Network.Destroy(player_object);
 				return;
 			}
 		}
 	}
 	
-	bool IsNetworkPlayerInstanciated(GameObject[] players, NetworkPlayer network_player)
+	bool IsNetworkPlayerInstanciated(GameObject[] players, PhotonPlayer photon_player)
 	{
 		foreach(GameObject player_object in players) {
 			Network_Player player = player_object.GetComponent<Network_Player>();
-			if(player.owner == network_player)
+			if(player.owner == photon_player)
 				return true;
 		}
 		
@@ -237,12 +237,12 @@ public class Lobby : MonoBehaviour
 		}
 	}
 	
-	void InstanciateNewNetworkPlayer(Vector3 start_position, NetworkPlayer network_player, int team, string name, int texture_id) 
+	void InstanciateNewNetworkPlayer(Vector3 start_position, PhotonPlayer photon_player, int team, string name, int texture_id) 
 	{
 		GameObject player = (GameObject)Network.Instantiate(net_player_prefab, start_position, transform.rotation, 0);
 						
 		Network_Player np = (Network_Player)player.GetComponent<Network_Player>();
-		np.InitializePlayerInfo(network_player, team, name, start_position, texture_id, 0);
+		np.InitializePlayerInfo(photon_player, team, name, start_position, texture_id, 0);
 		np.Start();
 		
 		Network_Game net_game = game_manager_object.GetComponent<Network_Game>();
@@ -262,57 +262,57 @@ public class Lobby : MonoBehaviour
 	}
 
 
-	void StartNetworkGame()
-	{
-		int players_team_1 = team_1.Count;
-		int players_team_2 = team_2.Count;
-		
-		float court_lenght = court_start_position_team_1.transform.position.x*(-2);
-		float distance_team_1 = court_lenght/(players_team_1+1);
-		float distance_team_2 = court_lenght/(players_team_2+1);
-		
-		if(game_manager_object == null)
-			game_manager_object = (GameObject)Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
-
-		int texture_id = 0;
-		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-		
-		for(int i = 0; i < team_1.Count; i++) {
-			Vector3 start_position = new Vector3(0,0,0);
-			start_position = court_start_position_team_1.transform.position;
-			start_position.x = start_position.x + distance_team_1*players_team_1;
-			players_team_1--;
-			
-			if(!IsNetworkPlayerInstanciated(players, team_1[i].network_player))
-				InstanciateNewNetworkPlayer(start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
-			else
-				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
-			
-			texture_id++;
-		}
-		
-		for(int i = 0; i < team_2.Count; i++){
-			Vector3 start_position = new Vector3(0,0,0);
-			start_position = court_start_position_team_2.transform.position;
-			start_position.x = start_position.x + distance_team_2*players_team_2;
-			players_team_2--;
-			
-			if(!IsNetworkPlayerInstanciated(players, team_2[i].network_player))
-				InstanciateNewNetworkPlayer(start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
-			else
-				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
-			
-			texture_id++;
-		}
-		
-		for(int i = 0; i < spectating.Count; i++){
-			if(IsNetworkPlayerInstanciated(players, spectating[i].network_player))
-				DestroyNetworkPlayer(players, spectating[i].network_player);
-		}
-		/*****************************************************************************************************************/
-		
-		networkView.RPC ("DisableLobby", RPCMode.All);
-	}
+//	void StartNetworkGame()
+//	{
+//		int players_team_1 = team_1.Count;
+//		int players_team_2 = team_2.Count;
+//		
+//		float court_lenght = court_start_position_team_1.transform.position.x*(-2);
+//		float distance_team_1 = court_lenght/(players_team_1+1);
+//		float distance_team_2 = court_lenght/(players_team_2+1);
+//		
+//		if(game_manager_object == null)
+//			game_manager_object = (GameObject)Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
+//
+//		int texture_id = 0;
+//		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+//		
+//		for(int i = 0; i < team_1.Count; i++) {
+//			Vector3 start_position = new Vector3(0,0,0);
+//			start_position = court_start_position_team_1.transform.position;
+//			start_position.x = start_position.x + distance_team_1*players_team_1;
+//			players_team_1--;
+//			
+//			if(!IsNetworkPlayerInstanciated(players, team_1[i].network_player))
+//				InstanciateNewNetworkPlayer(start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
+//			else
+//				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
+//			
+//			texture_id++;
+//		}
+//		
+//		for(int i = 0; i < team_2.Count; i++){
+//			Vector3 start_position = new Vector3(0,0,0);
+//			start_position = court_start_position_team_2.transform.position;
+//			start_position.x = start_position.x + distance_team_2*players_team_2;
+//			players_team_2--;
+//			
+//			if(!IsNetworkPlayerInstanciated(players, team_2[i].network_player))
+//				InstanciateNewNetworkPlayer(start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
+//			else
+//				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
+//			
+//			texture_id++;
+//		}
+//		
+//		for(int i = 0; i < spectating.Count; i++){
+//			if(IsNetworkPlayerInstanciated(players, spectating[i].network_player))
+//				DestroyNetworkPlayer(players, spectating[i].network_player);
+//		}
+//		/*****************************************************************************************************************/
+//		
+//		networkView.RPC ("DisableLobby", RPCMode.All);
+//	}
 
 	[RPC]
 	void DisableLobby()
@@ -375,28 +375,48 @@ public class Lobby : MonoBehaviour
 	void ConnectToServer()
 	{
 		show_lobby = true;
-		Network.Connect(game_settings.connect_to.guid);
+		PhotonNetwork.JoinRoom(game_settings.room_name);
+//		Network.Connect(game_settings.connect_to.guid);
+	}
+
+	void OnJoinedRoom()
+	{
+		photonView.RPC("AskForGameCreator", PhotonTargets.Others, PhotonNetwork.player);
+	}
+
+	[RPC]
+	void AskForGameCreator(PhotonPlayer photon_player)
+	{
+		if(game_settings.is_game_creator)
+			photonView.RPC("TellGameCreator", photon_player, game_settings.game_creator);
+	}
+
+	[RPC]
+	void TellGameCreator(PhotonPlayer photon_player)
+	{
+		game_settings.game_creator = photon_player;
+		photonView.RPC("TellName", game_settings.game_creator, PhotonNetwork.player, game_settings.player_name);
 	}
 	
-	void OnConnectedToServer()
-	{
-		networkView.RPC("TellName", RPCMode.Server, Network.player, game_settings.player_name);
-	}
+//	void OnConnectedToServer()
+//	{
+//		networkView.RPC("TellName", RPCMode.Server, Network.player, game_settings.player_name);
+//	}
 	
 	[RPC]
-	void TellName(NetworkPlayer network_player, string new_player_name)
+	void TellName(PhotonPlayer photon_player, string new_player_name)
 	{
 		/******* Initialize new player lists *********/
 		for(int i = 0; i < team_1.Count; i++)
-			networkView.RPC("AddNetworkPlayer", network_player, team_1[i].network_player, team_1[i].name, TEAM_1);
+			photonView.RPC("AddNetworkPlayer", photon_player, team_1[i].photon_player, team_1[i].name, TEAM_1);
 		for(int i = 0; i < team_2.Count; i++)
-			networkView.RPC("AddNetworkPlayer", network_player, team_2[i].network_player, team_2[i].name, TEAM_2);
+			photonView.RPC("AddNetworkPlayer", photon_player, team_2[i].photon_player, team_2[i].name, TEAM_2);
 		for(int i = 0; i < spectating.Count; i++)
-			networkView.RPC("AddNetworkPlayer", network_player, spectating[i].network_player, spectating[i].name, SPECTATING);
+			photonView.RPC("AddNetworkPlayer", photon_player, spectating[i].photon_player, spectating[i].name, SPECTATING);
 		/********************************************/
 		
-		networkView.RPC("AddNetworkPlayer", RPCMode.All, network_player, new_player_name, SPECTATING);
-		networkView.RPC("StartPlayers", network_player);
+		photonView.RPC("AddNetworkPlayer", PhotonTargets.All, photon_player, new_player_name, SPECTATING);
+		photonView.RPC("StartPlayers", photon_player);
 	}
 	
 	[RPC]
@@ -418,7 +438,7 @@ public class Lobby : MonoBehaviour
 			int new_team = SPECTATING;
 			
 			GUILayout.BeginHorizontal();
-				if((team == TEAM_2 || team == SPECTATING) && (local_game || Network.isServer)) {
+				if((team == TEAM_2 || team == SPECTATING) && (local_game || game_settings.is_game_creator)) {
 					if(GUILayout.Button("<", GUILayout.MaxWidth(0.03f*Screen.width))) {
 						if(team == SPECTATING)
 							new_team = TEAM_1;
@@ -427,11 +447,11 @@ public class Lobby : MonoBehaviour
 				}
 				GUILayout.FlexibleSpace();
 				GUILayout.Label(players[i].name);
-				if(!local_game && players[i].network_player != Network.player) {
-					GUILayout.Label("" + Network.GetAveragePing(players[i].network_player));
-				}
+				//if(!local_game && players[i].photon_player != PhotonNetwork.player) {
+				//	GUILayout.Label("" + Network.GetAveragePing(players[i].network_player));
+				//}
 				GUILayout.FlexibleSpace();
-				if((team == TEAM_1 || team == SPECTATING) && (local_game || Network.isServer)) {
+				if((team == TEAM_1 || team == SPECTATING) && (local_game || game_settings.is_game_creator)) {
 					if(GUILayout.Button(">", GUILayout.MaxWidth(0.03f*Screen.width))) {
 						if(team == SPECTATING)
 							new_team = TEAM_2;
@@ -444,7 +464,7 @@ public class Lobby : MonoBehaviour
 				if(local_game)
 					ChangeLocalPlayerTeam(players[i].controller, team, new_team);
 				else
-					networkView.RPC("ChangeNetworkPlayerTeam", RPCMode.All, players[i].network_player, team, new_team);
+					photonView.RPC("ChangeNetworkPlayerTeam", PhotonTargets.All, players[i].photon_player, team, new_team);
 			}
 		}
 	}
@@ -476,7 +496,7 @@ public class Lobby : MonoBehaviour
 	
 	/* When in a lobby the admin moves the player between teams, we use this function*/
 	[RPC]
-	void ChangeNetworkPlayerTeam(NetworkPlayer network_player, int old_team, int new_team)
+	void ChangeNetworkPlayerTeam(PhotonPlayer photon_player, int old_team, int new_team)
 	{
 		List<Player> old_player_team = spectating;
 		
@@ -493,42 +513,42 @@ public class Lobby : MonoBehaviour
 		}
 		
 		for(int i = 0; i < old_player_team.Count; i++){
-			if(old_player_team[i].network_player == network_player){
-				AddNetworkPlayer(network_player, old_player_team[i].name, new_team);
+			if(old_player_team[i].photon_player == photon_player){
+				AddNetworkPlayer(photon_player, old_player_team[i].name, new_team);
 				old_player_team.RemoveAt(i);
 				return;
 			}
 		}
 	}
 	
-	void OnPlayerDisconnected(NetworkPlayer network_player)
+	void OnPhotonPlayerDisconnected(PhotonPlayer photon_player)
 	{
-		Network.RemoveRPCs(network_player);
-		Network.DestroyPlayerObjects (network_player);
-		
-		networkView.RPC("RemovePlayer", RPCMode.All, network_player);
+//		Network.RemoveRPCs(network_player);
+//		Network.DestroyPlayerObjects (network_player);
 
-		if(Network.isServer)
-			MasterServer.UnregisterHost();
+		if(game_settings.game_creator == photon_player)
+			PhotonNetwork.Disconnect();
+		else
+			RemovePlayer(photon_player);
 	}
 	
 	[RPC]
-	void RemovePlayer(NetworkPlayer network_player)
+	void RemovePlayer(PhotonPlayer photon_player)
 	{
 		for(int i = 0; i < team_1.Count; i++){
-			if(team_1[i].network_player == network_player){
+			if(team_1[i].photon_player == photon_player){
 				team_1.RemoveAt(i);
 				return;
 			}
 		}
 		for(int i = 0; i < team_2.Count; i++){
-			if(team_2[i].network_player == network_player){
+			if(team_2[i].photon_player == photon_player){
 				team_2.RemoveAt(i);
 				return;
 			}
 		}
 		for(int i = 0; i < spectating.Count; i++){
-			if(spectating[i].network_player == network_player){
+			if(spectating[i].photon_player == photon_player){
 				spectating.RemoveAt(i);
 				return;
 			}
@@ -582,14 +602,14 @@ public class Lobby : MonoBehaviour
 						Application.LoadLevel("Main_Game");
 					GUILayout.FlexibleSpace();
 				}
-				if(Network.isServer || local_game){
+				if(game_settings.is_game_creator || local_game){
 					if(!local_game)
 						GUILayout.FlexibleSpace();
 					if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width))) {
 						if(local_game)
 							LocalHeroSelectScreen();
 						else
-							networkView.RPC("NetworkHeroSelectScreen", RPCMode.All);
+							photonView.RPC("NetworkHeroSelectScreen", PhotonTargets.All);
 					}
 				}
 			GUILayout.FlexibleSpace();
@@ -677,29 +697,30 @@ public class Lobby : MonoBehaviour
 		Material team_color;
 
 		if(self_player.team == 1) {
-			hero_script.InitializeNetworkPlayer(TEAM_1, self_player.name, 0, Network.player, this);
+			hero_script.InitializeNetworkPlayer(TEAM_1, self_player.name, 0, PhotonNetwork.player, this);
 		} else {
-			hero_script.InitializeNetworkPlayer(TEAM_2, self_player.name, 0, Network.player, this);
+			hero_script.InitializeNetworkPlayer(TEAM_2, self_player.name, 0, PhotonNetwork.player, this);
 		}
 	}
 
 	public void HeroChanged(int hero_index)
 	{
 		if(!local_game){
-			networkView.RPC("RPC_HeroChanged", RPCMode.All, hero_index, Network.player);
+			photonView.RPC("RPC_HeroChanged", PhotonTargets.All, hero_index, PhotonNetwork.player);
 		}
 	}
 
 	[RPC]
-	void RPC_HeroChanged(int hero_index, NetworkPlayer network_player)
+	void RPC_HeroChanged(int hero_index, PhotonPlayer photon_player)
 	{
 		List<Player> allPlayers = new List<Player>(team_1);
 		allPlayers.AddRange(team_2);
 
 		for(int i = 0; i < allPlayers.Count; i++){
-			if(allPlayers[i].network_player == network_player){
+			if(allPlayers[i].photon_player == photon_player){
 				OtherHeroChoices other = allPlayers[i].hero_choosen.GetComponent<OtherHeroChoices>();
 				other.ChangeHero(hero_index);
+				break;
 			}
 		}
 	}
@@ -760,12 +781,12 @@ public class Lobby : MonoBehaviour
 				Application.LoadLevel("Main_Game");
 
 		} else {
-			networkView.RPC("RPC_PlayerReady", RPCMode.All, Network.player, player.texture_id);
+			photonView.RPC("RPC_PlayerReady", PhotonTargets.All, PhotonNetwork.player, player.texture_id);
 		}
 	}
 
 	[RPC]
-	void RPC_PlayerReady(NetworkPlayer network_player, int texture_id) {
+	void RPC_PlayerReady(PhotonPlayer photon_player, int texture_id) {
 
 		players_ready++;
 
@@ -773,7 +794,7 @@ public class Lobby : MonoBehaviour
 		allPlayers.AddRange(team_2);
 		
 		for(int i = 0; i < allPlayers.Count; i++){
-			if(allPlayers[i].network_player == network_player){
+			if(allPlayers[i].photon_player == photon_player){
 				Hero_Selection.Player player = new Hero_Selection.Player();
 				OtherHeroChoices other = allPlayers[i].hero_choosen.GetComponent<OtherHeroChoices>();
 
@@ -781,21 +802,21 @@ public class Lobby : MonoBehaviour
 				player.player_name = allPlayers[i].name;
 				player.team = allPlayers[i].team;
 				player.texture_id = texture_id;
-				player.network_player = allPlayers[i].network_player;
+				player.photon_player = allPlayers[i].photon_player;
 
-				if(Network.isServer) {
+				if(game_settings.is_game_creator) {
 					game_settings.AddPlayer(player);
 				}
 				break;
 			}
 		}
 	
-		if (Network.isServer && players_ready == (team_1.Count + team_2.Count)) {
-			Network.Instantiate(network_loading_prefab, 
-			                    network_loading_prefab.transform.position,
-			                    network_loading_prefab.transform.rotation,
-			                    0);
-			networkView.RPC("StartGame", RPCMode.All);
+		if (game_settings.is_game_creator && players_ready == (team_1.Count + team_2.Count)) {
+			PhotonNetwork.Instantiate("Prefab/NetworkLoading",
+			                          network_loading_prefab.transform.position,
+			                          network_loading_prefab.transform.rotation,
+			                          0);
+			photonView.RPC("StartGame", PhotonTargets.All);
 		}
 
 	}

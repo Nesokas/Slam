@@ -9,7 +9,10 @@ public class Game_Settings : MonoBehaviour {
 	public bool local_game;
 	public string player_name;
 	public bool connected;
-	public HostData connect_to;
+	public string connect_to;
+	public bool is_game_creator;
+	public string room_name;
+	public PhotonPlayer game_creator;
 
 	public List<Hero_Selection.Player> players_list;
 
