@@ -12,10 +12,15 @@ public class Predictor {
 	public Transform observed_transform;
 	
 	public Vector3 server_pos;
-	
+	private Game_Settings game_settings;
+
+
 	public Predictor(Transform transform)
 	{
 		observed_transform = transform;
+
+		GameObject settings = GameObject.FindGameObjectWithTag("settings");
+		game_settings = settings.GetComponent<Game_Settings>();
 	}
 	
 	public void LerpPosToTarget()
@@ -31,7 +36,7 @@ public class Predictor {
 		}
 	}
 	
-	public void OnSerializeNetworkViewBall(BitStream stream, NetworkMessageInfo info)
+	public void OnSerializePhotonViewBall(PhotonStream stream, PhotonMessageInfo info)
 	{
 		Vector3 pos = observed_transform.position;
 		Vector3 angVelocity = observed_transform.rigidbody.angularVelocity;
@@ -39,16 +44,17 @@ public class Predictor {
 		
 		if (stream.isWriting) {
 		
-			stream.Serialize(ref pos);
-			stream.Serialize(ref velocity);
-			stream.Serialize(ref angVelocity);
+			stream.SendNext(pos);
+			stream.SendNext(velocity);
+			stream.SendNext(angVelocity);
 			
 		} else {
 			
 			//This code takes care of the local client
-			stream.Serialize(ref pos);
-			stream.Serialize(ref velocity);
-			stream.Serialize(ref angVelocity);
+			pos = (Vector3)stream.ReceiveNext();
+			velocity = (Vector3)stream.ReceiveNext();
+			angVelocity = (Vector3)stream.ReceiveNext();
+
 			server_pos = pos;
 			
 			// smoothly correct clients position
@@ -60,21 +66,22 @@ public class Predictor {
 	}
 	
 	
-	public void OnSerializeNetworkViewPlayer(BitStream stream, NetworkMessageInfo info)
+	public void OnPhotonSerializeViewPlayer(PhotonStream stream, PhotonMessageInfo info)
 	{
+		Debug.Log("Called");
 		Vector3 pos = observed_transform.position;
 		Vector3 velocity = observed_transform.rigidbody.velocity;
 		
 		if (stream.isWriting) {
 		
-			stream.Serialize(ref pos);
-			stream.Serialize(ref velocity);
+			stream.SendNext(pos);
+			stream.SendNext(velocity);
 			
 		} else {
 			
 			//This code takes care of the local client
-			stream.Serialize(ref pos);
-			stream.Serialize(ref velocity);
+			pos = (Vector3)stream.ReceiveNext();
+			velocity = (Vector3)stream.ReceiveNext();
 			server_pos = pos;
 			
 			// smoothly correct clients position
@@ -91,17 +98,17 @@ public class Predictor {
 		return observed_transform;
 	}
 	
-	public void PredictPlayer(NetworkView networkView)
+	public void PredictPlayer(PhotonView photonView)
 	{
 		
-		if (Network.player == networkView.owner || Network.isServer) {
+		if (PhotonNetwork.player == photonView.owner || game_settings.is_game_creator) {
 			return; //This is only for remote peers, get off!!
 		}
 		
 		//client side has **only the server connected**
-		client_ping = (Network.GetAveragePing(Network.connections[0]) / 100) + PING_MARGIN;
+		client_ping = (PhotonNetwork.networkingPeer.RoundTripTime / 100) + PING_MARGIN;
 		
-		float interpolation_time = (float)Network.time - client_ping;
+		float interpolation_time = (float)PhotonNetwork.time - client_ping;
 		
 		//ensure the buffer has at last one element
 		if (server_state == null)
@@ -116,9 +123,9 @@ public class Predictor {
 			
 			float x,y,z;
 		
-			x = server_state.pos.x + server_state.velocity.x*((float)Network.time - server_state.timestamp);
-			y = server_state.pos.y + server_state.velocity.y*((float)Network.time - server_state.timestamp);
-			z = server_state.pos.z + server_state.velocity.z*((float)Network.time - server_state.timestamp);
+			x = server_state.pos.x + server_state.velocity.x*((float)PhotonNetwork.time - server_state.timestamp);
+			y = server_state.pos.y + server_state.velocity.y*((float)PhotonNetwork.time - server_state.timestamp);
+			z = server_state.pos.z + server_state.velocity.z*((float)PhotonNetwork.time - server_state.timestamp);
 			
 			RaycastHit hit;
 			Vector3 predicted_pos = new Vector3(x,y,z);
@@ -143,17 +150,17 @@ public class Predictor {
 	}
 	
 	
-	public void PredictBall(NetworkView networkView)
+	public void PredictBall(PhotonView photonView)
 	{
 		
-		if (Network.player == networkView.owner || Network.isServer) {
+		if (PhotonNetwork.player == photonView.owner || game_settings.is_game_creator) {
 			return; //This is only for remote peers, get off!!
 		}
 		
 		//client side has **only the server connected**
-		client_ping = (Network.GetAveragePing(Network.connections[0]) / 100) + PING_MARGIN;
+		client_ping = (PhotonNetwork.networkingPeer.RoundTripTime / 100) + PING_MARGIN;
 		
-		float interpolation_time = (float)Network.time - client_ping;
+		float interpolation_time = (float)PhotonNetwork.time - client_ping;
 		
 		//ensure the buffer has at last one element
 		if (server_state == null)
@@ -170,9 +177,9 @@ public class Predictor {
 			
 			float x,y,z;
 		
-			x = server_state.pos.x + server_state.velocity.x*((float)Network.time - server_state.timestamp);
-			y = server_state.pos.y + server_state.velocity.y*((float)Network.time - server_state.timestamp);
-			z = server_state.pos.z + server_state.velocity.z*((float)Network.time - server_state.timestamp);
+			x = server_state.pos.x + server_state.velocity.x*((float)PhotonNetwork.time - server_state.timestamp);
+			y = server_state.pos.y + server_state.velocity.y*((float)PhotonNetwork.time - server_state.timestamp);
+			z = server_state.pos.z + server_state.velocity.z*((float)PhotonNetwork.time - server_state.timestamp);
 			
 			RaycastHit hit;
 			Vector3 predicted_pos = new Vector3(x,y,z);

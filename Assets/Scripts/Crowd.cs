@@ -29,7 +29,8 @@ public class Crowd : MonoBehaviour {
 			
 		foreach(Transform fan in transform) {
 
-			GameObject hero_to_instanciate = heroes[Random.Range(0, heroes.Length)];
+//			GameObject hero_to_instanciate = heroes[Random.Range(0, heroes.Length)];
+			GameObject hero_to_instanciate = heroes[0];
 
 			GameObject hero = (GameObject)Instantiate(hero_to_instanciate);
 			hero.transform.parent = fan;

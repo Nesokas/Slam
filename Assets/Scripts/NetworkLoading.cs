@@ -7,14 +7,18 @@ public class NetworkLoading : MonoBehaviour {
 	int total_load_complete = 0;
 	bool is_loading = false;
 	Game_Settings game_settings;
+	PhotonView photonView;
+	NetworkPreLoading network_pre_loading;
 
 	void Awake(){
 		DontDestroyOnLoad(this);
 		GameObject settings = GameObject.FindGameObjectWithTag("settings");
 		game_settings = settings.GetComponent<Game_Settings>();
+
+		photonView = PhotonView.Get(this);
 	}
 
-	public IEnumerator StartLoading()
+	public IEnumerator StartLoading(NetworkPreLoading network_pre_loading)
 	{
 		Debug.Log("Start Loading");
 		is_loading = true;
@@ -24,10 +28,20 @@ public class NetworkLoading : MonoBehaviour {
 		AsyncOperation async = Application.LoadLevelAsync("Main_Game");
 		yield return async;
 
-		Debug.Log("Loading Complete");
-		networkView.RPC("LoadingComplete", RPCMode.Server);
+		this.network_pre_loading = network_pre_loading;
+		Debug.Log("Loading Complete: " + total_players);
+		photonView.RPC("LoadingComplete", game_settings.game_creator);
+
+		if(!game_settings.is_game_creator) {
+			GameObject loading_camera = GameObject.Find("NetworkLoadingCamera");
+
+			Destroy(loading_camera);
+			Destroy(network_pre_loading);
+			Destroy(this);
+		}
 	}
 
+	[RPC]
 	void LoadingComplete()
 	{
 		total_load_complete++;
@@ -36,9 +50,21 @@ public class NetworkLoading : MonoBehaviour {
 			GameObject starter = GameObject.Find("GameStarter");
 			GameStarter game_starter = starter.GetComponent<GameStarter>();
 
-			is_loading = false;
+			photonView.RPC("StopLoading", PhotonTargets.All);
 			game_starter.StartNetworkGame();
+
+			GameObject loading_camera = GameObject.Find("NetworkLoadingCamera");
+			
+			Destroy(loading_camera);
+			Destroy(network_pre_loading);
+			Destroy(this);
 		}
+	}
+
+	[RPC]
+	void StopLoading()
+	{
+		is_loading = false;
 	}
 
 	void OnGUI()

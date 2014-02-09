@@ -7,6 +7,8 @@ public class Network_Game : Game_Behaviour {
 	public GameObject chat_prefab;
 
 	Dictionary<NetworkPlayer, bool> players_ready;
+	private Game_Settings game_settings;
+	private PhotonView photonView;
 
 //	protected void OnPlayerDisconnected(NetworkPlayer player) 
 //	{
@@ -42,7 +44,7 @@ public class Network_Game : Game_Behaviour {
 	
 	protected override void MovePlayersToStartPositions()
 	{
-		if(Network.isServer) {
+		if(game_settings.is_game_creator) {
 			ball.transform.position = ball_position;
 			ball.transform.rigidbody.velocity = Vector3.zero;
 			if (scored_team != 0) {
@@ -59,17 +61,22 @@ public class Network_Game : Game_Behaviour {
 	
 	void Awake()
 	{
-		if(Network.isServer) {
-			ball = (GameObject)Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);
+		GameObject settings = GameObject.FindGameObjectWithTag("settings");
+		game_settings = settings.GetComponent<Game_Settings>();
+
+		if(game_settings.is_game_creator) {
+			ball = PhotonNetwork.Instantiate("Prefab/Network_Ball", ball_position, ball_prefab.transform.rotation, 0);
 			ball.transform.name = "Ball";
 		}
 
 		Instantiate(chat_prefab);
+
+		photonView = PhotonView.Get(this);
 	}
 	
 	public void ServerStarGame()
 	{
-		networkView.RPC("StartGame", RPCMode.All);
+		photonView.RPC("StartGame", PhotonTargets.All);
 	}
 	
 	[RPC]
@@ -81,8 +88,8 @@ public class Network_Game : Game_Behaviour {
 	
 	public override void ReleasePlayers()
 	{
-		if(Network.isServer) {
-			networkView.RPC("ReleaseClientPlayers", RPCMode.All);
+		if(game_settings.is_game_creator) {
+			photonView.RPC("ReleaseClientPlayers", PhotonTargets.All);
 		}
 	}
 	

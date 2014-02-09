@@ -68,7 +68,7 @@ public class GameStarter : MonoBehaviour {
 		int team_1_total = team_1_count;
 		int team_2_total = team_2_count;
 
-		game_manager_object = (GameObject)Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
+		game_manager_object = PhotonNetwork.Instantiate("Prefab/Network_Game", Vector3.zero, transform.rotation, 0);
 		
 		foreach (Hero_Selection.Player player in game_settings.players_list) {
 			Vector3 start_position = new Vector3(0,0,0);
@@ -90,6 +90,7 @@ public class GameStarter : MonoBehaviour {
 
 	void InstantiateNewNetworkPlayer(Vector3 start_position, PhotonPlayer photon_player, int team, string name, int texture_id, int hero_index) 
 	{
+		Debug.Log("instanciating player");
 		GameObject player = PhotonNetwork.Instantiate("Prefab/Network_Player", start_position, transform.rotation, 0);
 		
 		Network_Player np = (Network_Player)player.GetComponent<Network_Player>();

@@ -146,7 +146,6 @@ public class Hero_Selection : MonoBehaviour {
 
 			if(hero_instances[i].transform.localPosition == final_position){
 				CancelInvoke("Rotate");
-				lobby.HeroChanged(rotations);
 			}
 		}
 	}
@@ -205,10 +204,12 @@ public class Hero_Selection : MonoBehaviour {
 			if(commands.horizontal_direction < 0 && heroes_positions[1] == 1) {
 				rotations++;
 				ShiftLeft();
+				lobby.HeroChanged(rotations);
 				InvokeRepeating("Rotate", 0, 0.01f);
 			} else if (commands.horizontal_direction > 0 && heroes_positions[heroes_positions.Length - 1] == 1) {
 				rotations--;
 				ShiftRight();
+				lobby.HeroChanged(rotations);
 				InvokeRepeating("Rotate", 0, 0.01f);
 			} else if (commands.enter == 1) {
 				ready_light.renderer.material.color = Color.green;

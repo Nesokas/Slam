@@ -38,8 +38,7 @@ public class Player_Behaviour : MonoBehaviour {
 	protected bool colliding_with_ball = false;
 	protected Collider ball_collider;
 	protected Transform player_base;
-	protected Transform power_bar;
-	public Transform power_bar_fill;
+	protected Transform arrow;
 	protected Transform dash_smoke;
 	protected Transform player_indicator_container;
 	public Vector3 viewport_dash_pos;
@@ -263,9 +262,7 @@ public class Player_Behaviour : MonoBehaviour {
 		GameObject[] goal_detection = GameObject.FindGameObjectsWithTag("goal_detection");
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		player_base = transform.Find("Mesh").Find("Base");
-		power_bar = transform.Find("Power_Bar");
-		power_bar_fill = power_bar.Find("Power_Fill");
-//		dash_smoke = transform.Find("Dash_Smoke");
+		arrow = transform.Find("Arrow");
 		shoot_effect = transform.Find("Shoot_Effect");
 		Transform base_collider = transform.Find("Collider");
 		Transform shoot_collider = transform.Find("ColliderShoot");
@@ -277,12 +274,16 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 
 		for (int i = 0; i < players.Length; i++) {
-			Transform other_player_mesh = players[i].transform.Find("Mesh");
-			Transform other_player_base = other_player_mesh.Find("Base");
-			Transform other_player_shoot_collider = players[i].transform.Find("ColliderShoot");
-			if(other_player_shoot_collider.collider != shoot_collider.collider) {
-				Physics.IgnoreCollision(other_player_shoot_collider.collider, shoot_collider.collider);
-				Physics.IgnoreCollision(other_player_shoot_collider.collider, base_collider.collider);
+			if(players[i].gameObject != this.gameObject) {
+				Transform other_player_mesh = players[i].transform.Find("Mesh");
+				if(other_player_mesh != null) {
+					Transform other_player_base = other_player_mesh.Find("Base");
+					Transform other_player_shoot_collider = players[i].transform.Find("ColliderShoot");
+					if(other_player_shoot_collider.collider != shoot_collider.collider) {
+						Physics.IgnoreCollision(other_player_shoot_collider.collider, shoot_collider.collider);
+						Physics.IgnoreCollision(other_player_shoot_collider.collider, base_collider.collider);
+					}
+				}
 			}
 		}
 		
@@ -338,7 +339,7 @@ public class Player_Behaviour : MonoBehaviour {
 		float width=0;
 		float height=0;
 		
-		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(power_bar.position);
+		Vector2 player_indicator_position = Camera.main.WorldToViewportPoint(arrow.position);
 		float player_x = (float)System.Math.Round((double)player_indicator_position.x, 3);
 		float player_y = (float)System.Math.Round((double)player_indicator_position.y, 3);
 		
@@ -503,11 +504,8 @@ public class Player_Behaviour : MonoBehaviour {
 			player_base = transform.Find("Mesh").Find("Base");
 		/***************************************************/
 		
-		if (power_bar_fill == null)
-			power_bar_fill = transform.Find("Dash_Fill");
-		
-		power_bar.rotation = Quaternion.Euler(0,180f,0);
-		viewport_dash_pos = Camera.main.WorldToViewportPoint(power_bar.position);
+		arrow.rotation = Quaternion.Euler(0,180f,0);
+		viewport_dash_pos = Camera.main.WorldToViewportPoint(arrow.position);
 		
 //		Debug.Log(Camera.main.WorldToViewportPoint(dash_bar.position));
 		

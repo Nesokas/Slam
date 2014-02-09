@@ -24,6 +24,9 @@ public class Network_Player: Kickoff_Player {
 //	Sends player info to every client
 	public void InitializePlayerInfo(PhotonPlayer photon_player, int team_num, string player_name, Vector3 position, int textureID, int hero_index)
 	{
+		if(!photonView)
+			photonView = PhotonView.Get(this);
+
 		photonView.RPC("TellInfoToPlayer", PhotonTargets.All, team_num, player_name, position, photon_player, textureID, hero_index);
 	}
 	
@@ -108,7 +111,7 @@ public class Network_Player: Kickoff_Player {
 		
 			photonView.RPC("AskCommands", PhotonTargets.All);
 		} else {
-			predictor.PredictPlayer(networkView);
+			predictor.PredictPlayer(photonView);
 		
 			transform.position = predictor.getPredictedTransform().position;
 			transform.rigidbody.velocity = predictor.getPredictedTransform().rigidbody.velocity;
@@ -173,13 +176,14 @@ public class Network_Player: Kickoff_Player {
 		hero.UsePower(commands);
 	}
 	
-	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
+		Debug.Log("fired");
 		try {
-			predictor.OnSerializeNetworkViewPlayer(stream, info);
+			predictor.OnPhotonSerializeViewPlayer(stream, info);
 		} catch (System.Exception ex) {
 			predictor = new Predictor(transform);
-			predictor.OnSerializeNetworkViewPlayer(stream, info);
+			predictor.OnPhotonSerializeViewPlayer(stream, info);
 		}
 	}
 	
