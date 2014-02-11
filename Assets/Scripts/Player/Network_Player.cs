@@ -38,6 +38,7 @@ public class Network_Player: Kickoff_Player {
 			controller_object = (GameObject)Instantiate(player_controller_prefab);
 			PlayerController player_controller = controller_object.GetComponent<PlayerController>();
 			player_controller.setInputNum(0);
+			commands = player_controller.GetCommands();
 		}
 		
 		GameObject game_controller = GameObject.FindGameObjectWithTag("GameController");
@@ -105,6 +106,7 @@ public class Network_Player: Kickoff_Player {
 		
 			transform.position = predictor.getPredictedTransform().position;
 			transform.rigidbody.velocity = predictor.getPredictedTransform().rigidbody.velocity;
+
 		}
 	}
 	
