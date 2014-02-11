@@ -90,7 +90,6 @@ public class GameStarter : MonoBehaviour {
 
 	void InstantiateNewNetworkPlayer(Vector3 start_position, PhotonPlayer photon_player, int team, string name, int texture_id, int hero_index) 
 	{
-		Debug.Log("instanciating player");
 		GameObject player = PhotonNetwork.Instantiate("Prefab/Network_Player", start_position, transform.rotation, 0);
 		
 		Network_Player np = (Network_Player)player.GetComponent<Network_Player>();

@@ -178,7 +178,6 @@ public class Network_Player: Kickoff_Player {
 	
 	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 	{
-		Debug.Log("fired");
 		try {
 			predictor.OnPhotonSerializeViewPlayer(stream, info);
 		} catch (System.Exception ex) {

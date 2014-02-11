@@ -82,6 +82,7 @@ public class Lobby : MonoBehaviour
 	}
 
 	private Player self_player;
+	public GUISkin gui_skin;
 
 	void Awake()
 	{
@@ -590,7 +591,7 @@ public class Lobby : MonoBehaviour
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
-				if(!local_game && GUILayout.Button("Disconnect", GUILayout.MinWidth(0.15f*Screen.width))){
+				if(!local_game && GUILayout.Button("Disconnect", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height))){
 					bool is_server = Network.isServer;
 					Network.Disconnect();
 					if(is_server)
@@ -598,14 +599,14 @@ public class Lobby : MonoBehaviour
 					BackToMainMenu();
 				}
 				if (local_game) {
-					if(GUILayout.Button("Restart and Refresh", GUILayout.MinWidth(0.15f*Screen.width)))
+					if(GUILayout.Button("Restart and Refresh", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height)))
 						Application.LoadLevel("Main_Game");
 					GUILayout.FlexibleSpace();
 				}
 				if(game_settings.is_game_creator || local_game){
 					if(!local_game)
 						GUILayout.FlexibleSpace();
-					if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width))) {
+					if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height))) {
 						if(local_game)
 							LocalHeroSelectScreen();
 						else
@@ -859,6 +860,7 @@ public class Lobby : MonoBehaviour
 	
 	void OnGUI()
 	{	
+		GUI.skin = gui_skin;
 		if(show_lobby) {
 			GUILayout.BeginArea(new Rect(Screen.width*0.01f, Screen.height*0.01f, Screen.width - Screen.width*0.02f, Screen.height - Screen.height*0.02f));
 			switch (lobby_state)

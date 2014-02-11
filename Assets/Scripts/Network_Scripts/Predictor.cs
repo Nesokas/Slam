@@ -68,7 +68,6 @@ public class Predictor {
 	
 	public void OnPhotonSerializeViewPlayer(PhotonStream stream, PhotonMessageInfo info)
 	{
-		Debug.Log("Called");
 		Vector3 pos = observed_transform.position;
 		Vector3 velocity = observed_transform.rigidbody.velocity;
 		

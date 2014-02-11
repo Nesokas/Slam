@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Standard Assets\Particles\Legacy Particles\TimedObjectDestructor.js" />
      <None Include="Assets\Materials\Shaders\LEDScreen.shader" />
+     <None Include="Assets\Materials\Shaders\ImageEffects.shader" />
      <None Include="Assets\JMO Assets\Cartoon FX\Shaders (Mobile)\CFXM_MobileParticleAdd_Alpha8.shader" />
      <None Include="Assets\JMO Assets\Cartoon FX\CartoonFX Releases Notes.txt" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
@@ -61,6 +62,7 @@
      <None Include="Assets\Photon Unity Networking\readme.txt" />
      <None Include="Assets\Materials\Shaders\Outline.shader" />
      <None Include="Assets\Materials\Shaders\ForceField.shader" />
+     <None Include="Assets\Materials\Shaders\Example.shader" />
      <None Include="Assets\Photon Unity Networking\changelog.txt" />
      <None Include="Assets\JMO Assets\Cartoon FX\CartoonFX Readme.txt" />
  <Reference Include="Assets\Plugins\Photon3Unity3D">

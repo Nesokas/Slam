@@ -21,7 +21,6 @@ public class Sam : Hero {
 	public override void Start()
 	{
 		dash_smoke = player.transform.Find("Mesh").Find("Dash_Smoke");
-		Debug.Log("dash-smoke ->"+dash_smoke);
 	}
 
 	public override void UsePower(PlayerController.Commands commands)

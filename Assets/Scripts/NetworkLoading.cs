@@ -20,7 +20,6 @@ public class NetworkLoading : MonoBehaviour {
 
 	public IEnumerator StartLoading(NetworkPreLoading network_pre_loading)
 	{
-		Debug.Log("Start Loading");
 		is_loading = true;
 
 		total_players = game_settings.team_1_count + game_settings.team_2_count;
@@ -29,7 +28,6 @@ public class NetworkLoading : MonoBehaviour {
 		yield return async;
 
 		this.network_pre_loading = network_pre_loading;
-		Debug.Log("Loading Complete: " + total_players);
 		photonView.RPC("LoadingComplete", game_settings.game_creator);
 
 		if(!game_settings.is_game_creator) {
