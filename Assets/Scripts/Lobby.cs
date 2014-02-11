@@ -83,6 +83,34 @@ public class Lobby : MonoBehaviour
 	private Player self_player;
 	public GUISkin gui_skin;
 
+	void OnEnable()
+	{
+		Application.RegisterLogCallback(LogCallback);
+	}
+
+	void OnDisable() {
+		Application.RegisterLogCallback(null);
+	}
+
+	private void LogCallback(string condition, string stackTrace, LogType type)
+	{
+		if (type == LogType.Error)
+		{
+			// Check if it is the NATPunchthroughFailed error 
+			const string MessageBeginning = "Receiving NAT punchthrough attempt from target";
+			
+			if (condition.StartsWith(MessageBeginning, StringComparison.Ordinal))
+			{
+				// Call the callback that Unity should be calling.
+				OnFailedToConnect(NetworkConnectionError.NATPunchthroughFailed);
+			}
+		}
+	}
+
+	void OnFailedToConnect(NetworkConnectionError error) {
+		Debug.Log("Could not connect to server: " + error);
+	}
+	
 	void Awake()
 	{
 		show_lobby = true;
