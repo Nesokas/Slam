@@ -57,6 +57,8 @@ public class Main_Menu : MonoBehaviour
 	private ArrayList available_rooms;
 
 	public GUIStyle main_menu_style;
+	public Texture background_texture;
+	public GUISkin gui_skin;
 
 	void InitializeMSF()
 	{
@@ -177,14 +179,15 @@ public class Main_Menu : MonoBehaviour
 			Application.LoadLevel("Pre_Game_Lobby");
 		}
 		GUILayout.FlexibleSpace();
-		if(GUILayout.Button ("Refresh")) {
+
+		if(GUILayout.Button("Refresh", GUILayout.MinHeight(0.05f*Screen.height))) {
 			MasterServer.ClearHostList();
 			MasterServer.RequestHostList(GAME_TYPE);
 		}
 		for (int i = 0; i < 75; i++)
 			GUILayout.FlexibleSpace();
 
-		if(GUILayout.Button("Back"))
+		if(GUILayout.Button("Back", GUILayout.MinHeight(0.05f*Screen.height)))
 			menu_state = NICKNAME_SCREEN;
 	}
 
@@ -217,19 +220,42 @@ public class Main_Menu : MonoBehaviour
 	void CreateRoom()
 	{
 		GUILayout.BeginHorizontal("box", GUILayout.ExpandHeight(true));
-		GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
-				offline_game = GUILayout.Toggle(offline_game, "Offline Game");
+			GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("Offline Game", GUILayout.Width(Screen.width*0.2f));
+					offline_game = GUILayout.Toggle(offline_game, "");
+				GUILayout.EndHorizontal();
 				if (!offline_game) {
 					GUILayout.BeginHorizontal();
-						GUILayout.Label("Room Name:", GUILayout.Width(Screen.width*0.2f));
-						room_name = GUILayout.TextField(room_name, STANDARD_MAX_CHARS, GUILayout.Width(0.14f*Screen.width));
+						GUILayout.BeginVertical();
+						GUILayout.FlexibleSpace();
+							GUILayout.Label("Room Name:", GUILayout.Width(Screen.width*0.2f));
+							GUILayout.FlexibleSpace();
+						GUILayout.EndVertical();
+						GUILayout.BeginVertical();
+							GUILayout.FlexibleSpace();
+							GUIStyle myStyle = new GUIStyle(GUI.skin.textField);
+							myStyle.alignment = TextAnchor.MiddleLeft;
+							room_name = GUILayout.TextField(room_name, STANDARD_MAX_CHARS, myStyle, GUILayout.Width(0.14f*Screen.width), GUILayout.Height(0.05f*Screen.height));
+							GUILayout.FlexibleSpace();
+						GUILayout.EndVertical();
 						GUILayout.FlexibleSpace();
 					GUILayout.EndHorizontal();
 					GUILayout.BeginHorizontal();
-						GUILayout.Label("Password:", GUILayout.MaxWidth(Screen.width*0.2f));
-						password = GUILayout.PasswordField(password, '*', STANDARD_MAX_CHARS, GUILayout.MinWidth(0.14f*Screen.width));
+						GUILayout.BeginVertical();
+							GUILayout.FlexibleSpace();
+							GUILayout.Label("Password:", GUILayout.MaxWidth(Screen.width*0.2f));
+							GUILayout.FlexibleSpace();
+						GUILayout.EndVertical();
+						GUILayout.BeginVertical();
+							GUILayout.FlexibleSpace();
+							password = GUILayout.PasswordField(password, '*', STANDARD_MAX_CHARS, myStyle, GUILayout.MinWidth(0.14f*Screen.width), GUILayout.Height(0.05f*Screen.height));
+							GUILayout.FlexibleSpace();
+						GUILayout.EndVertical();
 						GUILayout.FlexibleSpace();
 					GUILayout.EndHorizontal();
+					for(int i = 0; i < 100; i++)
+						GUILayout.FlexibleSpace();
 				} else {
 				GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
@@ -252,7 +278,7 @@ public class Main_Menu : MonoBehaviour
 					Application.LoadLevel("Pre_Game_Lobby");
 				}
 				GUILayout.FlexibleSpace();
-		if(GUILayout.Button("Back", GUILayout.Width(BUTTON_SIDE_SIZE)))
+		if(GUILayout.Button("Back", GUILayout.Width(BUTTON_SIDE_SIZE), GUILayout.MinHeight(0.05f*Screen.height)))
 					menu_state = NICKNAME_SCREEN;
 			GUILayout.EndVertical();
 		GUILayout.EndHorizontal();
@@ -264,21 +290,35 @@ public class Main_Menu : MonoBehaviour
 			GUILayout.FlexibleSpace();
 			GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
-				GUILayout.BeginVertical("box", GUILayout.MaxHeight(0.1f*Screen.height), GUILayout.MaxWidth(0.26f*Screen.width));
+				GUILayout.BeginVertical("box", GUILayout.MaxHeight(0.3f*Screen.height), GUILayout.MaxWidth(0.4f*Screen.width));
 					GUILayout.FlexibleSpace();
 					GUILayout.BeginHorizontal();
 						GUILayout.FlexibleSpace();
-						GUILayout.Label("Nickname:", GUILayout.Width(67));
-						game_settings.player_name = GUILayout.TextField(game_settings.player_name, STANDARD_MAX_CHARS, GUILayout.MinWidth(0.2f*Screen.width));
+						GUILayout.BeginVertical();
+							GUILayout.FlexibleSpace();
+							GUILayout.Label("Nickname:", GUILayout.Width(90));
+							GUILayout.FlexibleSpace();
+						GUILayout.EndVertical();
+						GUILayout.BeginVertical();
+							GUILayout.FlexibleSpace();
+							GUIStyle myStyle = new GUIStyle(GUI.skin.textField);
+							myStyle.alignment = TextAnchor.MiddleLeft;
+							game_settings.player_name = GUILayout.TextField(game_settings.player_name,
+			                                                STANDARD_MAX_CHARS, 
+		                                                	myStyle,
+			                                                GUILayout.MinWidth(0.2f*Screen.width), 
+			                                                GUILayout.MinHeight(0.05f*Screen.height));
+							GUILayout.FlexibleSpace();
+						GUILayout.EndVertical();
 						GUILayout.FlexibleSpace();
 					GUILayout.EndHorizontal();
 					GUILayout.FlexibleSpace();
 					GUILayout.BeginHorizontal();
 						GUILayout.FlexibleSpace();
-						if(GUILayout.Button("Exit", GUILayout.MinWidth(0.1f*Screen.width)))
+						if(GUILayout.Button("Exit", GUILayout.MinWidth(0.1f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height)))
 							Application.Quit();
 						GUILayout.FlexibleSpace();
-						if(GUILayout.Button("Start", GUILayout.MinWidth(0.1f*Screen.width)))
+						if(GUILayout.Button("Start", GUILayout.MinWidth(0.1f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height)))
 							menu_state = MAIN_MENU;
 						GUILayout.FlexibleSpace();
 					GUILayout.EndHorizontal();
@@ -296,7 +336,7 @@ public class Main_Menu : MonoBehaviour
 			GUILayout.BeginHorizontal();
 				GUILayout.BeginVertical();
 					// Draw tabs
-					tab_selected = GUILayout.Toolbar(tab_selected, tabs);
+					tab_selected = GUILayout.Toolbar(tab_selected, tabs, GUILayout.MinHeight(0.05f*Screen.height));
 					
 					switch(tab_selected){
 					case JOIN_TAB:
@@ -321,7 +361,7 @@ public class Main_Menu : MonoBehaviour
 	
 	void OnGUI()
 	{	
-		
+		GUI.skin = gui_skin;
 		GUILayout.BeginArea(new Rect(Screen.width*0.01f, Screen.height*0.01f, Screen.width - Screen.width*0.02f, Screen.height - Screen.height*0.02f));
 		switch(menu_state){
 		case NICKNAME_SCREEN:

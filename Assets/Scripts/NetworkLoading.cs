@@ -7,6 +7,7 @@ public class NetworkLoading : MonoBehaviour {
 	int total_load_complete = 0;
 	bool is_loading = false;
 	Game_Settings game_settings;
+	NetworkPreLoading network_pre_loading;
 
 	void Awake(){
 		DontDestroyOnLoad(this);
@@ -14,9 +15,8 @@ public class NetworkLoading : MonoBehaviour {
 		game_settings = settings.GetComponent<Game_Settings>();
 	}
 
-	public IEnumerator StartLoading()
+	public IEnumerator StartLoading(NetworkPreLoading network_pre_loading)
 	{
-		Debug.Log("Start Loading");
 		is_loading = true;
 
 		total_players = game_settings.team_1_count + game_settings.team_2_count;
@@ -24,8 +24,21 @@ public class NetworkLoading : MonoBehaviour {
 		AsyncOperation async = Application.LoadLevelAsync("Main_Game");
 		yield return async;
 
-		Debug.Log("Loading Complete");
+		this.network_pre_loading = network_pre_loading;
 		networkView.RPC("LoadingComplete", RPCMode.Server);
+
+		if(!Network.isServer) {
+			DestroyThisSceneObjects();
+		}
+	}
+
+	void DestroyThisSceneObjects()
+	{
+		GameObject loading_camera = GameObject.Find("NetworkLoadingCamera");
+		
+		Destroy(loading_camera);
+		Destroy(network_pre_loading);
+		Destroy(this);
 	}
 
 	void LoadingComplete()
@@ -38,6 +51,7 @@ public class NetworkLoading : MonoBehaviour {
 
 			is_loading = false;
 			game_starter.StartNetworkGame();
+			DestroyThisSceneObjects();
 		}
 	}
 
