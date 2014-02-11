@@ -62,16 +62,7 @@ public class Main_Menu : MonoBehaviour
 
 	void InitializeMSF()
 	{
-		IPHostEntry host;
-		
-		host = Dns.GetHostEntry("soccerpucks.com");
-		string ip = host.AddressList[0].ToString();
-		
-		MasterServer.ipAddress = ip;
-		MasterServer.port = 23466;
-		
-		Network.natFacilitatorIP = ip;
-		Network.natFacilitatorPort = 50005;
+		UsefullStuff.SetMSF();
 		
 		MasterServer.ClearHostList();
 	    MasterServer.RequestHostList(GAME_TYPE);
@@ -81,6 +72,8 @@ public class Main_Menu : MonoBehaviour
 		room_selection = new bool[hostData.Length];
 		for(int i = 0; i < room_selection.Length; i++)
 			room_selection[i] = false;
+
+		Debug.Log("NAT IP: " + Network.natFacilitatorIP);
 	}
 	
 	void Awake()

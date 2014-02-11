@@ -88,9 +88,9 @@ public class Lobby : MonoBehaviour
 		Application.RegisterLogCallback(LogCallback);
 	}
 
-	void OnDisable() {
-		Application.RegisterLogCallback(null);
-	}
+	//void OnDisable() {
+	//	Application.RegisterLogCallback(null);
+	//}
 
 	private void LogCallback(string condition, string stackTrace, LogType type)
 	{
@@ -113,6 +113,9 @@ public class Lobby : MonoBehaviour
 	
 	void Awake()
 	{
+		UsefullStuff.SetMSF();
+		Debug.Log("NAT IP: " + Network.natFacilitatorIP);
+
 		show_lobby = true;
 		escape_key_pressed = false;
 		lobby_state = (int)lobby_states.team_selection;
@@ -157,8 +160,6 @@ public class Lobby : MonoBehaviour
 			}
 		}
 	}
-	
-	void Start() {}
 	
 	Player CreatePlayer(string player_name, int team)
 	{		
@@ -404,7 +405,7 @@ public class Lobby : MonoBehaviour
 	void ConnectToServer()
 	{
 		show_lobby = true;
-		Network.Connect(game_settings.connect_to.guid);
+		Network.Connect(game_settings.connect_to);
 	}
 	
 	void OnConnectedToServer()
