@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -112,7 +112,7 @@ public class Chat : MonoBehaviour {
 							GUI.SetNextControlName("chat");
 							input_field = GUILayout.TextField(input_field, 100, GUILayout.MaxWidth(Screen.width*0.3f), GUILayout.Height(20));
 							if(GUILayout.Button("Send", GUILayout.Height(20)) && input_field != "") {
-								networkView.RPC("SendMessage", RPCMode.All, input_field, settings.player_name, "red");
+								GetComponent<uLink.NetworkView>().RPC("SendMessage", uLink.RPCMode.All, input_field, settings.player_name, "red");
 								input_field = "";
 							}
 						GUILayout.EndHorizontal();
@@ -133,7 +133,7 @@ public class Chat : MonoBehaviour {
 	{
 		if(using_chat) {
 			if(input_field != "")
-				networkView.RPC("SendMessage", RPCMode.All, input_field, settings.player_name, "red");
+				GetComponent<uLink.NetworkView>().RPC("SendMessage", uLink.RPCMode.All, input_field, settings.player_name, "red");
 			input_field = "";
 			using_chat = false;
 		} else {
@@ -154,7 +154,7 @@ public class Chat : MonoBehaviour {
 	}
 
 	[RPC]
-	void SendMessage(string message, string sender_name, string sender_color)
+	protected void SendMessage(string message, string sender_name, string sender_color)
 	{
 		ChatMessage new_message = new ChatMessage();
 

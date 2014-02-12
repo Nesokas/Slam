@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class Sam : Hero {
@@ -30,9 +30,9 @@ public class Sam : Hero {
 			player.transform.rigidbody.velocity *= DASH_STRENGTH;
 			player.resetPowerBar();
 			
-			// if networkView == null means localplay so we can't make an RPC
-			if (player.networkView != null)
-				player.networkView.RPC("EmmitPowerFX",RPCMode.All, "none");
+			// if GetComponent<uLink.NetworkView>() == null means localplay so we can't make an RPC
+			if (player.GetComponent<uLink.NetworkView>() != null)
+				player.GetComponent<uLink.NetworkView>().RPC("EmmitPowerFX",uLink.RPCMode.All, "none");
 			else
 				EmmitPowerFX();	
 		}
@@ -54,9 +54,9 @@ public class Sam : Hero {
 //			rigidbody.velocity *= DASH_STRENGTH;
 //			dash_bar_fill.renderer.material.color = Color.red;
 //			
-//			// if networkView == null means localplay so we can't make an RPC
-//			if (networkView != null)
-//				networkView.RPC("EmmitDashSmoke",RPCMode.All);
+//			// if GetComponent<uLink.NetworkView>() == null means localplay so we can't make an RPC
+//			if (GetComponent<uLink.NetworkView>() != null)
+//				GetComponent<uLink.NetworkView>().RPC("EmmitDashSmoke",uLink.RPCMode.All);
 //			else
 //				EmmitDashSmoke();	
 //		}

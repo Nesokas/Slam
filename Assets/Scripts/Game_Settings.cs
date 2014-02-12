@@ -9,7 +9,7 @@ public class Game_Settings : MonoBehaviour {
 	public bool local_game;
 	public string player_name;
 	public bool connected;
-	public HostData connect_to;
+	public uLink.HostData connect_to;
 
 	public List<Hero_Selection.Player> players_list;
 

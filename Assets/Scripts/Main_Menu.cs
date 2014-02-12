@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -67,17 +67,14 @@ public class Main_Menu : MonoBehaviour
 		host = Dns.GetHostEntry("soccerpucks.com");
 		string ip = host.AddressList[0].ToString();
 		
-		MasterServer.ipAddress = ip;
-		MasterServer.port = 23466;
+		uLink.MasterServer.ipAddress = ip;
+		uLink.MasterServer.port = 23466;
 		
-		Network.natFacilitatorIP = ip;
-		Network.natFacilitatorPort = 50005;
+		uLink.MasterServer.ClearHostList();
+	    uLink.MasterServer.RequestHostList(GAME_TYPE);
+		uLink.MasterServer.updateRate = 2;
 		
-		MasterServer.ClearHostList();
-	    MasterServer.RequestHostList(GAME_TYPE);
-		MasterServer.updateRate = 2;
-		
-		HostData[] hostData = MasterServer.PollHostList();
+		uLink.HostData[] hostData = uLink.MasterServer.PollHostList();
 		room_selection = new bool[hostData.Length];
 		for(int i = 0; i < room_selection.Length; i++)
 			room_selection[i] = false;
@@ -133,7 +130,7 @@ public class Main_Menu : MonoBehaviour
 
 			string[] room_names = new string[available_rooms.Count];
 			for(int i = 0; i < available_rooms.Count; i++) {
-				room_names[i] = ((HostData)available_rooms[i]).gameName;
+				room_names[i] = ((uLink.HostData)available_rooms[i]).gameName;
 			}
 			room_selected = GUILayout.SelectionGrid(room_selected, room_names, 1, GUILayout.MinWidth(Screen.width*0.38f), GUILayout.ExpandWidth(true));
 
@@ -145,13 +142,13 @@ public class Main_Menu : MonoBehaviour
 		total_players_connected = 0;
 		for(int i = 0; i < room_names.Length; i++) {
 			GUILayout.BeginHorizontal();
-			GUILayout.Label(((HostData)available_rooms[i]).gameType, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-			GUILayout.Label(((HostData)available_rooms[i]).connectedPlayers + "/" + ((HostData)available_rooms[i]).playerLimit, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
-			Ping player_ping = new Ping(((HostData)available_rooms[i]).ip.ToString());
+			GUILayout.Label(((uLink.HostData)available_rooms[i]).gameType, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+			GUILayout.Label(((uLink.HostData)available_rooms[i]).connectedPlayers + "/" + ((uLink.HostData)available_rooms[i]).playerLimit, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
+			Ping player_ping = new Ping(((uLink.HostData)available_rooms[i]).ip.ToString());
 			GUILayout.Label(player_ping.time.ToString(), GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
 			GUILayout.Label("Country" + i, GUILayout.MaxWidth(Screen.width*0.07f), GUILayout.Height(22));
 			GUILayout.EndHorizontal();
-			total_players_connected = total_players_connected + 1 + ((HostData)available_rooms[i]).connectedPlayers;
+			total_players_connected = total_players_connected + 1 + ((uLink.HostData)available_rooms[i]).connectedPlayers;
 		}
 	}
 
@@ -175,14 +172,14 @@ public class Main_Menu : MonoBehaviour
 	{
 		if(GUILayout.Button("Connect", GUILayout.Width(100f), GUILayout.Height(50f))) {
 			game_settings.connected = true;
-			game_settings.connect_to = (HostData)available_rooms[room_selected];
+			game_settings.connect_to = (uLink.HostData)available_rooms[room_selected];
 			Application.LoadLevel("Pre_Game_Lobby");
 		}
 		GUILayout.FlexibleSpace();
 
 		if(GUILayout.Button("Refresh", GUILayout.MinHeight(0.05f*Screen.height))) {
-			MasterServer.ClearHostList();
-			MasterServer.RequestHostList(GAME_TYPE);
+			uLink.MasterServer.ClearHostList();
+			uLink.MasterServer.RequestHostList(GAME_TYPE);
 		}
 		for (int i = 0; i < 75; i++)
 			GUILayout.FlexibleSpace();
@@ -194,13 +191,13 @@ public class Main_Menu : MonoBehaviour
 	void JoinRoom()
 	{
 		// Draw existing rooms
-		if (MasterServer.PollHostList().Length != 0) {
-            HostData[] hostData = MasterServer.PollHostList();
+		if (uLink.MasterServer.PollHostList().Length != 0) {
+            uLink.HostData[] hostData = uLink.MasterServer.PollHostList();
 			available_rooms = new ArrayList();
             for (int i = 0; i < hostData.Length; i++) {
 				available_rooms.Add(hostData[i]);
             }
-            MasterServer.ClearHostList();
+            uLink.MasterServer.ClearHostList();
         }
 		GUILayout.BeginVertical("box");
 			GUILayout.BeginHorizontal(GUILayout.Width(Screen.width*0.85f));
@@ -265,11 +262,12 @@ public class Main_Menu : MonoBehaviour
 			GUILayout.BeginVertical();
 				if(GUILayout.Button("Create", GUILayout.Width(BUTTON_SIDE_SIZE), GUILayout.Height(50f))){
 					if(!offline_game){
-						bool useNat = !Network.HavePublicAddress();
-						Network.InitializeServer(32, 25002, useNat);
+						bool useNat = !uLink.Network.HavePublicAddress();
+						uLink.Network.InitializeServer(32, 25002);
 					
 						// For now the game type will be "Default"
-						MasterServer.RegisterHost(GAME_TYPE, room_name);
+						uLink.Network.useProxy = true;
+						uLink.MasterServer.RegisterHost(GAME_TYPE, room_name);
 						
 						game_settings.local_game = false;
 					} else {

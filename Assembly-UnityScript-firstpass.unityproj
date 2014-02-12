@@ -50,7 +50,9 @@
      <None Include="Assets\Materials\Shaders\LEDScreen.shader" />
      <None Include="Assets\Materials\Shaders\ImageEffects.shader" />
      <None Include="Assets\JMO Assets\Cartoon FX\Shaders (Mobile)\CFXM_MobileParticleAdd_Alpha8.shader" />
+     <None Include="Assets\Resources\uLinkPrefs.txt" />
      <None Include="Assets\JMO Assets\Cartoon FX\CartoonFX Releases Notes.txt" />
+     <None Include="Assets\Plugins\uLink\Assembly\uLink.xml" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
      <None Include="Assets\JMO Assets\Cartoon FX Easy Editor\CartoonFX Easy Editor Readme.txt" />
      <None Include="Assets\JMO Assets\!JMO Assets Readme.txt" />
@@ -61,6 +63,9 @@
      <None Include="Assets\Materials\Shaders\ForceField.shader" />
      <None Include="Assets\Materials\Shaders\Example.shader" />
      <None Include="Assets\JMO Assets\Cartoon FX\CartoonFX Readme.txt" />
+ <Reference Include="Assets\Plugins\uLink\Assembly\uLink">
+ <HintPath>Assets\Plugins\uLink\Assembly\uLink.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

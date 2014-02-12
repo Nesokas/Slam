@@ -31,7 +31,7 @@ public class Predictor {
 		}
 	}
 	
-	public void OnSerializeNetworkViewBall(BitStream stream, NetworkMessageInfo info)
+	public void OnSerializeNetworkViewBall(uLink.BitStream stream, uLink.NetworkMessageInfo info)
 	{
 		Vector3 pos = observed_transform.position;
 		Vector3 angVelocity = observed_transform.rigidbody.angularVelocity;
@@ -60,7 +60,7 @@ public class Predictor {
 	}
 	
 	
-	public void OnSerializeNetworkViewPlayer(BitStream stream, NetworkMessageInfo info)
+	public void OnSerializeNetworkViewPlayer(uLink.BitStream stream, uLink.NetworkMessageInfo info)
 	{
 		Vector3 pos = observed_transform.position;
 		Vector3 velocity = observed_transform.rigidbody.velocity;
@@ -91,17 +91,17 @@ public class Predictor {
 		return observed_transform;
 	}
 	
-	public void PredictPlayer(NetworkView networkView)
+	public void PredictPlayer(uLink.NetworkView networkView)
 	{
 		
-		if (Network.player == networkView.owner || Network.isServer) {
+		if (uLink.Network.player == networkView.owner || uLink.Network.isServer) {
 			return; //This is only for remote peers, get off!!
 		}
 		
 		//client side has **only the server connected**
-		client_ping = (Network.GetAveragePing(Network.connections[0]) / 100) + PING_MARGIN;
+		client_ping = (uLink.Network.GetAveragePing(uLink.Network.connections[0]) / 100) + PING_MARGIN;
 		
-		float interpolation_time = (float)Network.time - client_ping;
+		float interpolation_time = (float)uLink.Network.time - client_ping;
 		
 		//ensure the buffer has at last one element
 		if (server_state == null)
@@ -116,9 +116,9 @@ public class Predictor {
 			
 			float x,y,z;
 		
-			x = server_state.pos.x + server_state.velocity.x*((float)Network.time - server_state.timestamp);
-			y = server_state.pos.y + server_state.velocity.y*((float)Network.time - server_state.timestamp);
-			z = server_state.pos.z + server_state.velocity.z*((float)Network.time - server_state.timestamp);
+			x = server_state.pos.x + server_state.velocity.x*((float)uLink.Network.time - server_state.timestamp);
+			y = server_state.pos.y + server_state.velocity.y*((float)uLink.Network.time - server_state.timestamp);
+			z = server_state.pos.z + server_state.velocity.z*((float)uLink.Network.time - server_state.timestamp);
 			
 			RaycastHit hit;
 			Vector3 predicted_pos = new Vector3(x,y,z);
@@ -143,17 +143,17 @@ public class Predictor {
 	}
 	
 	
-	public void PredictBall(NetworkView networkView)
+	public void PredictBall(uLink.NetworkView networkView)
 	{
 		
-		if (Network.player == networkView.owner || Network.isServer) {
+		if (uLink.Network.player == networkView.owner || uLink.Network.isServer) {
 			return; //This is only for remote peers, get off!!
 		}
 		
 		//client side has **only the server connected**
-		client_ping = (Network.GetAveragePing(Network.connections[0]) / 100) + PING_MARGIN;
+		client_ping = (uLink.Network.GetAveragePing(uLink.Network.connections[0]) / 100) + PING_MARGIN;
 		
-		float interpolation_time = (float)Network.time - client_ping;
+		float interpolation_time = (float)uLink.Network.time - client_ping;
 		
 		//ensure the buffer has at last one element
 		if (server_state == null)
@@ -170,9 +170,9 @@ public class Predictor {
 			
 			float x,y,z;
 		
-			x = server_state.pos.x + server_state.velocity.x*((float)Network.time - server_state.timestamp);
-			y = server_state.pos.y + server_state.velocity.y*((float)Network.time - server_state.timestamp);
-			z = server_state.pos.z + server_state.velocity.z*((float)Network.time - server_state.timestamp);
+			x = server_state.pos.x + server_state.velocity.x*((float)uLink.Network.time - server_state.timestamp);
+			y = server_state.pos.y + server_state.velocity.y*((float)uLink.Network.time - server_state.timestamp);
+			z = server_state.pos.z + server_state.velocity.z*((float)uLink.Network.time - server_state.timestamp);
 			
 			RaycastHit hit;
 			Vector3 predicted_pos = new Vector3(x,y,z);

@@ -19,7 +19,7 @@ public class Network_Ball : Ball_Behaviour {
 		base.Start();
 	}
 	
-	public void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+	public void uLink_OnSerializeNetworkView(uLink.BitStream stream, uLink.NetworkMessageInfo info)
 	{
 		if(predictor == null)
 			predictor = new Predictor(transform);
@@ -30,7 +30,7 @@ public class Network_Ball : Ball_Behaviour {
 	{
 		base.Update();
 			
-		predictor.PredictBall(networkView);
+		predictor.PredictBall(GetComponent<uLink.NetworkView>());
 		
 		transform.position = predictor.getPredictedTransform().position;
 			

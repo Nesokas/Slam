@@ -6,35 +6,35 @@ public class Network_Game : Game_Behaviour {
 
 	public GameObject chat_prefab;
 
-	Dictionary<NetworkPlayer, bool> players_ready;
+	Dictionary<uLink.NetworkPlayer, bool> players_ready;
 
-	protected void OnPlayerDisconnected(NetworkPlayer player) 
+	protected void uLink_OnPlayerDisconnected(uLink.NetworkPlayer player) 
 	{
-		Network.RemoveRPCs(player);
-		Network.DestroyPlayerObjects(player);
+		uLink.Network.RemoveRPCs(player);
+		uLink.Network.DestroyPlayerObjects(player);
 		
 		GameObject[] all_players = GameObject.FindGameObjectsWithTag("Player");
 		
 		foreach(GameObject player_obj in all_players){
 			Network_Player net_player = player_obj.GetComponent<Network_Player>();
 			if (net_player.owner == player) {
-				Network.Destroy(player_obj.GetComponent<NetworkView>().viewID);
+				uLink.Network.Destroy(player_obj.GetComponent<uLink.NetworkView>().viewID);
 				return;
 			}
 		}
 	}
 	
-//	protected void OnDisconnectedFromServer(NetworkDisconnection info)
+//	protected void uLink_OnDisconnectedFromServer(uLink.NetworkDisconnection info)
 //	{
-//		Network.RemoveRPCs(Network.player);
-//		Network.DestroyPlayerObjects(Network.player);
+//		uLink.Network.RemoveRPCs(uLink.Network.player);
+//		uLink.Network.DestroyPlayerObjects(uLink.Network.player);
 //		
 //		GameObject[] all_players = GameObject.FindGameObjectsWithTag("Player");
 //		
 //		foreach(GameObject player_obj in all_players){
 //			Network_Player net_player = player_obj.GetComponent<Network_Player>();
-//			if (net_player.owner == Network.player) {
-//				Network.Destroy(player_obj.GetComponent<NetworkView>().viewID);
+//			if (net_player.owner == uLink.Network.player) {
+//				uLink.Network.Destroy(player_obj.GetComponent<uLink.NetworkView>().viewID);
 //				return;
 //			}
 //		}
@@ -42,7 +42,7 @@ public class Network_Game : Game_Behaviour {
 	
 	protected override void MovePlayersToStartPositions()
 	{
-		if(Network.isServer) {
+		if(uLink.Network.isServer) {
 			ball.transform.position = ball_position;
 			ball.transform.rigidbody.velocity = Vector3.zero;
 			if (scored_team != 0) {
@@ -59,8 +59,8 @@ public class Network_Game : Game_Behaviour {
 	
 	void Awake()
 	{
-		if(Network.isServer) {
-			ball = (GameObject)Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);
+		if(uLink.Network.isServer) {
+			ball = (GameObject)uLink.Network.Instantiate(ball_prefab, ball_position, ball_prefab.transform.rotation, 0);
 			ball.transform.name = "Ball";
 		}
 
@@ -69,11 +69,11 @@ public class Network_Game : Game_Behaviour {
 	
 	public void ServerStarGame()
 	{
-		networkView.RPC("StartGame", RPCMode.All);
+		GetComponent<uLink.NetworkView>().RPC("StartGame", uLink.RPCMode.All);
 	}
 	
 	[RPC]
-	void StartGame()
+	protected void StartGame()
 	{
 		team_scored_message_xpos = DEFAULT_TEAM_SCORED_MESSAGE_XPOS;
 		MovePlayersToStartPositions();
@@ -81,8 +81,8 @@ public class Network_Game : Game_Behaviour {
 	
 	public override void ReleasePlayers()
 	{
-		if(Network.isServer) {
-			networkView.RPC("ReleaseClientPlayers", RPCMode.All);
+		if(uLink.Network.isServer) {
+			GetComponent<uLink.NetworkView>().RPC("ReleaseClientPlayers", uLink.RPCMode.All);
 		}
 	}
 	

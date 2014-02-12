@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class Hero_Selection : MonoBehaviour {
@@ -36,7 +36,7 @@ public class Hero_Selection : MonoBehaviour {
 		public int team;
 
 		public int controller; // used for local games
-		public NetworkPlayer network_player; // used for network games
+		public uLink.NetworkPlayer network_player; // used for network games
 	}
 
 	int team;
@@ -91,7 +91,7 @@ public class Hero_Selection : MonoBehaviour {
 		player_controller.setInputNum(input_num);
 	}
 
-	public void InitializeNetworkPlayer(int team, string name, int texture_id, NetworkPlayer network_player, Lobby lobby)
+	public void InitializeNetworkPlayer(int team, string name, int texture_id, uLink.NetworkPlayer network_player, Lobby lobby)
 	{
 		player = InitializePlayer(team, name, texture_id, lobby);
 		player.network_player = network_player;

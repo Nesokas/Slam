@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -41,7 +41,7 @@ public class GameStarter : MonoBehaviour {
 
 		if(game_settings.IsLocalGame())
 			StartLocalGame();
-		else if(Network.isServer)
+		else if(uLink.Network.isServer)
 			StartNetworkGame();
 
 	}
@@ -68,7 +68,7 @@ public class GameStarter : MonoBehaviour {
 		int team_1_total = team_1_count;
 		int team_2_total = team_2_count;
 
-		game_manager_object = (GameObject)Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
+		game_manager_object = (GameObject)uLink.Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
 		
 		foreach (Hero_Selection.Player player in game_settings.players_list) {
 			Vector3 start_position = new Vector3(0,0,0);
@@ -88,9 +88,9 @@ public class GameStarter : MonoBehaviour {
 		}
 	}
 
-	void InstantiateNewNetworkPlayer(Vector3 start_position, NetworkPlayer network_player, int team, string name, int texture_id, int hero_index) 
+	void InstantiateNewNetworkPlayer(Vector3 start_position, uLink.NetworkPlayer network_player, int team, string name, int texture_id, int hero_index) 
 	{
-		GameObject player = (GameObject)Network.Instantiate(net_player_prefab, start_position, transform.rotation, 0);
+		GameObject player = (GameObject)uLink.Network.Instantiate(net_player_prefab, start_position, transform.rotation, 0);
 		
 		Network_Player np = (Network_Player)player.GetComponent<Network_Player>();
 		np.InitializePlayerInfo(network_player, team, name, start_position, texture_id, hero_index);

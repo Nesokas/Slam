@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class NetworkLoading : MonoBehaviour {
@@ -25,9 +25,9 @@ public class NetworkLoading : MonoBehaviour {
 		yield return async;
 
 		this.network_pre_loading = network_pre_loading;
-		networkView.RPC("LoadingComplete", RPCMode.Server);
+		GetComponent<uLink.NetworkView>().RPC("LoadingComplete", uLink.RPCMode.Server);
 
-		if(!Network.isServer) {
+		if(!uLink.Network.isServer) {
 			DestroyThisSceneObjects();
 		}
 	}

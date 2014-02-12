@@ -71,7 +71,7 @@ public class Lobby : MonoBehaviour
 	{
 		public string name;
 		public int team;
-		public NetworkPlayer network_player;
+		public uLink.NetworkPlayer network_player;
 		public int controller;
 		public bool is_network;
 
@@ -112,11 +112,11 @@ public class Lobby : MonoBehaviour
 			local_game = true;
 
 		} else {
-			networkView.group = 1;
-			Network.SetLevelPrefix(1);
+			GetComponent<uLink.NetworkView>().group = 1;
+			uLink.Network.SetLevelPrefix(1);
 			
-			if(Network.isServer)
-				AddNetworkPlayer(Network.player, game_settings.player_name, SPECTATING);
+			if(uLink.Network.isServer)
+				AddNetworkPlayer(uLink.Network.player, game_settings.player_name, SPECTATING);
 			else{
 				ConnectToServer();
 			}
@@ -141,7 +141,7 @@ public class Lobby : MonoBehaviour
 	}
 	
 	[RPC]
-	void AddNetworkPlayer (NetworkPlayer network_player, string player_name, int team = SPECTATING)
+	protected void AddNetworkPlayer (uLink.NetworkPlayer network_player, string player_name, int team = SPECTATING)
 	{
 		Player player = CreatePlayer((string)player_name, team);
 		player.network_player = network_player;
@@ -159,7 +159,7 @@ public class Lobby : MonoBehaviour
 				break;
 		}
 
-		if(network_player == Network.player)
+		if(network_player == uLink.Network.player)
 			self_player = player;
 	}
 	
@@ -181,18 +181,18 @@ public class Lobby : MonoBehaviour
 		}
 	}
 	
-	void DestroyNetworkPlayer(GameObject[] players, NetworkPlayer network_player)
+	void DestroyNetworkPlayer(GameObject[] players, uLink.NetworkPlayer network_player)
 	{
 		foreach(GameObject player_object in players) {
 			Network_Player player = player_object.GetComponent<Network_Player>();
 			if(player.owner == network_player) {
-				Network.Destroy(player_object);
+				uLink.Network.Destroy(player_object);
 				return;
 			}
 		}
 	}
 	
-	bool IsNetworkPlayerInstanciated(GameObject[] players, NetworkPlayer network_player)
+	bool IsNetworkPlayerInstanciated(GameObject[] players, uLink.NetworkPlayer network_player)
 	{
 		foreach(GameObject player_object in players) {
 			Network_Player player = player_object.GetComponent<Network_Player>();
@@ -238,9 +238,9 @@ public class Lobby : MonoBehaviour
 		}
 	}
 	
-	void InstanciateNewNetworkPlayer(Vector3 start_position, NetworkPlayer network_player, int team, string name, int texture_id) 
+	void InstanciateNewNetworkPlayer(Vector3 start_position, uLink.NetworkPlayer network_player, int team, string name, int texture_id) 
 	{
-		GameObject player = (GameObject)Network.Instantiate(net_player_prefab, start_position, transform.rotation, 0);
+		GameObject player = (GameObject)uLink.Network.Instantiate(net_player_prefab, start_position, transform.rotation, 0);
 						
 		Network_Player np = (Network_Player)player.GetComponent<Network_Player>();
 		np.InitializePlayerInfo(network_player, team, name, start_position, texture_id, 0);
@@ -273,7 +273,7 @@ public class Lobby : MonoBehaviour
 		float distance_team_2 = court_lenght/(players_team_2+1);
 		
 		if(game_manager_object == null)
-			game_manager_object = (GameObject)Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
+			game_manager_object = (GameObject)uLink.Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
 
 		int texture_id = 0;
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -287,7 +287,7 @@ public class Lobby : MonoBehaviour
 			if(!IsNetworkPlayerInstanciated(players, team_1[i].network_player))
 				InstanciateNewNetworkPlayer(start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
 			else
-				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
+				GetComponent<uLink.NetworkView>().RPC("UpdateNetworkPlayer", uLink.RPCMode.All, start_position, team_1[i].network_player, team_1[i].team, team_1[i].name, texture_id);
 			
 			texture_id++;
 		}
@@ -301,7 +301,7 @@ public class Lobby : MonoBehaviour
 			if(!IsNetworkPlayerInstanciated(players, team_2[i].network_player))
 				InstanciateNewNetworkPlayer(start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
 			else
-				networkView.RPC("UpdateNetworkPlayer", RPCMode.All, start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
+				GetComponent<uLink.NetworkView>().RPC("UpdateNetworkPlayer", uLink.RPCMode.All, start_position, team_2[i].network_player, team_2[i].team, team_2[i].name, texture_id);
 			
 			texture_id++;
 		}
@@ -312,11 +312,11 @@ public class Lobby : MonoBehaviour
 		}
 		/*****************************************************************************************************************/
 		
-		networkView.RPC ("DisableLobby", RPCMode.All);
+		GetComponent<uLink.NetworkView>().RPC ("DisableLobby", uLink.RPCMode.All);
 	}
 
 	[RPC]
-	void DisableLobby()
+	protected void DisableLobby()
 	{
 		show_lobby = false;
 	}
@@ -376,32 +376,33 @@ public class Lobby : MonoBehaviour
 	void ConnectToServer()
 	{
 		show_lobby = true;
-		Network.Connect(game_settings.connect_to.guid);
+		uLink.Network.Connect(game_settings.connect_to);
 	}
 	
-	void OnConnectedToServer()
+	void uLink_OnConnectedToServer()
 	{
-		networkView.RPC("TellName", RPCMode.Server, Network.player, game_settings.player_name);
+		Debug.Log("connected to server");
+		GetComponent<uLink.NetworkView>().RPC("TellName", uLink.RPCMode.Server, uLink.Network.player, game_settings.player_name);
 	}
 	
 	[RPC]
-	void TellName(NetworkPlayer network_player, string new_player_name)
+	protected void TellName(uLink.NetworkPlayer network_player, string new_player_name)
 	{
 		/******* Initialize new player lists *********/
 		for(int i = 0; i < team_1.Count; i++)
-			networkView.RPC("AddNetworkPlayer", network_player, team_1[i].network_player, team_1[i].name, TEAM_1);
+			GetComponent<uLink.NetworkView>().RPC("AddNetworkPlayer", network_player, team_1[i].network_player, team_1[i].name, TEAM_1);
 		for(int i = 0; i < team_2.Count; i++)
-			networkView.RPC("AddNetworkPlayer", network_player, team_2[i].network_player, team_2[i].name, TEAM_2);
+			GetComponent<uLink.NetworkView>().RPC("AddNetworkPlayer", network_player, team_2[i].network_player, team_2[i].name, TEAM_2);
 		for(int i = 0; i < spectating.Count; i++)
-			networkView.RPC("AddNetworkPlayer", network_player, spectating[i].network_player, spectating[i].name, SPECTATING);
+			GetComponent<uLink.NetworkView>().RPC("AddNetworkPlayer", network_player, spectating[i].network_player, spectating[i].name, SPECTATING);
 		/********************************************/
 		
-		networkView.RPC("AddNetworkPlayer", RPCMode.All, network_player, new_player_name, SPECTATING);
-		networkView.RPC("StartPlayers", network_player);
+		GetComponent<uLink.NetworkView>().RPC("AddNetworkPlayer", uLink.RPCMode.All, network_player, new_player_name, SPECTATING);
+		GetComponent<uLink.NetworkView>().RPC("StartPlayers", network_player);
 	}
 	
 	[RPC]
-	void StartPlayers()
+	protected void StartPlayers()
 	{
 		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 		
@@ -419,7 +420,7 @@ public class Lobby : MonoBehaviour
 			int new_team = SPECTATING;
 			
 			GUILayout.BeginHorizontal();
-				if((team == TEAM_2 || team == SPECTATING) && (local_game || Network.isServer)) {
+				if((team == TEAM_2 || team == SPECTATING) && (local_game || uLink.Network.isServer)) {
 					if(GUILayout.Button("<", GUILayout.MaxWidth(0.03f*Screen.width))) {
 						if(team == SPECTATING)
 							new_team = TEAM_1;
@@ -428,11 +429,11 @@ public class Lobby : MonoBehaviour
 				}
 				GUILayout.FlexibleSpace();
 				GUILayout.Label(players[i].name);
-				if(!local_game && players[i].network_player != Network.player) {
-					GUILayout.Label("" + Network.GetAveragePing(players[i].network_player));
+				if(!local_game && players[i].network_player != uLink.Network.player) {
+					GUILayout.Label("" + uLink.Network.GetAveragePing(players[i].network_player));
 				}
 				GUILayout.FlexibleSpace();
-				if((team == TEAM_1 || team == SPECTATING) && (local_game || Network.isServer)) {
+				if((team == TEAM_1 || team == SPECTATING) && (local_game || uLink.Network.isServer)) {
 					if(GUILayout.Button(">", GUILayout.MaxWidth(0.03f*Screen.width))) {
 						if(team == SPECTATING)
 							new_team = TEAM_2;
@@ -445,7 +446,7 @@ public class Lobby : MonoBehaviour
 				if(local_game)
 					ChangeLocalPlayerTeam(players[i].controller, team, new_team);
 				else
-					networkView.RPC("ChangeNetworkPlayerTeam", RPCMode.All, players[i].network_player, team, new_team);
+					GetComponent<uLink.NetworkView>().RPC("ChangeNetworkPlayerTeam", uLink.RPCMode.All, players[i].network_player, team, new_team);
 			}
 		}
 	}
@@ -477,7 +478,7 @@ public class Lobby : MonoBehaviour
 	
 	/* When in a lobby the admin moves the player between teams, we use this function*/
 	[RPC]
-	void ChangeNetworkPlayerTeam(NetworkPlayer network_player, int old_team, int new_team)
+	protected void ChangeNetworkPlayerTeam(uLink.NetworkPlayer network_player, int old_team, int new_team)
 	{
 		List<Player> old_player_team = spectating;
 		
@@ -502,19 +503,19 @@ public class Lobby : MonoBehaviour
 		}
 	}
 	
-	void OnPlayerDisconnected(NetworkPlayer network_player)
+	void uLink_OnPlayerDisconnected(uLink.NetworkPlayer network_player)
 	{
-		Network.RemoveRPCs(network_player);
-		Network.DestroyPlayerObjects (network_player);
+		uLink.Network.RemoveRPCs(network_player);
+		uLink.Network.DestroyPlayerObjects (network_player);
 		
-		networkView.RPC("RemovePlayer", RPCMode.All, network_player);
+		GetComponent<uLink.NetworkView>().RPC("RemovePlayer", uLink.RPCMode.All, network_player);
 
-		if(Network.isServer)
-			MasterServer.UnregisterHost();
+		if(uLink.Network.isServer)
+			uLink.MasterServer.UnregisterHost();
 	}
 	
 	[RPC]
-	void RemovePlayer(NetworkPlayer network_player)
+	protected void RemovePlayer(uLink.NetworkPlayer network_player)
 	{
 		for(int i = 0; i < team_1.Count; i++){
 			if(team_1[i].network_player == network_player){
@@ -572,10 +573,10 @@ public class Lobby : MonoBehaviour
 			GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
 				if(!local_game && GUILayout.Button("Disconnect", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height))){
-					bool is_server = Network.isServer;
-					Network.Disconnect();
+					bool is_server = uLink.Network.isServer;
+					uLink.Network.Disconnect();
 					if(is_server)
-						MasterServer.UnregisterHost();
+						uLink.MasterServer.UnregisterHost();
 					BackToMainMenu();
 				}
 				if (local_game) {
@@ -583,14 +584,14 @@ public class Lobby : MonoBehaviour
 						Application.LoadLevel("Main_Game");
 					GUILayout.FlexibleSpace();
 				}
-				if(Network.isServer || local_game){
+				if(uLink.Network.isServer || local_game){
 					if(!local_game)
 						GUILayout.FlexibleSpace();
 					if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height))) {
 						if(local_game)
 							LocalHeroSelectScreen();
 						else
-							networkView.RPC("NetworkHeroSelectScreen", RPCMode.All);
+							GetComponent<uLink.NetworkView>().RPC("NetworkHeroSelectScreen", uLink.RPCMode.All);
 					}
 				}
 			GUILayout.FlexibleSpace();
@@ -611,7 +612,7 @@ public class Lobby : MonoBehaviour
 	}
 
 	[RPC]
-	void NetworkHeroSelectScreen()
+	protected void NetworkHeroSelectScreen()
 	{
 		show_lobby = false;
 		lobby_state = (int)lobby_states.hero_selection;
@@ -678,21 +679,21 @@ public class Lobby : MonoBehaviour
 		Material team_color;
 
 		if(self_player.team == 1) {
-			hero_script.InitializeNetworkPlayer(TEAM_1, self_player.name, 0, Network.player, this);
+			hero_script.InitializeNetworkPlayer(TEAM_1, self_player.name, 0, uLink.Network.player, this);
 		} else {
-			hero_script.InitializeNetworkPlayer(TEAM_2, self_player.name, 0, Network.player, this);
+			hero_script.InitializeNetworkPlayer(TEAM_2, self_player.name, 0, uLink.Network.player, this);
 		}
 	}
 
 	public void HeroChanged(int hero_index)
 	{
 		if(!local_game){
-			networkView.RPC("RPC_HeroChanged", RPCMode.All, hero_index, Network.player);
+			GetComponent<uLink.NetworkView>().RPC("RPC_HeroChanged", uLink.RPCMode.All, hero_index, uLink.Network.player);
 		}
 	}
 
 	[RPC]
-	void RPC_HeroChanged(int hero_index, NetworkPlayer network_player)
+	protected void RPC_HeroChanged(int hero_index, uLink.NetworkPlayer network_player)
 	{
 		List<Player> allPlayers = new List<Player>(team_1);
 		allPlayers.AddRange(team_2);
@@ -761,12 +762,12 @@ public class Lobby : MonoBehaviour
 				Application.LoadLevel("Main_Game");
 
 		} else {
-			networkView.RPC("RPC_PlayerReady", RPCMode.All, Network.player, player.texture_id);
+			GetComponent<uLink.NetworkView>().RPC("RPC_PlayerReady", uLink.RPCMode.All, uLink.Network.player, player.texture_id);
 		}
 	}
 
 	[RPC]
-	void RPC_PlayerReady(NetworkPlayer network_player, int texture_id) {
+	protected void RPC_PlayerReady(uLink.NetworkPlayer network_player, int texture_id) {
 
 		players_ready++;
 
@@ -784,25 +785,25 @@ public class Lobby : MonoBehaviour
 				player.texture_id = texture_id;
 				player.network_player = allPlayers[i].network_player;
 
-				if(Network.isServer) {
+				if(uLink.Network.isServer) {
 					game_settings.AddPlayer(player);
 				}
 				break;
 			}
 		}
 	
-		if (Network.isServer && players_ready == (team_1.Count + team_2.Count)) {
-			Network.Instantiate(network_loading_prefab, 
+		if (uLink.Network.isServer && players_ready == (team_1.Count + team_2.Count)) {
+			uLink.Network.Instantiate(network_loading_prefab, 
 			                    network_loading_prefab.transform.position,
 			                    network_loading_prefab.transform.rotation,
 			                    0);
-			networkView.RPC("StartGame", RPCMode.All);
+			GetComponent<uLink.NetworkView>().RPC("StartGame", uLink.RPCMode.All);
 		}
 
 	}
 
 	[RPC]
-	void StartGame()
+	protected void StartGame()
 	{
 		Application.LoadLevel("Network_Loading");
 	}
@@ -816,7 +817,12 @@ public class Lobby : MonoBehaviour
 //		//		lp.InitializePlayerInfo(team, name, start_position, controller, texture_id);
 //	}
 
-	void OnDisconnectedFromServer(NetworkDisconnection info)
+	void uLink_OnDisconnectedFromServer(uLink.NetworkDisconnection info)
+	{
+		Application.LoadLevel("Main_Menu");
+	}
+
+	void uLink_OnServerUninitialized(uLink.NetworkDisconnection info)
 	{
 		Application.LoadLevel("Main_Menu");
 	}
@@ -832,7 +838,7 @@ public class Lobby : MonoBehaviour
 	bool doneTesting = false;
 	bool probingPublicIP = false;
 	int serverPort = 9999;
-	ConnectionTesterStatus connectionTestResult = ConnectionTesterStatus.Undetermined;
+	uLink.ConnectionTesterStatus connectionTestResult = uLink.ConnectionTesterStatus.Undetermined;
 	bool useNat = false;
 
 	float timer = 0f;
@@ -865,19 +871,19 @@ public class Lobby : MonoBehaviour
 	void TestConnection() {
 		// Start/Poll the connection test, report the results in a label and 
 		// react to the results accordingly
-		connectionTestResult = Network.TestConnection();
+		connectionTestResult = uLink.Network.TestConnection();
 		switch (connectionTestResult) {
-		case ConnectionTesterStatus.Error: 
+		case uLink.ConnectionTesterStatus.Error: 
 			testMessage = "Problem determining NAT capabilities";
 			doneTesting = true;
 			break;
 			
-		case ConnectionTesterStatus.Undetermined: 
+		case uLink.ConnectionTesterStatus.Undetermined: 
 			testMessage = "Undetermined NAT capabilities";
 			doneTesting = false;
 			break;
 			
-		case ConnectionTesterStatus.PublicIPIsConnectable:
+		case uLink.ConnectionTesterStatus.PublicIPIsConnectable:
 			testMessage = "Directly connectable public IP address.";
 			useNat = false;
 			doneTesting = true;
@@ -885,14 +891,14 @@ public class Lobby : MonoBehaviour
 			
 			// This case is a bit special as we now need to check if we can 
 			// circumvent the blocking by using NAT punchthrough
-		case ConnectionTesterStatus.PublicIPPortBlocked:
+		case uLink.ConnectionTesterStatus.PublicIPPortBlocked:
 			testMessage = "Non-connectable public IP address (port " +
 				serverPort +" blocked), running a server is impossible.";
 			useNat = false;
 			// If no NAT punchthrough test has been performed on this public 
 			// IP, force a test
 			if (!probingPublicIP) {
-				connectionTestResult = Network.TestConnectionNAT();
+				connectionTestResult = uLink.Network.TestConnectionNAT();
 				probingPublicIP = true;
 				testStatus = "Testing if blocked public IP can be circumvented";
 				timer = Time.time + 10;
@@ -904,13 +910,13 @@ public class Lobby : MonoBehaviour
 				doneTesting = true;
 			}
 			break;
-		case ConnectionTesterStatus.PublicIPNoServerStarted:
+		case uLink.ConnectionTesterStatus.PublicIPNoServerStarted:
 			testMessage = "Public IP address but server not initialized, "+
 				"it must be started to check server accessibility. Restart "+
 					"connection test when ready.";
 			break;
 			
-		case ConnectionTesterStatus.LimitedNATPunchthroughPortRestricted:
+		case uLink.ConnectionTesterStatus.LimitedNATPunchthroughPortRestricted:
 			testMessage = "Limited NAT punchthrough capabilities. Cannot "+
 				"connect to all types of NAT servers. Running a server "+
 					"is ill advised as not everyone can connect.";
@@ -918,7 +924,7 @@ public class Lobby : MonoBehaviour
 			doneTesting = true;
 			break;
 			
-		case ConnectionTesterStatus.LimitedNATPunchthroughSymmetric:
+		case uLink.ConnectionTesterStatus.LimitedNATPunchthroughSymmetric:
 			testMessage = "Limited NAT punchthrough capabilities. Cannot "+
 				"connect to all types of NAT servers. Running a server "+
 					"is ill advised as not everyone can connect.";
@@ -926,8 +932,8 @@ public class Lobby : MonoBehaviour
 			doneTesting = true;
 			break;
 			
-		case ConnectionTesterStatus.NATpunchthroughAddressRestrictedCone:
-		case ConnectionTesterStatus.NATpunchthroughFullCone:
+		case uLink.ConnectionTesterStatus.NATpunchthroughAddressRestrictedCone:
+		case uLink.ConnectionTesterStatus.NATpunchthroughFullCone:
 			testMessage = "NAT punchthrough capable. Can connect to all "+
 				"servers and receive connections from all clients. Enabling "+
 					"NAT punchthrough functionality.";
