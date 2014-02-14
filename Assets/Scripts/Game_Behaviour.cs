@@ -29,8 +29,8 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_1;
 	public GameObject crowd_team_2;
 	
-	public float timer = 200f;
-	public float ENDGAME_TIMER = 600f;
+	float timer = 100f;
+	float ENDGAME_TIMER = 100f;
 
 	protected List<GameObject> players_team_1 = new List<GameObject>();
 	protected List<GameObject> players_team_2 = new List<GameObject>();
@@ -91,7 +91,7 @@ public class Game_Behaviour : MonoBehaviour {
 	public void FinishGame()
 	{
 		Destroy(GameObject.FindGameObjectWithTag("settings"));
-		Application.LoadLevel("Main_Game");
+		Application.LoadLevel("Pre_Game_Lobby");
 	}
 	
 //	public void setTimeUp(bool val)
@@ -210,6 +210,7 @@ public class Game_Behaviour : MonoBehaviour {
 			else if(timer_value > ENDGAME_TIMER && finish_game)
 				FinishGame();
 			else timer_value++;
+			Debug.Log("Endgame: " + ENDGAME_TIMER + " -> " + timer_value);
 		}
 		
 		if(is_celebrating)
