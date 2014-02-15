@@ -37,11 +37,8 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (game_settings.IsLocalGame() && input_num != KEYBOARD){
 
-			commands.vertical_direction = DxInputManager.Instance.GetValue(input_num, "Y Axis");
-			commands.horizontal_direction = DxInputManager.Instance.GetValue(input_num, "X Axis");
-
-			//commands.vertical_direction = Input.GetAxis("Vertical_Gamepad_" + input_num);
-			//commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num);
+			commands.vertical_direction = Input.GetAxis("Vertical_Gamepad_" + input_num);
+			commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num);
 			commands.shoot = Input.GetAxis("Shoot_Gamepad_" + input_num);
 			commands.dash = Input.GetAxis("Dash_Gamepad_" + input_num);
 			commands.enter = Input.GetAxis("Shoot_Gamepad_" + input_num);
