@@ -29,8 +29,8 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_1;
 	public GameObject crowd_team_2;
 	
-	float timer = 100f;
-	float ENDGAME_TIMER = 100f;
+	float timer = 200f;
+	float ENDGAME_TIMER = 200f;
 
 	protected List<GameObject> players_team_1 = new List<GameObject>();
 	protected List<GameObject> players_team_2 = new List<GameObject>();
@@ -225,6 +225,10 @@ public class Game_Behaviour : MonoBehaviour {
 //		if (is_celebrating && !isTimeUp)
 ////			gui_manager.DrawGoalScored(team_scored, GOAL_STR);
 //			led_screen_script.DrawGoalScored(team_scored);
+
+		if(Input.GetKeyUp(KeyCode.Escape)) {
+
+		}
 	}
 	
 	public int StopCelebration()

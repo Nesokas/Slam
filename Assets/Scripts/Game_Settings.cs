@@ -6,10 +6,12 @@ using System.Collections.Generic;
 
 public class Game_Settings : MonoBehaviour {
 	
-	public bool local_game;
+	public bool local_game = true;
 	public string player_name;
 	public bool connected;
 	public HostData connect_to;
+
+	public string main_menu_scene;
 
 	public List<Hero_Selection.Player> players_list;
 

@@ -22,7 +22,7 @@ public class Hero_Selection : MonoBehaviour {
 
 	private Player player;
 
-	private Lobby lobby;
+	private PreLobby lobby;
 
 	private Game_Settings game_settings;
 	private bool disable_keys = false;
@@ -82,7 +82,7 @@ public class Hero_Selection : MonoBehaviour {
 
 	}
 
-	public void InitializeLocalPlayer(int team, string name, int texture_id, int input_num, Lobby lobby) 
+	public void InitializeLocalPlayer(int team, string name, int texture_id, int input_num, PreLobby lobby) 
 	{
 		player = InitializePlayer(team, name, texture_id, lobby);
 		player.controller = input_num;
@@ -91,7 +91,7 @@ public class Hero_Selection : MonoBehaviour {
 		player_controller.setInputNum(input_num);
 	}
 
-	public void InitializeNetworkPlayer(int team, string name, int texture_id, NetworkPlayer network_player, Lobby lobby)
+	public void InitializeNetworkPlayer(int team, string name, int texture_id, NetworkPlayer network_player, PreLobby lobby)
 	{
 		player = InitializePlayer(team, name, texture_id, lobby);
 		player.network_player = network_player;
@@ -100,7 +100,7 @@ public class Hero_Selection : MonoBehaviour {
 		player_controller.setInputNum(0);
 	}
 
-	public Player InitializePlayer(int team, string name, int texture_id, Lobby lobby)
+	public Player InitializePlayer(int team, string name, int texture_id, PreLobby lobby)
 	{
 		Player new_player = new Player();
 		new_player.player_name = name;

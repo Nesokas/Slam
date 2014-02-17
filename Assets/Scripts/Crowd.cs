@@ -29,7 +29,13 @@ public class Crowd : MonoBehaviour {
 			
 		foreach(Transform fan in transform) {
 
-			GameObject hero_to_instanciate = heroes[Random.Range(0, heroes.Length)];
+			int hero_selected = Random.Range(0, 100);
+			GameObject hero_to_instanciate;
+
+			if(hero_selected <= 60)
+				hero_to_instanciate = heroes[0];
+			else 
+				hero_to_instanciate = heroes[1];
 
 			GameObject hero = (GameObject)Instantiate(hero_to_instanciate);
 			hero.transform.parent = fan;
@@ -59,8 +65,8 @@ public class Crowd : MonoBehaviour {
 	void DeactivateTeslaEffects(GameObject tesla)
 	{
 		// Deactivate Sparkles
-		//GameObject sparkles = tesla.transform.Find("Bulb").GetChild(0).gameObject;
-		//Destroy(sparkles);
+		GameObject sparkles = tesla.transform.Find("Armature/Bone/Base_0/Head/antena_base/antena_lower/antena_mid/antena_higher/bulb").GetChild(0).gameObject;
+		Destroy(sparkles);
 
 		// Deactivate Magnet
 		GameObject magnet = tesla.transform.Find("Base/Magnet").gameObject;

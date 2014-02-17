@@ -38,6 +38,7 @@ public class LocalPlayOnly : MonoBehaviour {
 									GUILayout.FlexibleSpace();
 									if(GUILayout.Button("Start", GUILayout.Height(0.1f*Screen.height), GUILayout.Width(0.2f*Screen.width))){
 										game_settings.local_game = true;
+										game_settings.main_menu_scene = Application.loadedLevelName;
 										Application.LoadLevel("Pre_Game_Lobby");
 									}
 									GUILayout.FlexibleSpace();
