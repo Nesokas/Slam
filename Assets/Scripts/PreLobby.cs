@@ -17,6 +17,7 @@ public class PreLobby : Lobby
 
 	public GameObject local_player_prefab;
 	public GameObject choose_hero_prefab;
+	private List<Camera> heroes_camera_list = new List<Camera>();
 	public GameObject other_hero_choices_prefab;
 	public GameObject network_loading_prefab;
 
@@ -27,7 +28,8 @@ public class PreLobby : Lobby
 	private int players_ready = 0;
 
 	private Camera[] other_choices_cameras;
-
+	private float native_horizontal_resolution = 1296f;
+	private float native_vertical_resolution = 729f;
 	void Awake()
 	{
 		base.Awake();
@@ -163,6 +165,17 @@ public class PreLobby : Lobby
 		}
 	}
 
+	private void BotActivationGUI()
+	{
+		for (int i = 0; i < heroes_camera_list.Count; i++) {
+			//Debug.Log(screen_to_viewport.x);
+			Vector3 add_bot_label_position = (heroes_camera_list[i].ViewportToScreenPoint(new Vector3((Screen.width*0.315f)/748, 0.5f, 0)));
+			if(GUI.Button(new Rect(add_bot_label_position.x, -add_bot_label_position.y+Screen.height,100,30), "Add Bot")) {
+				Debug.Log(add_bot_label_position);
+			}
+		}
+	}
+
 	void LocalHeroSelectScreen()
 	{
 		int total_players_team_1 = team_1.Count;
@@ -176,7 +189,7 @@ public class PreLobby : Lobby
 
 			GameObject choose_hero = (GameObject)Instantiate(choose_hero_prefab);
 			Camera choose_hero_camera = choose_hero.transform.Find("Main Camera").GetComponent<Camera>();
-
+		
 			Vector3 new_choose_hero_position = new Vector3(choose_hero.transform.position.x,
 			                                               choose_hero.transform.position.y + 30*i,
 			                                               choose_hero.transform.position.z
@@ -195,12 +208,13 @@ public class PreLobby : Lobby
 				hero_script.InitializeLocalPlayer(TEAM_2, team_2[player_number].name, i, team_2[player_number].controller, this);
 				total_players_team_2--;
 			} else {
+				heroes_camera_list.Add(choose_hero_camera);
 				GameObject lights = choose_hero.transform.Find("Lights").gameObject;
 				lights.SetActive(false);
-
 				GameObject halo = choose_hero.transform.Find("ready_led").Find("Halo").gameObject;
 				halo.SetActive(false);
 				hero_script.SetTeam((int)team + 1);
+			//	PrintAddBotOverlay();
 			}
 
 			player_number += (i%2);
@@ -306,7 +320,7 @@ public class PreLobby : Lobby
 			LobbyScreen();
 			break;
 		case (int)lobby_states.hero_selection:
-			//HeroScreen();
+			BotActivationGUI();
 			break;
 		}
 	}
