@@ -29,8 +29,8 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_1;
 	public GameObject crowd_team_2;
 	
-	float timer = 200f;
-	float ENDGAME_TIMER = 200f;
+//	float timer = 200f;
+	float ENDGAME_TIMER = 100f;
 
 	protected List<GameObject> players_team_1 = new List<GameObject>();
 	protected List<GameObject> players_team_2 = new List<GameObject>();
@@ -205,7 +205,7 @@ public class Game_Behaviour : MonoBehaviour {
 	protected void Update () 
 	{
 		if(trigger_timer){
-			if(timer_value > timer && !finish_game)
+			if(timer_value > ENDGAME_TIMER && !finish_game)
 				StartGameAgain();
 			else if(timer_value > ENDGAME_TIMER && finish_game)
 				FinishGame();

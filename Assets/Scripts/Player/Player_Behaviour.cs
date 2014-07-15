@@ -100,6 +100,7 @@ public class Player_Behaviour : MonoBehaviour {
 				Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 				bb.ReleasePlayers();
 				bb.SetLastPlayerTouched(this.gameObject);
+
 			}
 		}
 	}
