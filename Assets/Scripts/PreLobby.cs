@@ -30,6 +30,9 @@ public class PreLobby : Lobby
 	private Camera[] other_choices_cameras;
 	private float native_horizontal_resolution = 1296f;
 	private float native_vertical_resolution = 729f;
+
+	bool[] is_pressed_button = new bool[4] {false, false, false, false};
+
 	void Awake()
 	{
 		base.Awake();
@@ -53,6 +56,7 @@ public class PreLobby : Lobby
 		}
 
 		show_lobby_arrows = true;
+		
 	}
 
 	void HeroScreen()
@@ -167,11 +171,20 @@ public class PreLobby : Lobby
 
 	private void BotActivationGUI()
 	{
+
+
 		for (int i = 0; i < heroes_camera_list.Count; i++) {
 			//Debug.Log(screen_to_viewport.x);
 			Vector3 add_bot_label_position = (heroes_camera_list[i].ViewportToScreenPoint(new Vector3((Screen.width*0.315f)/748, 0.5f, 0)));
-			if(GUI.Button(new Rect(add_bot_label_position.x, -add_bot_label_position.y+Screen.height,100,30), "Add Bot")) {
-				Debug.Log(add_bot_label_position);
+			if(!is_pressed_button[i] && GUI.Button(new Rect(add_bot_label_position.x, -add_bot_label_position.y+Screen.height,100,30), "Add Bot")) {
+				Debug.Log(is_pressed_button[i]);
+				if (i == 0 || i == 2)
+					game_settings.red_team_bots++;
+				else
+					game_settings.blue_team_bots++;
+
+				is_pressed_button[i] = true;
+				Debug.Log(is_pressed_button[i]);
 			}
 		}
 	}

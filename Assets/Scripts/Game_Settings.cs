@@ -18,6 +18,9 @@ public class Game_Settings : MonoBehaviour {
 	public int team_1_count = 0;
 	public int team_2_count = 0;
 
+	public int red_team_bots = 0;
+	public int blue_team_bots = 0;
+
 	void Awake()
 	{
 		connected = false;
