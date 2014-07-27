@@ -20,20 +20,31 @@ public class GameStarter : MonoBehaviour {
 	public GameObject net_game_prefab;
 
 	public GameObject settings_prefab;
+	public GameObject AI_prefab;
 
 	private GameObject game_manager_object;
+	private AIManager AIManager;
+
+	private int red_bots = 0;
+	private int blue_bots = 0;
 
 	// Use this for initialization
 	void Start () {
-		GameObject settings = GameObject.Find("Settings(Clone)");
 
+		GameObject settings = GameObject.Find("Settings(Clone)");
 		if(settings == null)
 			settings = (GameObject)Instantiate(settings_prefab);
+
+//		GameObject ai_manager = GameObject.Find("AIManager");
+//		if (ai_manager == null)
+//			ai_manager = (GameObject)Instantiate(AI_prefab);
 
 		game_settings = settings.GetComponent<Game_Settings>();
 
 		team_1_count = game_settings.team_1_count;
 		team_2_count = game_settings.team_2_count;
+
+		red_bots = game_settings.GetRedTeamBots();
 
 		float court_lenght = court_start_position_team_1.transform.position.x*(-2);
 		distance_team_1 = court_lenght/(team_1_count+1);
@@ -43,7 +54,21 @@ public class GameStarter : MonoBehaviour {
 			StartLocalGame();
 		else if(Network.isServer)
 			StartNetworkGame();
+		
+		GameObject AIManager_object = GameObject.Find("AIManager");
+		AIManager = AIManager_object.GetComponent<AIManager>();
+		if(AIManager != null)
+			AIManager.test();
+		
+	}
 
+	public void SetAIManager(AIManager ai_manager)
+	{
+		// For some fucking reason I can't seem to find the AIManager in Start()
+//		AIManager = ai_manager;
+//		for (int i = 0; i < red_bots; i++)
+//			AIManager.InstantiateBot(CalculatePosition(1), 1);
+		
 	}
 
 	private void StartLocalGame()
@@ -60,6 +85,21 @@ public class GameStarter : MonoBehaviour {
 			                          player.hero_index
 			                         );
 		}
+
+		for (int i = 0; i < game_settings.GetRedTeamBots(); i++) {
+		
+			InstantiateNewLocalPlayer(CalculatePosition(1), 1, "AI", i*(-1)-1, 4, 2); // bots have negative controller to differentiate
+			int x =  i*(-1)-1;
+			Debug.Log("RED" + x);
+		}
+
+		for (int i = 0; i < game_settings.GetBlueTeamBots(); i++) {
+			
+			InstantiateNewLocalPlayer(CalculatePosition(2), 2, "AI", (game_settings.GetRedTeamBots() + i)*(-1)-1, 4, 2);
+			int x =  (game_settings.GetRedTeamBots() + i)*(-1)-1;
+			Debug.Log("BLUE" + x);
+		}
+
 	}
 
 	public void StartNetworkGame()

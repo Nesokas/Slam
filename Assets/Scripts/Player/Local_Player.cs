@@ -19,7 +19,6 @@ public class Local_Player : Kickoff_Player {
 		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
 		controller = input_num;
 		player_controller.setInputNum(input_num);
-		
 		GameObject game_controller = GameObject.FindGameObjectWithTag("GameController");
         Local_Game local_game = game_controller.GetComponent<Local_Game>();
         indicator_arrow = local_game.GetTexture(texture_id);

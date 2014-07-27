@@ -55,7 +55,7 @@ public class Player_Behaviour : MonoBehaviour {
 	protected bool is_adding_speed = false;
 	protected float animation_speed = 1f;
 
-	protected PlayerController.Commands commands;
+	public PlayerController.Commands commands;
 	
 	private float PLAYER_ARROW_SIZE = 0.015f;
 	private float INIT_PLAYER_STAR_SIZE = 0.5f;
@@ -78,7 +78,9 @@ public class Player_Behaviour : MonoBehaviour {
 
 	private bool is_cooldown_over = true;
 	private bool is_power_activated_timer_over = false;
-	
+
+	protected bool is_ai = true;
+
 	void VerifyShoot()
 	{
 		if(colliding_with_ball && !ball_collision && move){

@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		if (game_settings.IsLocalGame() && input_num != KEYBOARD){
+		if (game_settings.IsLocalGame() && input_num > KEYBOARD){ //which means, if it's a human locally playing with a gamepad
 
 			commands.vertical_direction = Input.GetAxis("Vertical_Gamepad_" + input_num);
 			commands.horizontal_direction = Input.GetAxis("Horizontal_Gamepad_" + input_num);
@@ -43,14 +43,16 @@ public class PlayerController : MonoBehaviour {
 			commands.dash = Input.GetAxis("Dash_Gamepad_" + input_num);
 			commands.enter = Input.GetAxis("Shoot_Gamepad_" + input_num);
 
-		} else {
+		} else if(input_num == KEYBOARD) {
 
 			commands.vertical_direction = Input.GetAxis("Vertical");
 			commands.horizontal_direction = Input.GetAxis("Horizontal");
 			commands.shoot = Input.GetAxis("Shoot");
 			commands.dash = Input.GetAxis("Dash");
 			commands.enter = Input.GetAxis("Shoot");
-
+		//	Debug.Log(Input.GetAxis("Horizontal"));
+		} else  {
+			commands.vertical_direction = 1;
 		}
 	}
 	

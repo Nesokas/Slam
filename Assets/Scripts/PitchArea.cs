@@ -12,7 +12,7 @@ public class PitchArea : MonoBehaviour {
 		AIManager = AIManager_object.GetComponent<AIManager>();
 
 		index = int.Parse(name);
-		Debug.Log(index);
+	//	Debug.Log(index);
 	}
 	
 	// Update is called once per frame

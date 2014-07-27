@@ -136,6 +136,9 @@ public class Kickoff_Player : Player_Behaviour {
 		case 1:
 			hero = new Tesla(this);
 			break;
+		case 2:
+			hero = new AI(this);
+			break;
 		}
 		hero.InstantiateMesh(this.transform);
 		

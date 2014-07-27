@@ -18,8 +18,8 @@ public class Game_Settings : MonoBehaviour {
 	public int team_1_count = 0;
 	public int team_2_count = 0;
 
-	public int red_team_bots = 0;
-	public int blue_team_bots = 0;
+	private int red_team_bots = 0;
+	private int blue_team_bots = 0;
 
 	void Awake()
 	{
@@ -49,4 +49,23 @@ public class Game_Settings : MonoBehaviour {
 		
 	}
 
+	public int GetRedTeamBots()
+	{
+		return red_team_bots;
+	}
+
+	public int GetBlueTeamBots()
+	{
+		return blue_team_bots;
+	}
+
+	public void IncRedTeamBots()
+	{
+		red_team_bots++;
+	}
+
+	public void IncBlueTeamBots()
+	{
+		blue_team_bots++;
+	}
 }

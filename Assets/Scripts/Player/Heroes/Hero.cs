@@ -28,4 +28,6 @@ public abstract class Hero {
 		return player.IsCooldownOver();
 	}
 
+
+
 }

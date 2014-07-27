@@ -6,6 +6,7 @@ public class AIManager : MonoBehaviour {
 
 	//The pitch is divided in 18 areas. This list relates the players to each area of the pitch
 	private List<Player_Behaviour>[] pitch_area_list = new List<Player_Behaviour>[18];
+	private List<Hero> ai_list = new List<Hero>();
 	private int red_team_bots;
 	private int blue_team_bots;
 
@@ -14,30 +15,54 @@ public class AIManager : MonoBehaviour {
 
 	private Game_Settings game_settings;
 
+	private GameStarter game_starter;
+
+	protected GameObject AI_prefab;
+
+
 	void Start () {
 
-		GameObject settings = GameObject.FindGameObjectWithTag("settings");
+		GameObject game_starter_object = GameObject.Find("GameStarter");
+		game_starter = game_starter_object.GetComponent<GameStarter>();
+		
+		game_starter.SetAIManager(this);
+		
+		AI_prefab = Resources.Load<GameObject>("Heroes/AI");
 
-		game_settings = settings.GetComponent<Game_Settings>();
+//		GameObject settings = GameObject.FindGameObjectWithTag("settings");
+
+//		game_settings = settings.GetComponent<Game_Settings>();
 
 		for (int i = 0; i <= 17; i++) {
 
 			pitch_area_list[i] = new List<Player_Behaviour>();
 		
 		}
-
-		red_team_bots = game_settings.red_team_bots;
-		blue_team_bots = game_settings.blue_team_bots;
-
-		Debug.Log("red bots: " + red_team_bots);
-		Debug.Log("blue bots: " + blue_team_bots);
 	
+	}
+
+	public void InsertAI(Hero hero)
+	{
+		Debug.Log("added hero");
+		ai_list.Add(hero);
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
+		foreach (AI ai in ai_list)
+			ai.Update();
+	}
 
+	public void InstantiateBot(Vector3 start_position, int team)
+	{
+
+
+	}
+
+	public void test()
+	{
+		Debug.Log("test");
 	}
 
 	public void InsertPlayerInList(Player_Behaviour player, int index)
@@ -55,7 +80,7 @@ public class AIManager : MonoBehaviour {
 	public void SetDiskArea(int index)
 	{
 		disk_area = index;
-		Debug.Log(index);
+		//Debug.Log(index);
 	}
 
 }

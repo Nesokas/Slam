@@ -178,13 +178,18 @@ public class PreLobby : Lobby
 			Vector3 add_bot_label_position = (heroes_camera_list[i].ViewportToScreenPoint(new Vector3((Screen.width*0.315f)/748, 0.5f, 0)));
 			if(!is_pressed_button[i] && GUI.Button(new Rect(add_bot_label_position.x, -add_bot_label_position.y+Screen.height,100,30), "Add Bot")) {
 				Debug.Log(is_pressed_button[i]);
-				if (i == 0 || i == 2)
-					game_settings.red_team_bots++;
-				else
-					game_settings.blue_team_bots++;
+				if (i == 0 || i == 2) {
+					game_settings.IncBlueTeamBots();
+					game_settings.team_2_count++;
+				}
+				else {
+					game_settings.IncRedTeamBots();
+					game_settings.team_1_count++;
+				}
 
 				is_pressed_button[i] = true;
 				Debug.Log(is_pressed_button[i]);
+
 			}
 		}
 	}
