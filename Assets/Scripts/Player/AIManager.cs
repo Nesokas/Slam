@@ -43,7 +43,6 @@ public class AIManager : MonoBehaviour {
 
 	public void InsertAI(Hero hero)
 	{
-		Debug.Log("added hero");
 		ai_list.Add(hero);
 	}
 	

@@ -41,6 +41,7 @@ public class Local_Player : Kickoff_Player {
 		UpdateCommands();
 
 	}
+
 	
 	void UpdateCommands()
 	{

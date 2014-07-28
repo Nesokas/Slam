@@ -81,6 +81,8 @@ public class Player_Behaviour : MonoBehaviour {
 
 	protected bool is_ai = true;
 
+	private int current_area; //every player knows where it is in the pitch;
+
 	void VerifyShoot()
 	{
 		if(colliding_with_ball && !ball_collision && move){
@@ -117,7 +119,6 @@ public class Player_Behaviour : MonoBehaviour {
 		hero.UsePower(commands);
 	}
 
-
 	public void resetPowerBar()
 	{
 		power_cooldown = POWER_COOLDOWN+Time.time;
@@ -129,12 +130,15 @@ public class Player_Behaviour : MonoBehaviour {
 		POWER_COOLDOWN = power_cooldown;
 	}
 	
-//	[RPC]
-//	void EmmitDashSmoke()
-//	{
-//		dash_smoke.particleEmitter.Emit();
-//		dash_smoke.particleSystem.Play();
-//	}
+	public void SetCurrentArea(int area)
+	{
+		current_area = area;
+	}
+
+	public int getCurrentArea()
+	{
+		return current_area;
+	}
 	
 	public void GoalScored()
 	{

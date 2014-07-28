@@ -22,10 +22,14 @@ public class PitchArea : MonoBehaviour {
 
 	void OnTriggerEnter(Collider collider)
 	{
-		if (collider.gameObject.CompareTag("player_collider"))
+		if (collider.gameObject.CompareTag("player_collider")) {
 
-			AIManager.InsertPlayerInList(collider.gameObject.GetComponent<Player_Behaviour>(), index);
+			Player_Behaviour player = collider.transform.parent.gameObject.GetComponent<Player_Behaviour>();
+			player.SetCurrentArea(index); //every player knows where it is in the pitch;
+		//	Debug.Log("area: " + index + "player_area: " + player.getCurrentArea());
+			AIManager.InsertPlayerInList(player, index);
 
+		}
 		else if (collider.gameObject.CompareTag("ball"))
 
 		         AIManager.SetDiskArea(index);
