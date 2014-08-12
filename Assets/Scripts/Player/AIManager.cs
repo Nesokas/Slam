@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class AIManager : MonoBehaviour {
 
@@ -18,6 +19,8 @@ public class AIManager : MonoBehaviour {
 	private GameStarter game_starter;
 
 	protected GameObject AI_prefab;
+
+	private Vector3[] pitch_area_coordinates = new Vector3[18];
 
 
 	void Start () {
@@ -53,10 +56,29 @@ public class AIManager : MonoBehaviour {
 			ai.Update();
 	}
 
+	public void InsertPitchAreaCoordinates(int index, Vector3 pos)
+	{
+		pitch_area_coordinates[index] = pos;
+
+		Debug.Log(index + " - " + pos + " --> " + pitch_area_coordinates[index]);
+		PrintPitchAreaCoords();
+	}
+
 	public void InstantiateBot(Vector3 start_position, int team)
 	{
 
 
+	}
+
+	public Vector3 GetPitchAreaCoords(int index)
+	{
+		return pitch_area_coordinates[index];
+	}
+
+	public void PrintPitchAreaCoords()
+	{
+		for (int i = 0; i < 18; i++)
+			Debug.Log(i + " - " + pitch_area_coordinates[i]);
 	}
 
 	public void test()

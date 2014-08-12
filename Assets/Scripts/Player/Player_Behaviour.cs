@@ -79,7 +79,7 @@ public class Player_Behaviour : MonoBehaviour {
 	private bool is_cooldown_over = true;
 	private bool is_power_activated_timer_over = false;
 
-	protected bool is_ai = true;
+	protected bool is_ai = false;
 
 	private int current_area; //every player knows where it is in the pitch;
 
@@ -482,6 +482,11 @@ public class Player_Behaviour : MonoBehaviour {
 	public bool IsPowerTimerOver()
 	{
 		return is_power_activated_timer_over;
+	}
+
+	public void SetIsAI(bool is_ai)
+	{
+		this.is_ai = is_ai;
 	}
 
 	public void setPowerActivatedTimer(float value)

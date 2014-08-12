@@ -12,7 +12,9 @@ public class PitchArea : MonoBehaviour {
 		AIManager = AIManager_object.GetComponent<AIManager>();
 
 		index = int.Parse(name);
-	//	Debug.Log(index);
+
+		AIManager.InsertPitchAreaCoordinates(index, this.transform.position);
+		//Debug.Log(index + " - " +transform.localPosition);
 	}
 	
 	// Update is called once per frame

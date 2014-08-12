@@ -42,7 +42,6 @@ public class PlayerController : MonoBehaviour {
 			commands.shoot = Input.GetAxis("Shoot_Gamepad_" + input_num);
 			commands.dash = Input.GetAxis("Dash_Gamepad_" + input_num);
 			commands.enter = Input.GetAxis("Shoot_Gamepad_" + input_num);
-
 		} else if(input_num == KEYBOARD) {
 
 			commands.vertical_direction = Input.GetAxis("Vertical");
@@ -51,9 +50,17 @@ public class PlayerController : MonoBehaviour {
 			commands.dash = Input.GetAxis("Dash");
 			commands.enter = Input.GetAxis("Shoot");
 		//	Debug.Log(Input.GetAxis("Horizontal"));
-		} else  {
-			commands.vertical_direction = 1;
-		}
+		} 
+	}
+
+	public void SetVerticalDirection(int direction)
+	{
+		commands.vertical_direction = direction;
+	}
+
+	public void SetHorizontalDirection(int direction)
+	{
+		commands.horizontal_direction = direction;
 	}
 	
 	public Commands GetCommands()

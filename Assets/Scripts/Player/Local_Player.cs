@@ -4,6 +4,13 @@ using System.Collections;
 public class Local_Player : Kickoff_Player {
 	
 	public int controller;
+	public PlayerController player_controller;
+
+//	void Start()
+//	{
+//		base.Start();
+//		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+//	}
 
 	public void InitializePlayerInfo(int team_num, string player_name, Vector3 position, int input_num, int texture_id, int hero_index)
 	{
@@ -16,7 +23,7 @@ public class Local_Player : Kickoff_Player {
 		player_mesh.animation.Play("Idle");
 		initial_position = position;
 		controller_object = (GameObject)Instantiate(player_controller_prefab);
-		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
+		player_controller = controller_object.GetComponent<PlayerController>();
 		controller = input_num;
 		player_controller.setInputNum(input_num);
 		GameObject game_controller = GameObject.FindGameObjectWithTag("GameController");
@@ -37,7 +44,8 @@ public class Local_Player : Kickoff_Player {
 		} else {
 			player_base.renderer.material = normal_material;
 		}
-		
+
+		//if (!is_ai)
 		UpdateCommands();
 
 	}
@@ -45,7 +53,6 @@ public class Local_Player : Kickoff_Player {
 	
 	void UpdateCommands()
 	{
-		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
 		commands = player_controller.GetCommands();
 	}
 	

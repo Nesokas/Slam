@@ -38,6 +38,7 @@ public class Sam : Hero {
 		}
 
 		last_dash = commands.dash;
+
 	}
 
 	public override void EmmitPowerFX(string type ="none")
