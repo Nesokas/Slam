@@ -60,8 +60,8 @@ public class AIManager : MonoBehaviour {
 	{
 		pitch_area_coordinates[index] = pos;
 
-		Debug.Log(index + " - " + pos + " --> " + pitch_area_coordinates[index]);
-		PrintPitchAreaCoords();
+	//	Debug.Log(index + " - " + pos + " --> " + pitch_area_coordinates[index]);
+	//	PrintPitchAreaCoords();
 	}
 
 	public void InstantiateBot(Vector3 start_position, int team)

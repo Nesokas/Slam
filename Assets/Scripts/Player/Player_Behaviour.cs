@@ -276,9 +276,11 @@ public class Player_Behaviour : MonoBehaviour {
 		shoot_effect = transform.Find("Shoot_Effect");
 		Transform base_collider = transform.Find("Collider");
 		Transform shoot_collider = transform.Find("ColliderShoot");
+		Transform colliderAIPossession = transform.Find("ColliderAIPossession");
 		Transform court_collider = court_walls.transform.Find("forcefield");
 		Physics.IgnoreCollision(court_collider.collider, base_collider.collider);
 		Physics.IgnoreCollision(court_collider.collider, shoot_collider.collider);
+		Physics.IgnoreCollision(court_collider.collider, colliderAIPossession.collider);
 		for(int i = 0; i < goal_detection.Length; i++) {
 			Physics.IgnoreCollision(goal_detection[i].collider, base_collider.collider);
 		}

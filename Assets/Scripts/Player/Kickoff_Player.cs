@@ -23,47 +23,67 @@ public class Kickoff_Player : Player_Behaviour {
 		player_base = transform.Find("Mesh").Find("Base");
 		Transform base_collider = transform.Find("Collider");
 		Transform shoot_collider = transform.Find("ColliderShoot");
+		Transform colliderAIPossession = transform.Find("ColliderAIPossession");
 		
 		if (scored_team == 0){
 			if(team == 1){
 				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
 				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider, false);
+
 				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
 				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
+				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider);
 			} else {
 				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
 				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider, false);
+
 				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
 				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
+				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider);
 			}
 		} else if (team == 1) {
 			if (scored_team == 1) {
 				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
 				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider, false);
+
 				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
 				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
+				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider);
 			} else {
 				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
 				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider, false);
+
 				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
 				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
+				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider);
 			}
 		} else {
 			if (scored_team == 1) {
 				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
 				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider, false);
+
 				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
 				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
+				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider);
 			} else {
 				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
 				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
+				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider, false);
+
 				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
 				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
+				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider);
 			}
 		}
 		for(int i = 0; i < center_planes.Length; i++) {
 			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider, false);
 			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider, false);
+			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossession.collider, false);
 		}
 	}
 	
@@ -79,14 +99,20 @@ public class Kickoff_Player : Player_Behaviour {
 		player_base = transform.Find("Mesh").Find("Base");
 		Transform base_collider = transform.Find("Collider");
 		Transform shoot_collider = transform.Find("ColliderShoot");
+		Transform colliderAIPossession = transform.Find("ColliderAIPossession");
+
 		for (int i = 0; i < center_planes.Length; i++) {
 			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider);
 			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider);
+			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossession.collider);
 		}
 		Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
 		Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
+		Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider);
+
 		Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
 		Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
+		Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider);
 	}
 	
 	public void Awake() 

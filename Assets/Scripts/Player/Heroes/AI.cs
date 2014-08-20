@@ -16,9 +16,15 @@ public class AI : Hero {
 	private bool has_ball = false;
 
 	private float distance_to_ball = 0;
+
+	//distance from which the player is considered to be in possession
 	private float possession_distance_threshold = 1f;
 
-	private GameObject sphere;
+	private Transform sphere;
+
+	private int goto_area = 0;
+
+	Transform colliderAIPossession;
 //	private struct beliefs {
 //	
 //		private Dictionary teammates_positions;
@@ -34,7 +40,9 @@ public class AI : Hero {
 		player.SetIsAI(true);
 		ball = GameObject.FindGameObjectWithTag("ball");
 
-		//ai_manager.PrintPitchAreaCords();
+		colliderAIPossession = player.transform.Find("ColliderAIPossession");
+		colliderAIPossession.gameObject.SetActive(true);
+
 	}
 	// Use this for initialization
 	public override void Start () {
@@ -63,27 +71,22 @@ public class AI : Hero {
 
 	private void DribbleToArea(int index)
 	{
-		RaycastHit hit;
+		goto_area = index;
 
-//		if (Physics.Raycast (ball.transform.position, ai_manager.GetPitchAreaCoords(index) - ball.transform.position, out hit)) {
-//		
-//				if (hit.transform == player.transform)
-//					Debug.Log("hello world");
-//		
-//		}
+		RaycastHit hit;
+		
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
-		//Vector3 pitch_vector = new Vector3ai_manager.GetPitchAreaCoords().x
 		Ray ray = new Ray(ball_vector, -1*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
-		if (player.transform.Find("Collider").collider.Raycast(ray, out hit, Mathf.Infinity))
+		
+		if (colliderAIPossession.collider.Raycast(ray, out hit, Mathf.Infinity))
 			Debug.Log("HIT");
-			//Debug.DrawLine(ray.origin, hit.point);
+
+
 
 
 		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
 		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
-		Debug.Log(ball_vector + " - " + ai_manager.GetPitchAreaCoords(index));
-		//Debug.Log(ai_manager.GetPitchAreaCoords(index));
-		//Physics.raycast
+	//	Debug.Log(ball_vector + " - " + ai_manager.GetPitchAreaCoords(index));
 	}
 
 
