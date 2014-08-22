@@ -8,10 +8,13 @@ public class AI : Hero {
 //	private PlayerController controller;
 	Local_Player player;
 	private GameObject ball;
+	private Ball_Behaviour ball_behaviour;
 
 	private const int BOTTOM_FLANK = 0, MID_FLANK = 1, TOP_FLANK = 2, LEFT = 3, RIGHT = 4;
 
 	private const int MOVE_UP = 1, MOVE_DOWN = -1, MOVE_LEFT = 1, MOVE_RIGHT = -1;
+
+	private const int ABOVE = 1, BELOW = 2;
 
 	private bool has_ball = false;
 
@@ -40,6 +43,8 @@ public class AI : Hero {
 		player.SetIsAI(true);
 		ball = GameObject.FindGameObjectWithTag("ball");
 
+		ball_behaviour = ball.GetComponent<Ball_Behaviour>();
+
 		colliderAIPossession = player.transform.Find("ColliderAIPossession");
 		colliderAIPossession.gameObject.SetActive(true);
 
@@ -66,6 +71,11 @@ public class AI : Hero {
 //
 //		Debug.Log(has_ball);
 
+		if (distance_to_ball < possession_distance_threshold) {
+			has_ball = true;
+		} else {
+			has_ball = false;
+		}
 		DribbleToArea(0);
 	}
 
@@ -77,18 +87,65 @@ public class AI : Hero {
 		
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
 		Ray ray = new Ray(ball_vector, -1*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
-		
-		if (colliderAIPossession.collider.Raycast(ray, out hit, Mathf.Infinity))
-			Debug.Log("HIT");
+
+		if (!has_ball) {
+
+			GoToBall();
 
 
 
+		} else {
+
+		//	ResetControllers();
+
+			RotateAroundBallClockwise();
+
+			if (colliderAIPossession.collider.Raycast(ray, out hit, Mathf.Infinity)) {
+				Debug.Log("HIT");
+
+				int below_or_above = IsBallAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
+				int left_or_right = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
+
+				if (below_or_above == ABOVE)
+				    player.player_controller.commands.vertical_direction = MOVE_DOWN;
+				else if (below_or_above == BELOW)
+					player.player_controller.commands.vertical_direction = MOVE_UP;
+				else
+					player.player_controller.commands.vertical_direction = 0;
+			
+				if (left_or_right == LEFT)
+					player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+				else if (left_or_right == RIGHT)
+					player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+				else
+					player.player_controller.commands.horizontal_direction = 0;
+
+
+			}
+
+		}
+	
 
 		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
 		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
 	//	Debug.Log(ball_vector + " - " + ai_manager.GetPitchAreaCoords(index));
 	}
 
+	private int IsBallAboveOrBellow(int ball_area, int target_area)
+	{
+		int area_flank = AreaToFlank(target_area);
+		int ball_flank = AreaToFlank(ball_area);
+
+		if (ball_flank > area_flank)
+			return ABOVE;
+
+		else if (ball_flank < area_flank)
+			return BELOW;
+
+		else 
+			return 0;
+
+	}
 
 
 	private void ResetControllers()
@@ -161,8 +218,7 @@ public class AI : Hero {
 	private void RotateAroundBallClockwise()
 	{
 		int quadrant = GetQuadrant();
-		
-		Debug.Log(quadrant);
+
 		
 		if (quadrant == 1) {
 			

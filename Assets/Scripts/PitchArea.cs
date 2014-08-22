@@ -5,6 +5,8 @@ public class PitchArea : MonoBehaviour {
 
 	private AIManager AIManager;
 	private int index;
+	private Ball_Behaviour ball;
+
 
 	// Use this for initialization
 	void Start () {
@@ -15,6 +17,7 @@ public class PitchArea : MonoBehaviour {
 
 		AIManager.InsertPitchAreaCoordinates(index, this.transform.position);
 		//Debug.Log(index + " - " +transform.localPosition);
+		
 	}
 	
 	// Update is called once per frame
@@ -25,12 +28,15 @@ public class PitchArea : MonoBehaviour {
 	void OnTriggerEnter(Collider collider)
 	{
 		if (collider.gameObject.CompareTag("player_collider")) {
-
 			Player_Behaviour player = collider.transform.parent.gameObject.GetComponent<Player_Behaviour>();
 			player.SetCurrentArea(index); //every player knows where it is in the pitch;
 		//	Debug.Log("area: " + index + "player_area: " + player.getCurrentArea());
 			AIManager.InsertPlayerInList(player, index);
 
+		} else if(collider.gameObject.CompareTag("ball")) {
+			if (!ball)
+				ball = GameObject.Find("Ball").GetComponent<Ball_Behaviour>();
+			ball.SetCurrentArea(index);
 		}
 		else if (collider.gameObject.CompareTag("ball"))
 

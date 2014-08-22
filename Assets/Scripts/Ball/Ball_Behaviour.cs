@@ -6,7 +6,9 @@ public class Ball_Behaviour : MonoBehaviour {
 	protected bool game_restarted = true;
 	protected bool animation_finished = true;
 	protected bool rolling_eyes = false;
-	
+
+	private int current_area = 7;
+
 	/*animations of type1 can be crossfaded to type2
 	 * such as look_left -> Default*/
 	string[] animationsType1;
@@ -48,6 +50,16 @@ public class Ball_Behaviour : MonoBehaviour {
 			}
 			
 		}
+	}
+
+	public void SetCurrentArea(int area)
+	{
+		current_area = area;
+	}
+
+	public int GetCurrentArea()
+	{
+		return current_area;
 	}
 	
 	protected void OnTriggerEnter(Collider collider)
