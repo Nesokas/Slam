@@ -102,11 +102,11 @@ public class AI : Hero {
 		} else {
 			has_ball = false;
 		}
-		//DribbleToArea(key);
+		DribbleToArea(key);
 
-		test(key);
-
-		RotateAroundBall(key);
+//		test(key);
+//
+//		RotateAroundBall(key);
 	}
 
 	private void test(int index)
@@ -148,10 +148,7 @@ public class AI : Hero {
 
 			ResetControllers();
 		
-			if (!touched_ball)
-				RotateAroundBallClockwise();
-			else
-				RotateAroundBallCounterclockwise();
+			RotateAroundBall(index);
 		
 			int below_or_above = IsBallAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
 			int left_or_right = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
@@ -197,6 +194,8 @@ public class AI : Hero {
 		int ball_below_or_above_target = IsBallAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
 		int ball_left_or_right_target = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
 
+		int player_left_or_right_target = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
+		int player_below_or_above_target = IsBallAboveOrBellow(player.getCurrentArea(), index);
 		int player_below_or_above_ball;
 		int player_left_or_right_ball;
 
@@ -219,41 +218,72 @@ public class AI : Hero {
 		}
 
 		float ball_target_slope = GetSlope(ball.transform.position, ai_manager.GetPitchAreaCoords(index));
+		float ball_target_y_intercept = GetYIntercept(ball_target_slope, ball.transform.position);
 
 		float player_target_slope = GetSlope(player.transform.position, ai_manager.GetPitchAreaCoords(index));
 
-		Debug.Log("player slope -> " + player_target_slope + " ball slope -> " + ball_target_slope);
+		Debug.Log(IsAboveLine(player.transform.position, ball_target_slope, ball_target_y_intercept));
+
+		if (IsAboveLine(player.transform.position, ball_target_slope, ball_target_y_intercept))
+			if (ball_below_or_above_target == ABOVE)
+				if (ball_target_slope > 0)
+					RotateAroundBallClockwise();
+				else
+					RotateAroundBallCounterclockwise();
+			else
+				if(ball_target_slope > 0)
+					RotateAroundBallCounterclockwise();
+				else
+					RotateAroundBallClockwise();
+		else
+			if (ball_below_or_above_target == ABOVE)
+				if(ball_target_slope > 0)
+					RotateAroundBallCounterclockwise();
+				else
+					RotateAroundBallClockwise();
+			else
+				if (ball_target_slope > 0)
+					RotateAroundBallClockwise();
+				else
+					RotateAroundBallCounterclockwise();
+	
+
+	//	Debug.Log("player slope -> " + player_target_slope + " ball slope -> " + ball_target_slope);
 		
 		//ROTATE CLOCKWISE
 
-		Debug.Log(ball_left_or_right_target == LEFT);
+		//Debug.Log(ball_left_or_right_target == LEFT);
 
-		if((ball_left_or_right_target == LEFT || ball_left_or_right_target == 0) && ball_below_or_above_target == ABOVE)
-			if (player_left_or_right_ball == LEFT && player_below_or_above_ball == BELOW)
-					Debug.Log("ROTATE CLOCKWISE");
-
-
-		if (ball_left_or_right_target == LEFT && ball_below_or_above_target == 0)
-			if (player_left_or_right_ball == LEFT)
-				if (player_below_or_above_ball == BELOW)
-					Debug.Log("ROTATE CLOCKWISE");
-				else
-					Debug.Log("ROTATE COUNTERCLOCKWISE");
-
-		if (ball_left_or_right_target == LEFT && ball_below_or_above_target == BELOW)
-			if (player_left_or_right_ball == LEFT)
-				if (player_below_or_above_ball == BELOW)
-					if (player_target_slope > ball_target_slope)
-						Debug.Log("ROTATE CLOCKWISE");
-					else
-						Debug.Log("ROTATE COUNTERCLOCKWISE");
-
-
-
+		
 
 	//	Debug.Log(ball_target_slope);
 	}
 
+	private float GetYIntercept(float slope, Vector3 point)
+	{
+		//y = m.x + b
+
+		float y = point.x;
+		float x = -point.z;
+
+		float b = y - slope * x;
+
+		return b;
+	}
+
+	private bool IsAboveLine(Vector3 point, float slope, float b)
+	{
+		Debug.Log("player point -> " + point);
+		float x = -point.z;
+
+		float y = x * slope + b;
+
+		if (y > point.x)
+			return false;
+
+		else
+			return true;
+	}
 
 	private float GetSlope(Vector3 vec1, Vector3 vec2)
 	{
@@ -357,7 +387,7 @@ public class AI : Hero {
 	{
 		int quadrant = GetQuadrant();
 
-		Debug.Log(quadrant);
+	//	Debug.Log(quadrant);
 
 		if (quadrant == 1) {
 		
