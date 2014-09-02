@@ -16,7 +16,9 @@ public class AI : Hero {
 
 	private const int ABOVE = 1, BELOW = 2;
 
-	private bool has_ball = false;
+	private const int RED = 0, BLUE = 1;
+
+//	private bool has_ball = false;
 
 	private bool is_clockwise_rotation = true;
 
@@ -37,12 +39,19 @@ public class AI : Hero {
 	Transform colliderAIPossessionLeft;
 	Transform colliderAIPossessionRight;
 	Transform player_collider;
-//	private struct beliefs {
-//	
+
+	private struct Beliefs {
+	
 //		private Dictionary teammates_positions;
-//		private Dictionary 
-//	
-//	}
+//		private Dictionary oponnents_positions;
+//		private Vector3 ball_position;
+//		private bool player_with_ball;
+//		private int team;
+		public bool has_ball;
+	}
+
+	Beliefs beliefs;
+
 
 	public AI(Player_Behaviour player)
 	{
@@ -98,9 +107,9 @@ public class AI : Hero {
 
 
 		if (distance_to_ball < possession_distance_threshold) {
-			has_ball = true;
+			beliefs.has_ball = true;
 		} else {
-			has_ball = false;
+			beliefs.has_ball = false;
 		}
 		DribbleToArea(key);
 
@@ -140,8 +149,8 @@ public class AI : Hero {
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
 		Ray ray = new Ray(ball_vector, -1*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
-		if (!has_ball) {
-
+		if (!beliefs.has_ball) {
+	
 			GoToBall();
 
 		} else {
@@ -198,6 +207,7 @@ public class AI : Hero {
 		int player_below_or_above_target = IsBallAboveOrBellow(player.getCurrentArea(), index);
 		int player_below_or_above_ball;
 		int player_left_or_right_ball;
+		
 
 		if (player.transform.position.x > ball.transform.position.x) {
 			player_below_or_above_ball = ABOVE;
@@ -230,22 +240,32 @@ public class AI : Hero {
 					RotateAroundBallClockwise();
 				else
 					RotateAroundBallCounterclockwise();
-			else
+			else if (ball_below_or_above_target == BELOW)
 				if(ball_target_slope > 0)
 					RotateAroundBallCounterclockwise();
 				else
 					RotateAroundBallClockwise();
+			else if(ball_left_or_right_target == LEFT)
+				RotateAroundBallCounterclockwise();
+			else
+				RotateAroundBallClockwise();
 		else
 			if (ball_below_or_above_target == ABOVE)
 				if(ball_target_slope > 0)
 					RotateAroundBallCounterclockwise();
 				else
 					RotateAroundBallClockwise();
-			else
+			else if (ball_below_or_above_target == BELOW)
 				if (ball_target_slope > 0)
 					RotateAroundBallClockwise();
 				else
 					RotateAroundBallCounterclockwise();
+			else if(ball_left_or_right_target == LEFT)
+				RotateAroundBallClockwise();
+			else
+				RotateAroundBallCounterclockwise();
+		//	else
+		//	RotateAroundBallClockwise();
 	
 
 	//	Debug.Log("player slope -> " + player_target_slope + " ball slope -> " + ball_target_slope);
