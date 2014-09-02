@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Kickoff_Player : Player_Behaviour {
 	
-	public int team = 1;
+	//public int team = 1;
 	public int player_num = 1;
 	
 	public Material normal_team_2_material;

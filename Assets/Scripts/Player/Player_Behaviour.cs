@@ -83,6 +83,8 @@ public class Player_Behaviour : MonoBehaviour {
 
 	private int current_area; //every player knows where it is in the pitch;
 
+	public int team = 1;
+
 	void VerifyShoot()
 	{
 		if(colliding_with_ball && !ball_collision && move){

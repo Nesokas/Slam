@@ -14,6 +14,8 @@ public class AI : Hero {
 
 	private const int MOVE_UP = 1, MOVE_DOWN = -1, MOVE_LEFT = 1, MOVE_RIGHT = -1;
 
+	private const int UP = 1, DOWN = 2;
+
 	private const int ABOVE = 1, BELOW = 2;
 
 	private const int RED = 0, BLUE = 1;
@@ -45,8 +47,8 @@ public class AI : Hero {
 //		private Dictionary teammates_positions;
 //		private Dictionary oponnents_positions;
 //		private Vector3 ball_position;
-//		private bool player_with_ball;
-//		private int team;
+	//	private bool player_with_ball;
+		public int team;
 		public bool has_ball;
 	}
 
@@ -74,6 +76,7 @@ public class AI : Hero {
 	public override void Start () {
 //		controller = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
 		ai_manager.InsertAI(this);
+		beliefs.team = player.team;
 	}
 
 	public void Update () 
@@ -111,7 +114,9 @@ public class AI : Hero {
 		} else {
 			beliefs.has_ball = false;
 		}
-		DribbleToArea(key);
+		//DribbleToArea(key);
+
+	//	GoToArea(0);
 
 //		test(key);
 //
@@ -139,6 +144,49 @@ public class AI : Hero {
 
 	}
 
+	private void GoToArea(int index)
+	{
+		int below_or_above = IsAboveOrBellow(player.getCurrentArea(), index);
+		int left_or_right = IsLeftOrRight(player.getCurrentArea(), index);
+
+		if (below_or_above == ABOVE)
+			Move(DOWN);
+		else if (below_or_above == BELOW)
+			Move(UP);
+		else 
+			StopMovingVertically();
+
+		if (left_or_right == LEFT)
+			Move (RIGHT);
+		else if (left_or_right == RIGHT)
+			Move (LEFT);
+		else
+			StopMovingHorizontally();
+
+	}
+
+	private void Move(int direction)
+	{
+		if (direction == UP)
+			player.player_controller.commands.vertical_direction = MOVE_UP;
+		else if (direction == DOWN)
+			player.player_controller.commands.vertical_direction = MOVE_DOWN;
+		else if (direction == LEFT)
+			player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+		else if (direction == RIGHT)
+			player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+	}
+
+	private void StopMovingVertically()
+	{
+			player.player_controller.commands.vertical_direction = 0;
+	}
+
+	private void StopMovingHorizontally()
+	{
+		player.player_controller.commands.horizontal_direction = 0;
+	}
+
 	private void DribbleToArea(int index)
 	{
 
@@ -159,7 +207,7 @@ public class AI : Hero {
 		
 			RotateAroundBall(index);
 		
-			int below_or_above = IsBallAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
+			int below_or_above = IsAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
 			int left_or_right = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
 
 			if (player_collider.collider.Raycast(ray, out hit, Mathf.Infinity)) {
@@ -200,11 +248,11 @@ public class AI : Hero {
 
 	private void RotateAroundBall(int index)
 	{
-		int ball_below_or_above_target = IsBallAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
+		int ball_below_or_above_target = IsAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
 		int ball_left_or_right_target = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
 
 		int player_left_or_right_target = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
-		int player_below_or_above_target = IsBallAboveOrBellow(player.getCurrentArea(), index);
+		int player_below_or_above_target = IsAboveOrBellow(player.getCurrentArea(), index);
 		int player_below_or_above_ball;
 		int player_left_or_right_ball;
 		
@@ -232,7 +280,7 @@ public class AI : Hero {
 
 		float player_target_slope = GetSlope(player.transform.position, ai_manager.GetPitchAreaCoords(index));
 
-		Debug.Log(IsAboveLine(player.transform.position, ball_target_slope, ball_target_y_intercept));
+//		Debug.Log(IsAboveLine(player.transform.position, ball_target_slope, ball_target_y_intercept));
 
 		if (IsAboveLine(player.transform.position, ball_target_slope, ball_target_y_intercept))
 			if (ball_below_or_above_target == ABOVE)
@@ -348,7 +396,7 @@ public class AI : Hero {
 		}
 	}
 
-	private int IsBallAboveOrBellow(int ball_area, int target_area)
+	private int IsAboveOrBellow(int ball_area, int target_area)
 	{
 		int area_flank = AreaToFlank(target_area);
 		int ball_flank = AreaToFlank(ball_area);
@@ -371,25 +419,25 @@ public class AI : Hero {
 		player.player_controller.commands.horizontal_direction = 0;
 	}
 
-	private void GoToArea(int area)
-	{
-		int area_flank = AreaToFlank(area);
-		int current_flank = AreaToFlank(player.getCurrentArea());
-		
-		if (current_flank < area_flank)
-			player.player_controller.commands.vertical_direction = 1;
-		else if (current_flank > area_flank)
-			player.player_controller.commands.vertical_direction = -1;
-		else if (current_flank == area_flank)
-			player.player_controller.commands.vertical_direction = 0;
-
-		if (IsLeftOrRight(area, player.getCurrentArea()) == LEFT)
-			player.player_controller.commands.horizontal_direction = 1;
-		else if (IsLeftOrRight(area, player.getCurrentArea()) == RIGHT)
-			player.player_controller.commands.horizontal_direction = -1;
-		else
-			player.player_controller.commands.horizontal_direction = 0;
-	}
+//	private void GoToArea(int area)
+//	{
+//		int area_flank = AreaToFlank(area);
+//		int current_flank = AreaToFlank(player.getCurrentArea());
+//		
+//		if (current_flank < area_flank)
+//			player.player_controller.commands.vertical_direction = 1;
+//		else if (current_flank > area_flank)
+//			player.player_controller.commands.vertical_direction = -1;
+//		else if (current_flank == area_flank)
+//			player.player_controller.commands.vertical_direction = 0;
+//
+//		if (IsLeftOrRight(area, player.getCurrentArea()) == LEFT)
+//			player.player_controller.commands.horizontal_direction = 1;
+//		else if (IsLeftOrRight(area, player.getCurrentArea()) == RIGHT)
+//			player.player_controller.commands.horizontal_direction = -1;
+//		else
+//			player.player_controller.commands.horizontal_direction = 0;
+//	}
 
 	private void GoToBall()
 	{
