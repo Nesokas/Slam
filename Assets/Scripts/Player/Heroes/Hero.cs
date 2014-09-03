@@ -7,6 +7,7 @@ public abstract class Hero {
 	protected Player_Behaviour player;
 	public abstract void UsePower(PlayerController.Commands commands);
 	protected float power_cooldown;
+	protected int team;
 
 	public abstract void Start();
 
@@ -21,6 +22,12 @@ public abstract class Hero {
 		hero.transform.localScale = Vector3.one;
 
 		hero.transform.name = "Mesh";
+		
+	}
+
+	public int GetTeam()
+	{
+		return team;
 	}
 
 	public bool IsCooldownOver()

@@ -8,6 +8,9 @@ public class AIManager : MonoBehaviour {
 	//The pitch is divided in 18 areas. This list relates the players to each area of the pitch
 	private List<Player_Behaviour>[] pitch_area_list = new List<Player_Behaviour>[18];
 	private List<Hero> ai_list = new List<Hero>();
+
+	//If more than one player is in possession, than the involved players are fighting for possession
+	private List<Hero> players_in_possession = new List<Hero>();
 	private int red_team_bots;
 	private int blue_team_bots;
 
@@ -42,6 +45,21 @@ public class AIManager : MonoBehaviour {
 		
 		}
 	
+	}
+
+	public void InsertPlayerInPossession(Hero hero)
+	{
+		players_in_possession.Add(hero);
+	}
+
+	public void RemovePlayerInPossession(Hero hero)
+	{
+		players_in_possession.Remove(hero);
+	}
+
+	public List<Hero> GetPlayersInPossession()
+	{
+		return players_in_possession;
 	}
 
 	public void InsertAI(Hero hero)

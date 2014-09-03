@@ -42,18 +42,33 @@ public class AI : Hero {
 	Transform colliderAIPossessionRight;
 	Transform player_collider;
 
-	private struct Beliefs {
+	private struct Beliefs 
+	{
 	
 //		private Dictionary teammates_positions;
 //		private Dictionary oponnents_positions;
 //		private Vector3 ball_position;
-	//	private bool player_with_ball;
+		public bool opponent_has_ball;
+		public bool teammate_has_ball;
 		public int team;
 		public bool has_ball;
 	}
 
+	private enum Desires 
+	{
+		PASS,
+		SCORE,
+		DRIBBLE,
+		TACKLE,
+		MOVE_TO_AREA,
+		TAKE_POSSESSION
+		
+	}
+
 	Beliefs beliefs;
 
+	// The desire to which the agent has commited will be the intention
+	Desires desire; 
 
 	public AI(Player_Behaviour player)
 	{
@@ -74,27 +89,17 @@ public class AI : Hero {
 	}
 	// Use this for initialization
 	public override void Start () {
-//		controller = GameObject.FindGameObjectWithTag("PlayerController").GetComponent<PlayerController>();
 		ai_manager.InsertAI(this);
 		beliefs.team = player.team;
+		desire = Desires.TAKE_POSSESSION;
+		Debug.Log(desire);
 	}
 
 	public void Update () 
 	{
-//		distance_to_ball = Vector3.Distance (ball.transform.position, player.transform.position);
-//
-//		if (has_ball == false)
-//			GoToBall();
-//
-//		if (distance_to_ball < possession_distance_threshold) {
-//			has_ball = true;
-//			ResetControllers();
-//		} else {
-//			has_ball = false;
-//		}
-//
-//		Debug.Log(has_ball);
 
+
+		
 
 		if (Input.GetKeyDown("0"))
 		    key = 0;
@@ -106,14 +111,8 @@ public class AI : Hero {
 			key = 3;
 		if (Input.GetKeyDown("4"))
 			key = 4;
+		
 
-
-
-		if (distance_to_ball < possession_distance_threshold) {
-			beliefs.has_ball = true;
-		} else {
-			beliefs.has_ball = false;
-		}
 		//DribbleToArea(key);
 
 	//	GoToArea(0);
@@ -121,6 +120,35 @@ public class AI : Hero {
 //		test(key);
 //
 //		RotateAroundBall(key);
+	}
+
+	private void UpdateBeliefs()
+	{
+		UpdatePossession();
+
+	}
+
+	private void UpdatePossession()
+	{
+		bool teammate_has_ball = false;
+		bool opponent_has_ball = false;
+		if (distance_to_ball < possession_distance_threshold) {
+			beliefs.has_ball = true;
+			ai_manager.InsertPlayerInPossession(this);
+		} else {
+			beliefs.has_ball = false;
+			ai_manager.RemovePlayerInPossession(this);
+		}
+		foreach(Hero hero in ai_manager.GetPlayersInPossession()) {
+			if (hero.GetTeam() == this.team)
+				teammate_has_ball = true;
+			else if (hero.GetTeam() != this.team)
+				opponent_has_ball = true;
+		}
+
+		beliefs.teammate_has_ball = teammate_has_ball;
+		beliefs.opponent_has_ball = opponent_has_ball;
+
 	}
 
 	private void test(int index)

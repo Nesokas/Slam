@@ -93,6 +93,7 @@ public class Tesla : Hero {
 	{
 		magnet = player.transform.Find("Mesh").Find("Base").Find("Magnet");
 		magnet.particleSystem.Stop();
+		team = player.team;
 	}
 
 	bool IsPowerKeyDown(float power_key)
