@@ -6,7 +6,8 @@ using System;
 public class AIManager : MonoBehaviour {
 
 	//The pitch is divided in 18 areas. This list relates the players to each area of the pitch
-	private List<Player_Behaviour>[] pitch_area_list = new List<Player_Behaviour>[18];
+//	private List<Player_Behaviour>[] pitch_area_list = new List<Player_Behaviour>[18];
+	private List<Hero>[] pitch_area_list = new List<Hero>[18];
 	private List<Hero> ai_list = new List<Hero>();
 
 	//If more than one player is in possession, than the involved players are fighting for possession
@@ -41,7 +42,7 @@ public class AIManager : MonoBehaviour {
 
 		for (int i = 0; i <= 17; i++) {
 
-			pitch_area_list[i] = new List<Player_Behaviour>();
+			pitch_area_list[i] = new List<Hero>();
 		
 		}
 	
@@ -104,16 +105,21 @@ public class AIManager : MonoBehaviour {
 		Debug.Log("test");
 	}
 
-	public void InsertPlayerInList(Player_Behaviour player, int index)
+	public void InsertHeroInList(Hero hero, int index)
 	{
-		pitch_area_list[index].Add(player);
-		//Debug.Log("added " + index);
+		pitch_area_list[index].Add(hero);
+	//	Debug.Log("added " + index);
+	}
+	
+	public void RemoveHeroFromList(Hero hero, int index)
+	{
+		pitch_area_list[index].Remove(hero);
+		//Debug.Log("removed " + index);
 	}
 
-	public void RemovePlayerFromList(Player_Behaviour player, int index)
+	public List<Hero> GetPlayerListFromArea(int index)
 	{
-		pitch_area_list[index].Add(player);
-		//Debug.Log("removed " + index);
+		return pitch_area_list[index];
 	}
 
 	public void SetDiskArea(int index)

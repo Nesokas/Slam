@@ -111,6 +111,11 @@ public class Player_Behaviour : MonoBehaviour {
 		}
 	}
 
+	public Hero GetHero()
+	{
+		return hero;
+	}
+
 	public bool IsCollidingWithBall()
 	{
 		return colliding_with_ball;

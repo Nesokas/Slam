@@ -29,9 +29,10 @@ public class PitchArea : MonoBehaviour {
 	{
 		if (collider.gameObject.CompareTag("player_collider")) {
 			Player_Behaviour player = collider.transform.parent.gameObject.GetComponent<Player_Behaviour>();
+			Hero hero = player.GetHero();
 			player.SetCurrentArea(index); //every player knows where it is in the pitch;
 		//	Debug.Log("area: " + index + "player_area: " + player.getCurrentArea());
-			AIManager.InsertPlayerInList(player, index);
+			AIManager.InsertHeroInList(hero, index);
 
 		} else if(collider.gameObject.CompareTag("ball")) {
 			if (!ball)
@@ -46,7 +47,9 @@ public class PitchArea : MonoBehaviour {
 	void OnTriggerExit(Collider collider)
 	{
 		if (collider.gameObject.CompareTag("player_collider")) {
-			AIManager.RemovePlayerFromList(collider.gameObject.GetComponent<Player_Behaviour>(), index);
+			Player_Behaviour player = collider.transform.parent.gameObject.GetComponent<Player_Behaviour>();
+			Hero hero = player.GetHero();
+			AIManager.RemoveHeroFromList(hero, index);
 		}
 	}
 }

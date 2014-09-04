@@ -52,6 +52,7 @@ public class AI : Hero {
 		public bool teammate_has_ball;
 		public int team;
 		public bool has_ball;
+		public List<int> opponents_in_the_way;
 	}
 
 	private enum Desires 
@@ -92,7 +93,6 @@ public class AI : Hero {
 		ai_manager.InsertAI(this);
 		beliefs.team = player.team;
 		desire = Desires.TAKE_POSSESSION;
-		Debug.Log(desire);
 	}
 
 	public void Update () 
@@ -112,7 +112,7 @@ public class AI : Hero {
 		if (Input.GetKeyDown("4"))
 			key = 4;
 		
-
+		UpdatePossession();
 		//DribbleToArea(key);
 
 	//	GoToArea(0);
@@ -120,6 +120,14 @@ public class AI : Hero {
 //		test(key);
 //
 //		RotateAroundBall(key);
+		//RotateAroundBall(key);
+
+		if(beliefs.has_ball) {
+			if (!IsObstructedPath())
+				DribbleToArea(0);
+		} else
+			GoToBall();
+
 	}
 
 	private void UpdateBeliefs()
@@ -151,6 +159,51 @@ public class AI : Hero {
 
 	}
 
+	private bool IsObstructedPath()
+	{
+		int layer_mask = 1 << 30;
+		int index = 0;
+		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
+		Ray ray = new Ray(ball_vector, (ai_manager.GetPitchAreaCoords(index) - ball_vector));
+
+		RaycastHit[] hits;
+		hits = Physics.RaycastAll(ray, Mathf.Infinity , layer_mask);
+
+		for (int i=0; i < hits.Length; i++) {
+			RaycastHit hit = hits[i];
+			if (IsOponnentInArea(int.Parse(hit.collider.name)))
+				return true;	
+		}
+
+
+//		RaycastHit hit;
+//		if(Physics.Raycast(ray, out hit, Mathf.Infinity, layer_mask))
+//			Debug.Log(IsOponnentInArea(int.Parse(hit.collider.name)));
+
+
+	//	Debug.Log(hit.collider.name);
+		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
+		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
+
+		return false;
+	}
+
+	private bool IsOponnentInArea(int index)
+	{
+		List<Hero> hero_list = ai_manager.GetPlayerListFromArea(index);
+	//	Debug.Log("area -> " + index + "hero_list size = " + hero_list.Count);
+		foreach(Hero hero in hero_list) {
+	//		Debug.Log("hero - " + hero.GetTeam() + "this - " + this.team);
+			if (hero.GetTeam() != this.team) {
+			//	Debug.Log("true");
+				return true;
+					
+			}
+		}
+	//	Debug.Log("false");
+		return false;
+	}
+
 	private void test(int index)
 	{
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
@@ -167,8 +220,8 @@ public class AI : Hero {
 				Debug.Log("RIGHT");
 			}
 		}
-		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
-		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
+	//	Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
+		Debug.DrawRay(ball_vector, (ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
 	}
 

@@ -210,7 +210,7 @@ public class Game_Behaviour : MonoBehaviour {
 			else if(timer_value > ENDGAME_TIMER && finish_game)
 				FinishGame();
 			else timer_value++;
-			Debug.Log("Endgame: " + ENDGAME_TIMER + " -> " + timer_value);
+//			Debug.Log("Endgame: " + ENDGAME_TIMER + " -> " + timer_value);
 		}
 		
 		if(is_celebrating)
