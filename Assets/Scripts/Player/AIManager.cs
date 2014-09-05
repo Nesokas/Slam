@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -26,6 +26,9 @@ public class AIManager : MonoBehaviour {
 
 	private Vector3[] pitch_area_coordinates = new Vector3[18];
 
+	private GameObject red_team_goal;
+
+	private GameObject blue_team_goal;
 
 	void Start () {
 
@@ -45,8 +48,26 @@ public class AIManager : MonoBehaviour {
 			pitch_area_list[i] = new List<Hero>();
 		
 		}
-	
+
+		red_team_goal = GameObject.Find("Score_Team1");
+		blue_team_goal = GameObject.Find("Score_Team2");
 	}
+
+	public Vector3 GetRedTeamGoalPosition()
+	{
+		return red_team_goal.transform.position;
+	}
+
+	public float GoalWidth()
+	{
+		return red_team_goal.transform.lossyScale.x;
+	}
+
+	public Vector3 GetBlueTeamGoalPosition()
+	{
+		return blue_team_goal.transform.position;
+	}
+
 
 	public void InsertPlayerInPossession(Hero hero)
 	{
@@ -73,6 +94,13 @@ public class AIManager : MonoBehaviour {
 	{
 		foreach (AI ai in ai_list)
 			ai.Update();
+
+		/*if(red_team_goal == null)
+			red_team_goal = GameObject.Find("Score_Team1");
+
+		else */
+//			Debug.Log(red_team_goal.transform.localPosition);
+//		Debug.Log( red_team_goal.transform.lossyScale);
 	}
 
 	public void InsertPitchAreaCoordinates(int index, Vector3 pos)

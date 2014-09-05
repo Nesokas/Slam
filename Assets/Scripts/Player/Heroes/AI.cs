@@ -18,7 +18,7 @@ public class AI : Hero {
 
 	private const int ABOVE = 1, BELOW = 2;
 
-	private const int RED = 0, BLUE = 1;
+	private const int RED = 1, BLUE = 2;
 
 //	private bool has_ball = false;
 
@@ -44,15 +44,15 @@ public class AI : Hero {
 
 	private struct Beliefs 
 	{
-	
-//		private Dictionary teammates_positions;
-//		private Dictionary oponnents_positions;
-//		private Vector3 ball_position;
+		public Vector3 own_goal_position;
+		public Vector3 opponent_goal_position;
+		public float goal_width;
 		public bool opponent_has_ball;
 		public bool teammate_has_ball;
 		public int team;
 		public bool has_ball;
-		public List<int> opponents_in_the_way;
+		public bool is_obstructed_path;
+		//public List<int> opponents_in_the_way;
 	}
 
 	private enum Desires 
@@ -91,8 +91,20 @@ public class AI : Hero {
 	// Use this for initialization
 	public override void Start () {
 		ai_manager.InsertAI(this);
+
 		beliefs.team = player.team;
+		if (beliefs.team == RED) {
+			beliefs.own_goal_position = ai_manager.GetRedTeamGoalPosition();
+			beliefs.opponent_goal_position = ai_manager.GetBlueTeamGoalPosition();
+		} else if (beliefs.team == BLUE) {
+			beliefs.own_goal_position = ai_manager.GetBlueTeamGoalPosition();
+			beliefs.opponent_goal_position = ai_manager.GetRedTeamGoalPosition();
+			Debug.Log("CORRECT TEAM");
+		}
+		beliefs.goal_width = ai_manager.GoalWidth();
+
 		desire = Desires.TAKE_POSSESSION;
+
 	}
 
 	public void Update () 
@@ -122,17 +134,66 @@ public class AI : Hero {
 //		RotateAroundBall(key);
 		//RotateAroundBall(key);
 
-		if(beliefs.has_ball) {
-			if (!IsObstructedPath())
-				DribbleToArea(0);
-		} else
-			GoToBall();
+//		if(beliefs.has_ball) {
+//			if (!CheckObstructedPath())
+//				DribbleToArea(0);
+//		} else
+//			GoToBall();
 
+		Score();
 	}
+
+//	private void Score()
+//	{
+//
+//	}
+
+	private void Score()
+	{
+
+		int layer_mask = 1 << 29 | 1 << 28 | 1 << 27;
+		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
+		//Ray ray = new Ray(ball_vector, (beliefs.opponent_goal_position - ball_vector));
+		
+//		RaycastHit[] hits;
+//		hits = Physics.RaycastAll(ray, Mathf.Infinity , layer_mask);
+//		
+//		for (int i=0; i < hits.Length; i++) {
+//			RaycastHit hit = hits[i];
+//			if (IsOponnentInArea(int.Parse(hit.collider.name))) {
+//				beliefs.is_obstructed_path = true;
+//				return true;
+//			}
+//		}
+		RaycastHit goal_hit;
+		RaycastHit shoot_hit;
+
+		Vector3 goal_pos = new Vector3(beliefs.opponent_goal_position.x, -0.1f, beliefs.opponent_goal_position.z);
+		Ray goal_ray = new Ray(ball_vector, beliefs.opponent_goal_position - ball_vector);
+		Ray shoot_ray = new Ray(ball_vector, -1*(beliefs.opponent_goal_position - ball_vector));
+		
+		if(Physics.Raycast(goal_ray, out goal_hit, Mathf.Infinity, layer_mask)) {
+			if (goal_hit.collider.CompareTag("GoalDetection")) {
+				if (colliderAIPossession.collider.Raycast(goal_ray, out shoot_hit, Mathf.Infinity)) {
+					player.player_controller.commands.shoot = 1;
+				}
+			}
+	
+
+
+	//	Debug.Log(goal_pos + " - " + ai_manager.GetPitchAreaCoords(16));
+
+		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
+		Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
+	}
+
+
 
 	private void UpdateBeliefs()
 	{
 		UpdatePossession();
+		if (beliefs.has_ball)
+			CheckObstructedPath();
 
 	}
 
@@ -159,8 +220,13 @@ public class AI : Hero {
 
 	}
 
-	private bool IsObstructedPath()
+	private bool CheckObstructedPath()
 	{
+		if(beliefs.has_ball == false) {
+			beliefs.is_obstructed_path = false;
+			return false;
+		
+		}
 		int layer_mask = 1 << 30;
 		int index = 0;
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
@@ -171,8 +237,10 @@ public class AI : Hero {
 
 		for (int i=0; i < hits.Length; i++) {
 			RaycastHit hit = hits[i];
-			if (IsOponnentInArea(int.Parse(hit.collider.name)))
-				return true;	
+			if (IsOponnentInArea(int.Parse(hit.collider.name))) {
+				beliefs.is_obstructed_path = true;
+				return true;
+			}
 		}
 
 
@@ -185,6 +253,7 @@ public class AI : Hero {
 		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
 		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
+		beliefs.is_obstructed_path = false;
 		return false;
 	}
 
