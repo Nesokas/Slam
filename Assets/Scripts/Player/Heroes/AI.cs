@@ -143,48 +143,38 @@ public class AI : Hero {
 		Score();
 	}
 
-//	private void Score()
-//	{
-//
-//	}
 
 	private void Score()
 	{
 
 		int layer_mask = 1 << 29 | 1 << 28 | 1 << 27;
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
-		//Ray ray = new Ray(ball_vector, (beliefs.opponent_goal_position - ball_vector));
-		
-//		RaycastHit[] hits;
-//		hits = Physics.RaycastAll(ray, Mathf.Infinity , layer_mask);
-//		
-//		for (int i=0; i < hits.Length; i++) {
-//			RaycastHit hit = hits[i];
-//			if (IsOponnentInArea(int.Parse(hit.collider.name))) {
-//				beliefs.is_obstructed_path = true;
-//				return true;
-//			}
-//		}
+	
 		RaycastHit goal_hit;
 		RaycastHit shoot_hit;
 
 		Vector3 goal_pos = new Vector3(beliefs.opponent_goal_position.x, -0.1f, beliefs.opponent_goal_position.z);
 		Ray goal_ray = new Ray(ball_vector, beliefs.opponent_goal_position - ball_vector);
-		Ray shoot_ray = new Ray(ball_vector, -1*(beliefs.opponent_goal_position - ball_vector));
+		Ray shoot_ray = new Ray(ball_vector, -1*(goal_pos - ball_vector));
 		
 		if(Physics.Raycast(goal_ray, out goal_hit, Mathf.Infinity, layer_mask)) {
-			if (goal_hit.collider.CompareTag("GoalDetection")) {
-				if (colliderAIPossession.collider.Raycast(goal_ray, out shoot_hit, Mathf.Infinity)) {
+			if (goal_hit.collider.CompareTag("goal_detection")) {
+				if (colliderAIPossession.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
 					player.player_controller.commands.shoot = 1;
+					Debug.Log("SHOOT");
 				}
 			}
-	
-
-
-	//	Debug.Log(goal_pos + " - " + ai_manager.GetPitchAreaCoords(16));
+		}
 
 		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
 		Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
+	}
+
+	private bool IsInArea(int index)
+	{
+		if (player.getCurrentArea() == index)
+			return true;
+		else return false;
 	}
 
 
@@ -242,14 +232,7 @@ public class AI : Hero {
 				return true;
 			}
 		}
-
-
-//		RaycastHit hit;
-//		if(Physics.Raycast(ray, out hit, Mathf.Infinity, layer_mask))
-//			Debug.Log(IsOponnentInArea(int.Parse(hit.collider.name)));
-
-
-	//	Debug.Log(hit.collider.name);
+		
 		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
 		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
@@ -568,26 +551,6 @@ public class AI : Hero {
 		player.player_controller.commands.vertical_direction = 0;
 		player.player_controller.commands.horizontal_direction = 0;
 	}
-
-//	private void GoToArea(int area)
-//	{
-//		int area_flank = AreaToFlank(area);
-//		int current_flank = AreaToFlank(player.getCurrentArea());
-//		
-//		if (current_flank < area_flank)
-//			player.player_controller.commands.vertical_direction = 1;
-//		else if (current_flank > area_flank)
-//			player.player_controller.commands.vertical_direction = -1;
-//		else if (current_flank == area_flank)
-//			player.player_controller.commands.vertical_direction = 0;
-//
-//		if (IsLeftOrRight(area, player.getCurrentArea()) == LEFT)
-//			player.player_controller.commands.horizontal_direction = 1;
-//		else if (IsLeftOrRight(area, player.getCurrentArea()) == RIGHT)
-//			player.player_controller.commands.horizontal_direction = -1;
-//		else
-//			player.player_controller.commands.horizontal_direction = 0;
-//	}
 
 	private void GoToBall()
 	{
