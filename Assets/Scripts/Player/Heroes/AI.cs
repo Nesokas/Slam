@@ -26,10 +26,8 @@ public class AI : Hero {
 
 	private bool touched_ball = false;
 
-	private float distance_to_ball = 0;
-
 	//distance from which the player is considered to be in possession
-	private float possession_distance_threshold = 1f;
+	private float possession_distance_threshold = 1.25f;
 
 	private Transform sphere;
 
@@ -52,6 +50,7 @@ public class AI : Hero {
 		public int team;
 		public bool has_ball;
 		public bool is_obstructed_path;
+		public float distance_to_ball;
 		//public List<int> opponents_in_the_way;
 	}
 
@@ -103,6 +102,8 @@ public class AI : Hero {
 		}
 		beliefs.goal_width = ai_manager.GoalWidth();
 
+		beliefs.distance_to_ball = 0;
+
 		desire = Desires.TAKE_POSSESSION;
 
 	}
@@ -123,9 +124,10 @@ public class AI : Hero {
 			key = 3;
 		if (Input.GetKeyDown("4"))
 			key = 4;
-		
+
+		ResetControllers();
 		UpdatePossession();
-		//DribbleToArea(key);
+		//DribbleToArea(16);
 
 	//	GoToArea(0);
 
@@ -134,13 +136,13 @@ public class AI : Hero {
 //		RotateAroundBall(key);
 		//RotateAroundBall(key);
 
-//		if(beliefs.has_ball) {
-//			if (!CheckObstructedPath())
-//				DribbleToArea(0);
-//		} else
-//			GoToBall();
-
-		Score();
+		if(beliefs.has_ball) {
+			if (!CheckObstructedPath())
+				DribbleToArea(16);
+		} else
+			GoToBall();
+		Debug.Log(beliefs.has_ball);
+		//Score();
 	}
 
 
@@ -161,7 +163,6 @@ public class AI : Hero {
 			if (goal_hit.collider.CompareTag("goal_detection")) {
 				if (colliderAIPossession.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
 					player.player_controller.commands.shoot = 1;
-					Debug.Log("SHOOT");
 				}
 			}
 		}
@@ -189,9 +190,14 @@ public class AI : Hero {
 
 	private void UpdatePossession()
 	{
+
+		beliefs.distance_to_ball = FindDistanceToBall();
+
+		Debug.Log(beliefs.distance_to_ball + " + " + possession_distance_threshold);
+
 		bool teammate_has_ball = false;
 		bool opponent_has_ball = false;
-		if (distance_to_ball < possession_distance_threshold) {
+		if (beliefs.distance_to_ball < possession_distance_threshold) {
 			beliefs.has_ball = true;
 			ai_manager.InsertPlayerInPossession(this);
 		} else {
@@ -208,6 +214,17 @@ public class AI : Hero {
 		beliefs.teammate_has_ball = teammate_has_ball;
 		beliefs.opponent_has_ball = opponent_has_ball;
 
+	}
+
+	private float FindDistanceToBall()
+	{
+		float x;
+		float z;
+
+		x = player.transform.position.x - ball.transform.position.x;
+		z = player.transform.position.z - ball.transform.position.z;
+
+		return Mathf.Abs(Mathf.Sqrt(x*x + z*z));
 	}
 
 	private bool CheckObstructedPath()
@@ -279,8 +296,8 @@ public class AI : Hero {
 
 	private void GoToArea(int index)
 	{
-		int below_or_above = IsAboveOrBellow(player.getCurrentArea(), index);
-		int left_or_right = IsLeftOrRight(player.getCurrentArea(), index);
+		int below_or_above = IsAboveOrBellow(player.transform.position, ai_manager.GetPitchAreaCoords(index));
+		int left_or_right = IsLeftOrRight(player.transform.position, ai_manager.GetPitchAreaCoords(index));
 
 		if (below_or_above == ABOVE)
 			Move(DOWN);
@@ -338,10 +355,10 @@ public class AI : Hero {
 
 			ResetControllers();
 		
-			RotateAroundBall(index);
-		
-			int below_or_above = IsAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
-			int left_or_right = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
+			RotateAroundBall(ai_manager.GetPitchAreaCoords(index));
+			
+			int below_or_above = IsAboveOrBellow(ball_behaviour.transform.position, ai_manager.GetPitchAreaCoords(index));
+			int left_or_right = IsLeftOrRight(ball_behaviour.transform.position, ai_manager.GetPitchAreaCoords(index));
 
 			if (player_collider.collider.Raycast(ray, out hit, Mathf.Infinity)) {
 				if (colliderAIPossession.collider.Raycast(ray, out hit, Mathf.Infinity)) {
@@ -379,39 +396,22 @@ public class AI : Hero {
 	}
 
 
-	private void RotateAroundBall(int index)
+	private void RotateAroundBall(Vector3 target)
 	{
-		int ball_below_or_above_target = IsAboveOrBellow(ball_behaviour.GetCurrentArea(), index);
-		int ball_left_or_right_target = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
+		int ball_below_or_above_target = IsAboveOrBellow(ball_behaviour.transform.position, target);
+		int ball_left_or_right_target = IsLeftOrRight(ball_behaviour.transform.position, target);
 
-		int player_left_or_right_target = IsLeftOrRight(ball_behaviour.GetCurrentArea(), index);
-		int player_below_or_above_target = IsAboveOrBellow(player.getCurrentArea(), index);
-		int player_below_or_above_ball;
-		int player_left_or_right_ball;
-		
+		int player_left_or_right_target = IsLeftOrRight(ball_behaviour.transform.position, target);
+		int player_below_or_above_target = IsAboveOrBellow(player.transform.position, target);
 
-		if (player.transform.position.x > ball.transform.position.x) {
-			player_below_or_above_ball = ABOVE;
-			//Debug.Log("---> PLAYER IS ABOVE THE BALL");
-		}
-		else {
-			player_below_or_above_ball = BELOW;
-		//	Debug.Log("---> PLAYER IS BELOW THE BALL");
-		}
+		int player_below_or_above_ball = IsAboveOrBellow(player.transform.position, ball.transform.position);
+		int player_left_or_right_ball = IsLeftOrRight(player.transform.position, ball.transform.position);
 
-		if (player.transform.position.z > ball.transform.position.z) {
-			player_left_or_right_ball = LEFT;
-			//Debug.Log("---> PLAYER IS LEFT FROM BALL");
-		}
-		else {
-			player_left_or_right_ball = RIGHT;
-		//	Debug.Log("---> PLAYER IS RIGHT FROM BALL");
-		}
 
-		float ball_target_slope = GetSlope(ball.transform.position, ai_manager.GetPitchAreaCoords(index));
+		float ball_target_slope = GetSlope(ball.transform.position, target);
 		float ball_target_y_intercept = GetYIntercept(ball_target_slope, ball.transform.position);
 
-		float player_target_slope = GetSlope(player.transform.position, ai_manager.GetPitchAreaCoords(index));
+		float player_target_slope = GetSlope(player.transform.position, target);
 
 //		Debug.Log(IsAboveLine(player.transform.position, ball_target_slope, ball_target_y_intercept));
 
@@ -529,25 +529,36 @@ public class AI : Hero {
 		}
 	}
 
-	private int IsAboveOrBellow(int ball_area, int target_area)
+//	private int IsAboveOrBellow(int ball_area, int target_area)
+//	{
+//		int area_flank = AreaToFlank(target_area);
+//		int ball_flank = AreaToFlank(ball_area);
+//
+//		if (ball_flank > area_flank)
+//			return ABOVE;
+//
+//		else if (ball_flank < area_flank)
+//			return BELOW;
+//
+//		else 
+//			return 0;
+//
+//	}
+
+	private int IsAboveOrBellow(Vector3 ball_pos, Vector3 target_pos)
 	{
-		int area_flank = AreaToFlank(target_area);
-		int ball_flank = AreaToFlank(ball_area);
 
-		if (ball_flank > area_flank)
+		if (ball_pos.x > target_pos.x)
 			return ABOVE;
-
-		else if (ball_flank < area_flank)
+		else
 			return BELOW;
-
-		else 
-			return 0;
 
 	}
 
 
 	private void ResetControllers()
 	{
+		player.player_controller.commands.shoot = 0;
 		player.player_controller.commands.vertical_direction = 0;
 		player.player_controller.commands.horizontal_direction = 0;
 	}
@@ -671,16 +682,22 @@ public class AI : Hero {
 
 	}
 
-	private int IsLeftOrRight(int area, int current_area)
+	private int IsLeftOrRight(Vector3 area, Vector3 current_area)
 	{
-		if(current_area == area || current_area == area+1 || current_area == area-1)
-			return 0; //is neither left nor right;
-		else if (current_area > area)
-			return RIGHT;
-		else if (current_area < area)
-			return LEFT;
 
-		return 0;
+		if (area.z > current_area.z)
+			return LEFT;
+		else
+			return RIGHT;
+
+//		if(current_area == area || current_area == area+1 || current_area == area-1)
+//			return 0; //is neither left nor right;
+//		else if (current_area > area)
+//			return RIGHT;
+//		else if (current_area < area)
+//			return LEFT;
+//
+//		return 0;
 	}
 
 	public override void UsePower(PlayerController.Commands commands){}
