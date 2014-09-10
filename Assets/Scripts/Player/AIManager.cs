@@ -6,9 +6,15 @@ using System;
 public class AIManager : MonoBehaviour {
 
 	//The pitch is divided in 18 areas. This list relates the players to each area of the pitch
-//	private List<Player_Behaviour>[] pitch_area_list = new List<Player_Behaviour>[18];
 	private List<Hero>[] pitch_area_list = new List<Hero>[18];
+
+	//The list of instantiated AI that will have their Update() function ran through the AIManager
 	private List<Hero> ai_list = new List<Hero>();
+
+	//which heroes are in each of the three flanks
+	private List<Hero>[] top_flank_heroes = new List<Hero>[6];
+	private List<Hero>[] mid_flank_heroes = new List<Hero>[6];
+	private List<Hero>[] bottom_flank_heroes = new List<Hero>[6];
 
 	//If more than one player is in possession, than the involved players are fighting for possession
 	private List<Hero> players_in_possession = new List<Hero>();
@@ -39,15 +45,19 @@ public class AIManager : MonoBehaviour {
 		
 		AI_prefab = Resources.Load<GameObject>("Heroes/AI");
 
-//		GameObject settings = GameObject.FindGameObjectWithTag("settings");
-
-//		game_settings = settings.GetComponent<Game_Settings>();
-
 		for (int i = 0; i <= 17; i++) {
 
 			pitch_area_list[i] = new List<Hero>();
 		
 		}
+
+		for (int i = 0; i < 6; i++) {
+			top_flank_heroes[i] = new List<Hero>();
+			mid_flank_heroes[i] = new List<Hero>();
+			bottom_flank_heroes[i] = new List<Hero>();
+		}
+
+
 
 		red_team_goal = GameObject.Find("Score_Team1");
 		blue_team_goal = GameObject.Find("Score_Team2");
@@ -88,19 +98,11 @@ public class AIManager : MonoBehaviour {
 	{
 		ai_list.Add(hero);
 	}
-	
-	// Update is called once per frame
+
 	void Update () 
 	{
 		foreach (AI ai in ai_list)
 			ai.Update();
-
-		/*if(red_team_goal == null)
-			red_team_goal = GameObject.Find("Score_Team1");
-
-		else */
-//			Debug.Log(red_team_goal.transform.localPosition);
-//		Debug.Log( red_team_goal.transform.lossyScale);
 	}
 
 	public void InsertPitchAreaCoordinates(int index, Vector3 pos)
@@ -125,15 +127,12 @@ public class AIManager : MonoBehaviour {
 			Debug.Log(i + " - " + pitch_area_coordinates[i]);
 	}
 
-	public void test()
-	{
-		Debug.Log("test");
-	}
-
 	public void InsertHeroInList(Hero hero, int index)
 	{
 		pitch_area_list[index].Add(hero);
-	//	Debug.Log("added " + index);
+		SetHeroeFlank(hero, index);
+		hero.SetCurrentArea(index);
+		
 	}
 	
 	public void RemoveHeroFromList(Hero hero, int index)
@@ -151,6 +150,63 @@ public class AIManager : MonoBehaviour {
 	{
 		disk_area = index;
 		//Debug.Log(index);
+	}
+
+	private void SetHeroeFlank(Hero hero, int index)
+	{
+		int flank = AreaToFlank(index);
+		int previous_area = hero.GetCurrentArea();
+		int previous_flank = AreaToFlank(previous_area);
+		
+		if (previous_flank == GlobalConstants.BOTTOM_FLANK)
+			bottom_flank_heroes[previous_area/3].Remove(hero);
+
+		if (previous_flank == GlobalConstants.MID_FLANK)
+			mid_flank_heroes[previous_area/3].Remove(hero);
+
+		if (previous_flank == GlobalConstants.TOP_FLANK)
+			top_flank_heroes[previous_area/3].Remove(hero);
+
+		if (flank == GlobalConstants.BOTTOM_FLANK)
+			bottom_flank_heroes[index/3].Add(hero);
+
+		else if (flank == GlobalConstants.MID_FLANK)
+			mid_flank_heroes[index/3].Add(hero);
+
+		else if (flank == GlobalConstants.TOP_FLANK)
+			top_flank_heroes[index/3].Add(hero);
+		
+	}
+
+	public List<Hero>[] GetTopFlankHeroes()
+	{
+		return top_flank_heroes;
+	}
+
+	public List<Hero>[] GetMidFlankHeroes()
+	{
+		return mid_flank_heroes;
+	}
+
+	public List<Hero>[] GetBottomFlankHeroes()
+	{
+		return bottom_flank_heroes;
+	}
+
+	// given an area, it returns the flank
+	private int AreaToFlank(int area) 
+	{
+		int flank;
+		
+		for (int i = 0; i < 6; i++)
+			if (area == 3*i)
+				return GlobalConstants.BOTTOM_FLANK;
+		else if (area == 3*i+1)
+			return GlobalConstants.MID_FLANK;
+		else if (area == 3*i+2)
+			return GlobalConstants.TOP_FLANK;
+		return -1;
+		
 	}
 
 }

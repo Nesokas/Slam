@@ -30,7 +30,7 @@ public class PitchArea : MonoBehaviour {
 		if (collider.gameObject.CompareTag("player_collider")) {
 			Player_Behaviour player = collider.transform.parent.gameObject.GetComponent<Player_Behaviour>();
 			Hero hero = player.GetHero();
-			player.SetCurrentArea(index); //every player knows where it is in the pitch;
+		//	player.SetCurrentArea(index); //every player knows where it is in the pitch;
 		//	Debug.Log("area: " + index + "player_area: " + player.getCurrentArea());
 			AIManager.InsertHeroInList(hero, index);
 

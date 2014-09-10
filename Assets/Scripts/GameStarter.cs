@@ -57,8 +57,6 @@ public class GameStarter : MonoBehaviour {
 		
 		GameObject AIManager_object = GameObject.Find("AIManager");
 		AIManager = AIManager_object.GetComponent<AIManager>();
-		if(AIManager != null)
-			AIManager.test();
 		
 	}
 

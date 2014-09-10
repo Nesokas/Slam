@@ -9,6 +9,8 @@ public abstract class Hero {
 	protected float power_cooldown;
 	protected int team;
 
+	protected int current_area = -1; //every player knows where it is in the pitch;
+
 	public abstract void Start();
 
 	public abstract void EmmitPowerFX(string type = "none");
@@ -35,6 +37,14 @@ public abstract class Hero {
 		return player.IsCooldownOver();
 	}
 
+	public int GetCurrentArea()
+	{
+		return current_area;
+	}
 
+	public void SetCurrentArea(int current_area)
+	{
+		this.current_area = current_area;
+	}
 
 }

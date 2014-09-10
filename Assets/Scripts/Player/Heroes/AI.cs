@@ -18,7 +18,7 @@ public class AI : Hero {
 
 	private const int ABOVE = 1, BELOW = 2;
 
-	private const int RED = 1, BLUE = 2;
+	//private const int RED = 1, BLUE = 2;
 
 //	private bool has_ball = false;
 
@@ -92,10 +92,10 @@ public class AI : Hero {
 		ai_manager.InsertAI(this);
 
 		beliefs.team = player.team;
-		if (beliefs.team == RED) {
+		if (beliefs.team == GlobalConstants.RED) {
 			beliefs.own_goal_position = ai_manager.GetRedTeamGoalPosition();
 			beliefs.opponent_goal_position = ai_manager.GetBlueTeamGoalPosition();
-		} else if (beliefs.team == BLUE) {
+		} else if (beliefs.team == GlobalConstants.BLUE) {
 			beliefs.own_goal_position = ai_manager.GetBlueTeamGoalPosition();
 			beliefs.opponent_goal_position = ai_manager.GetRedTeamGoalPosition();
 			Debug.Log("CORRECT TEAM");
@@ -110,10 +110,7 @@ public class AI : Hero {
 
 	public void Update () 
 	{
-
-
 		
-
 		if (Input.GetKeyDown("0"))
 		    key = 0;
 		else if (Input.GetKeyDown("1"))
@@ -129,19 +126,15 @@ public class AI : Hero {
 		UpdatePossession();
 		//DribbleToArea(16);
 
-	//	GoToArea(0);
 
-//		test(key);
-//
-//		RotateAroundBall(key);
-		//RotateAroundBall(key);
+		Pass ();
 
-		if(beliefs.has_ball) {
-			if (!CheckObstructedPath())
-				DribbleToArea(16);
-		} else
-			GoToBall();
-		Debug.Log(beliefs.has_ball);
+//		if(beliefs.has_ball) {
+//			if (!CheckObstructedPath())
+//				DribbleToArea(16);
+//		} else
+//			GoToBall();
+//		Debug.Log(beliefs.has_ball);
 		//Score();
 	}
 
@@ -171,9 +164,24 @@ public class AI : Hero {
 		Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
 	}
 
+	private void Pass()
+	{
+		List<Hero>[] top_flank = ai_manager.GetTopFlankHeroes();
+
+		for(int i = 0; i < 6; i++)
+			foreach(Hero hero in top_flank[i]) {
+				Debug.Log(hero.GetCurrentArea());
+			}
+		
+	}
+
+	private void GetPlayersInFlanks()
+	{
+	}
+
 	private bool IsInArea(int index)
 	{
-		if (player.getCurrentArea() == index)
+		if (current_area == index)
 			return true;
 		else return false;
 	}
@@ -193,7 +201,7 @@ public class AI : Hero {
 
 		beliefs.distance_to_ball = FindDistanceToBall();
 
-		Debug.Log(beliefs.distance_to_ball + " + " + possession_distance_threshold);
+	//	Debug.Log(beliefs.distance_to_ball + " + " + possession_distance_threshold);
 
 		bool teammate_has_ball = false;
 		bool opponent_has_ball = false;
@@ -270,6 +278,17 @@ public class AI : Hero {
 			}
 		}
 	//	Debug.Log("false");
+		return false;
+	}
+
+	private bool IsTeammateInArea(int index)
+	{
+		List<Hero> hero_list = ai_manager.GetPlayerListFromArea(index);
+		foreach(Hero hero in hero_list) {
+			if (hero.GetTeam() == this.team) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -529,22 +548,6 @@ public class AI : Hero {
 		}
 	}
 
-//	private int IsAboveOrBellow(int ball_area, int target_area)
-//	{
-//		int area_flank = AreaToFlank(target_area);
-//		int ball_flank = AreaToFlank(ball_area);
-//
-//		if (ball_flank > area_flank)
-//			return ABOVE;
-//
-//		else if (ball_flank < area_flank)
-//			return BELOW;
-//
-//		else 
-//			return 0;
-//
-//	}
-
 	private int IsAboveOrBellow(Vector3 ball_pos, Vector3 target_pos)
 	{
 
@@ -666,22 +669,6 @@ public class AI : Hero {
 
 	}
 
-	// given an area, it returns the flank
-	private int AreaToFlank(int area) 
-	{
-		int flank;
-
-		for (int i = 0; i < 6; i++)
-			if (area == 3*i)
-				return BOTTOM_FLANK;
-			else if (area == 3*i+1)
-				return MID_FLANK;
-			else if (area == 3*i+2)
-				return TOP_FLANK;
-		return -1;
-
-	}
-
 	private int IsLeftOrRight(Vector3 area, Vector3 current_area)
 	{
 
@@ -689,15 +676,7 @@ public class AI : Hero {
 			return LEFT;
 		else
 			return RIGHT;
-
-//		if(current_area == area || current_area == area+1 || current_area == area-1)
-//			return 0; //is neither left nor right;
-//		else if (current_area > area)
-//			return RIGHT;
-//		else if (current_area < area)
-//			return LEFT;
-//
-//		return 0;
+		
 	}
 
 	public override void UsePower(PlayerController.Commands commands){}

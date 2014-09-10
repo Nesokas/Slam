@@ -81,8 +81,6 @@ public class Player_Behaviour : MonoBehaviour {
 
 	protected bool is_ai = false;
 
-	private int current_area; //every player knows where it is in the pitch;
-
 	public int team = 1;
 
 	void VerifyShoot()
@@ -135,16 +133,6 @@ public class Player_Behaviour : MonoBehaviour {
 	public void setDashCooldown(float power_cooldown)
 	{
 		POWER_COOLDOWN = power_cooldown;
-	}
-	
-	public void SetCurrentArea(int area)
-	{
-		current_area = area;
-	}
-
-	public int getCurrentArea()
-	{
-		return current_area;
 	}
 	
 	public void GoalScored()
