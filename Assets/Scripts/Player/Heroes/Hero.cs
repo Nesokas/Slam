@@ -47,4 +47,9 @@ public abstract class Hero {
 		this.current_area = current_area;
 	}
 
+	public Vector3 GetPosition()
+	{
+		return player.transform.position;
+	}
+
 }

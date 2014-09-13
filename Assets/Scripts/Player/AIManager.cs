@@ -103,6 +103,7 @@ public class AIManager : MonoBehaviour {
 	{
 		foreach (AI ai in ai_list)
 			ai.Update();
+		IsTeammateAloneInFlanks();
 	}
 
 	public void InsertPitchAreaCoordinates(int index, Vector3 pos)
@@ -192,6 +193,88 @@ public class AIManager : MonoBehaviour {
 	{
 		return bottom_flank_heroes;
 	}
+
+	// The vector it returns will be (RED,0,-1) if the Top flank has at least a red teammate and
+	// no opponent in the flank, the Mid has both Red and Blue, and Bottom has no one.
+	public Vector3 IsTeammateAloneInFlanks()
+	{
+		Vector3 flanks = new Vector3(-1,-1,-1);
+
+		flanks.x = IsTeammateAloneInTopFlank();
+		flanks.y = IsTeammateAloneInMidFlank();
+		flanks.z = IsTeammateAloneInBottomFlank();
+
+		//Debug.Log(flanks);
+
+		return flanks;
+
+	}
+
+	private int IsTeammateAloneInTopFlank()
+	{
+		int flank = -1;
+
+		for (int i = 0; i < 6; i++)
+			foreach (Hero hero in top_flank_heroes[i])
+				if (hero.GetTeam() == GlobalConstants.RED)
+					if (flank == -1 || flank == GlobalConstants.RED)
+						flank = GlobalConstants.RED;
+					else
+						flank = 0;
+				else if (hero.GetTeam() == GlobalConstants.BLUE)
+					if (flank == -1 || flank == GlobalConstants.BLUE)
+						flank = GlobalConstants.BLUE;
+					else
+						flank = 0;
+
+		return flank;
+
+	}
+
+	private int IsTeammateAloneInMidFlank()
+	{
+		int flank = -1;
+		
+		for (int i = 0; i < 6; i++)
+			foreach (Hero hero in mid_flank_heroes[i]) {
+				if (hero.GetTeam() == GlobalConstants.RED)
+					if (flank == -1 || flank == GlobalConstants.RED)
+						flank = GlobalConstants.RED;
+					else
+						flank = 0;
+				else if (hero.GetTeam() == GlobalConstants.BLUE)
+					if (flank == -1 || flank == GlobalConstants.BLUE)
+						flank = GlobalConstants.BLUE;
+					else
+						flank = 0;
+		
+
+		}
+				return flank;
+		
+	}
+
+	private int IsTeammateAloneInBottomFlank()
+	{
+		int flank = -1;
+		
+		for (int i = 0; i < 6; i++)
+			foreach (Hero hero in bottom_flank_heroes[i])
+				if (hero.GetTeam() == GlobalConstants.RED)
+					if (flank == -1 || flank == GlobalConstants.RED)
+						flank = GlobalConstants.RED;
+					else
+						flank = 0;
+				else if (hero.GetTeam() == GlobalConstants.BLUE)
+					if (flank == -1 || flank == GlobalConstants.BLUE)
+						flank = GlobalConstants.BLUE;
+					else
+						flank = 0;
+		
+		return flank;
+		
+	}
+
 
 	// given an area, it returns the flank
 	private int AreaToFlank(int area) 
