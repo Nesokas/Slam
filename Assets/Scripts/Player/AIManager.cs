@@ -21,6 +21,11 @@ public class AIManager : MonoBehaviour {
 	private int red_team_bots;
 	private int blue_team_bots;
 
+	//The player who is intending to grab possession
+	private Hero red_going_for_ball;
+	private Hero blue_going_for_ball;
+
+
 	//in which of the 18 areas is the disk
 	private int disk_area;
 
@@ -76,6 +81,33 @@ public class AIManager : MonoBehaviour {
 	public Vector3 GetBlueTeamGoalPosition()
 	{
 		return blue_team_goal.transform.position;
+	}
+
+	public void SetGoingForBall(Hero hero)
+	{
+		if (hero.GetTeam() == GlobalConstants.RED)
+			red_going_for_ball = hero;
+		else
+			blue_going_for_ball = hero;
+	}
+
+	public void ResetGoingForBall(Hero hero)
+	{
+		if (hero.GetTeam() == GlobalConstants.RED)
+			red_going_for_ball = null;
+		else
+			blue_going_for_ball = null;
+	}
+
+	public int GetGoingForBall(int team)
+	{
+		if (team == GlobalConstants.RED)
+			return GlobalConstants.RED;
+		else if (team == GlobalConstants.BLUE)
+			return GlobalConstants.BLUE;
+		else
+			return 0;
+
 	}
 
 

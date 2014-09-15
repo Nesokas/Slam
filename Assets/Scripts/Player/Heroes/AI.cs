@@ -47,10 +47,13 @@ public class AI : Hero {
 		public float goal_width;
 		public bool opponent_has_ball;
 		public bool teammate_has_ball;
+		public bool teammate_going_for_ball;
+		public bool opponent_going_for_ball;
 		public int team;
 		public bool has_ball;
 		public bool is_obstructed_path;
 		public float distance_to_ball;
+
 		//public List<int> opponents_in_the_way;
 	}
 
@@ -104,6 +107,9 @@ public class AI : Hero {
 
 		beliefs.distance_to_ball = 0;
 
+		beliefs.teammate_going_for_ball = false;
+		beliefs.opponent_going_for_ball = false;
+
 		desire = Desires.TAKE_POSSESSION;
 
 	}
@@ -123,25 +129,24 @@ public class AI : Hero {
 			key = 4;
 
 		ResetControllers();
-		UpdatePossession();
-		//DribbleToArea(16);
+	
+		UpdateBeliefs();
+		UpdateDesires();
 
 
-	//	Pass ();
 
-		if(beliefs.has_ball) {
-			if (!CheckObstructedPath())
-				if (IsInArea(0))
-				    Pass ();
-				else
-					DribbleToArea(0);
-		} else {
-			GoToBall();
-		//	Debug.Log("gotoball");
-		}
-	//	Debug.Log(beliefs.has_ball);
-		//Score();
-	//	Pass ();
+
+
+
+//		if(beliefs.has_ball) {
+//			if (!CheckObstructedPath())
+//				if (IsInArea(0))
+//				    Pass ();
+//				else
+//					DribbleToArea(0);
+//		} else {
+//			GoToBall();
+//		}
 	}
 
 
@@ -173,25 +178,23 @@ public class AI : Hero {
 	{
 		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks();
 
-		if (flanks.x != team) {
+		if (flanks.x != team)
+			PassToFlank(ai_manager.GetTopFlankHeroes());
 
-			PassTopFlank();
-		}
-//		else if (flanks.y == team)
-//			PassMidFlank();
-//		else if (flanks.z == team)
-//			PassBottomTeam();
+		else if (flanks.y == team)
+			PassToFlank(ai_manager.GetMidFlankHeroes());
+
+		else if (flanks.z == team)
+			PassToFlank(ai_manager.GetBottomFlankHeroes());
 		
 	}
 
-	private void PassTopFlank()
+	private void PassToFlank(List<Hero>[] flank_heroes)
 	{
-		List<Hero>[] top_flank_heroes = ai_manager.GetTopFlankHeroes();
 
 		for (int i = 0; i < 6; i++)
-			foreach(Hero hero in top_flank_heroes[i]) {
+			foreach(Hero hero in flank_heroes[i]) {
 				PassTeammate(hero);
-				
 				return;
 		}
 
@@ -248,8 +251,19 @@ public class AI : Hero {
 	private void UpdateBeliefs()
 	{
 		UpdatePossession();
-		if (beliefs.has_ball)
-			CheckObstructedPath();
+		if (beliefs.team == GlobalConstants.RED) {
+			beliefs.teammate_going_for_ball = ai_manager.GetGoingForBall(GlobalConstants.RED);
+			beliefs.opponent_going_for_ball = ai_manager.GetGoingForBall(GlobalConstants.BLUE);
+		} else {
+			beliefs.teammate_going_for_ball = ai_manager.GetGoingForBall(GlobalConstants.BLUE);
+			beliefs.opponent_going_for_ball = ai_manager.GetGoingForBall(GlobalConstants.RED);
+		}
+	}
+
+	private void UpdateDesires()
+	{
+		if (beliefs.has_ball == false)
+			if (beliefs.teammate_has_ball == false)
 
 	}
 
@@ -292,7 +306,7 @@ public class AI : Hero {
 		return Mathf.Abs(Mathf.Sqrt(x*x + z*z));
 	}
 
-	private bool CheckObstructedPath()
+	private bool CheckObstructedPath(int index)
 	{
 		if(beliefs.has_ball == false) {
 			beliefs.is_obstructed_path = false;
@@ -300,7 +314,7 @@ public class AI : Hero {
 		
 		}
 		int layer_mask = 1 << 30;
-		int index = 0;
+		//int index =  ai_manager.GetPitchAreaCoords(point);
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
 		Ray ray = new Ray(ball_vector, (ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
