@@ -82,6 +82,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	{
 		if(collider.gameObject.tag == "Player")
 			last_player_touched = collider.gameObject;
+
 	}
 	
 	protected IEnumerator LoopAnimation(string anim1, string anim2, int repeatNumber)

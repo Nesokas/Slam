@@ -53,7 +53,7 @@ public class AI : Hero {
 		public bool has_ball;
 		public bool is_obstructed_path;
 		public float distance_to_ball;
-
+		public Hero hero_in_possession;
 		//public List<int> opponents_in_the_way;
 	}
 
@@ -94,7 +94,7 @@ public class AI : Hero {
 	public override void Start () {
 		ai_manager.InsertAI(this);
 		this.team = player.team;
-		beliefs.team = player.team;
+		beliefs.team = GlobalConstants.RED;//player.team;
 		if (beliefs.team == GlobalConstants.RED) {
 			beliefs.own_goal_position = ai_manager.GetRedTeamGoalPosition();
 			beliefs.opponent_goal_position = ai_manager.GetBlueTeamGoalPosition();
@@ -127,14 +127,20 @@ public class AI : Hero {
 			key = 3;
 		if (Input.GetKeyDown("4"))
 			key = 4;
+		if (Input.GetKeyDown("5"))
+			key = 5;
 
 		ResetControllers();
 	
-		UpdateBeliefs();
-		UpdateDesires();
+	//	UpdateBeliefs();
+	//	UpdateDesires();
 
+	//	Debug.Log(DepthToArea(GlobalConstants.TOP_FLANK, key));
+		UpdatePossession();
+		if (ai_manager.GetPlayersInPossession().Count == 1)
+			Unmark();
 
-
+	//	Debug.Log(beliefs.hero_in_possession);
 
 
 
@@ -264,6 +270,76 @@ public class AI : Hero {
 	{
 		if (beliefs.has_ball == false)
 			if (beliefs.teammate_has_ball == false)
+				if (beliefs.teammate_going_for_ball == false)
+					GoToBall();
+				else 
+					GoToArea(0);
+			else
+				GoToArea(10);
+		else
+			GoToArea(5);
+		
+	}
+
+	private void Unmark()
+	{
+		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks();
+
+		if (flanks.x == -1)
+			UnmarkTopFlank();
+	}
+
+
+	private void UnmarkTopFlank()
+	{
+		Hero hero = ai_manager.GetPlayersInPossession()[0];
+//		int area_possession = beliefs.hero_in_possession.GetCurrentArea();
+		int area_possession = hero.GetCurrentArea();
+		int current_flank = ai_manager.AreaToFlank(area_possession);
+		int current_depth = AreaToDepth( current_flank, area_possession);
+
+		int unmark_to_area = DepthToArea(current_flank, current_depth+2 );
+
+		Debug.Log(current_area + " - " + current_depth + " - " + unmark_to_area);
+		
+
+	}
+
+	// Receives a flank and a depth (from 1 to 6) and converts that depth
+	// to the corresponding area 
+	private int DepthToArea(int flank, int depth)
+	{
+
+		int area = 0;
+		int current_depth = 0;
+
+		while (current_depth < depth){
+		
+			if (ai_manager.AreaToFlank(area) == flank)
+				current_depth++;
+		
+			area++;
+		}
+
+		return area-1;
+	}
+
+	private int AreaToDepth(int flank, int area)
+	{
+		int area_counter = 0;
+		int current_depth = 1;
+		
+		while (area_counter < area){
+			
+			if (ai_manager.AreaToFlank(area_counter) == flank) {
+			//	Debug.Log(area_counter + " - " + area);
+				current_depth++;
+			}
+			
+			area_counter++;
+		}
+		//Debug.Log(current_depth + " - " + area + " - " + flank);
+		return current_depth;
 
 	}
 

@@ -99,21 +99,25 @@ public class AIManager : MonoBehaviour {
 			blue_going_for_ball = null;
 	}
 
-	public int GetGoingForBall(int team)
+	public bool GetGoingForBall(int team)
 	{
-		if (team == GlobalConstants.RED)
-			return GlobalConstants.RED;
-		else if (team == GlobalConstants.BLUE)
-			return GlobalConstants.BLUE;
+		if (red_going_for_ball != null && team == red_going_for_ball.GetTeam())
+			return true;
+		else if (blue_going_for_ball != null && team == blue_going_for_ball.GetTeam())
+			return true;
 		else
-			return 0;
+			return false;
 
 	}
 
 
 	public void InsertPlayerInPossession(Hero hero)
 	{
-		players_in_possession.Add(hero);
+		if (!players_in_possession.Contains(hero)) {
+			players_in_possession.Add(hero);
+		}
+		Debug.Log("inserting");
+		Debug.Log(players_in_possession.Count);
 	}
 
 	public void RemovePlayerInPossession(Hero hero)
@@ -309,7 +313,7 @@ public class AIManager : MonoBehaviour {
 
 
 	// given an area, it returns the flank
-	private int AreaToFlank(int area) 
+	public int AreaToFlank(int area) 
 	{
 		int flank;
 		
@@ -323,5 +327,7 @@ public class AIManager : MonoBehaviour {
 		return -1;
 		
 	}
+
+
 
 }
