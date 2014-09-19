@@ -18,7 +18,7 @@ public class Kickoff_Player : Player_Behaviour {
 
 	private Transform base_collider;
 	private Transform shoot_collider;
-	private Transform colliderAIPossession;
+	private Transform colliderAIPossessionCenter;
 	private Transform colliderAIPossessionLeft;
 	private Transform colliderAIPossessionRight;
 
@@ -27,7 +27,7 @@ public class Kickoff_Player : Player_Behaviour {
 		player_base = transform.Find("Mesh").Find("Base");
 		base_collider = transform.Find("Collider");
 		shoot_collider = transform.Find("ColliderShoot");
-		colliderAIPossession = transform.Find("ColliderAIPossession");
+		colliderAIPossessionCenter = transform.Find("ColliderAIPossession/ColliderAIPossessionCenter");
 		colliderAIPossessionLeft = transform.Find("ColliderAIPossession/ColliderAIPossessionLeft");
 		colliderAIPossessionRight = transform.Find("ColliderAIPossession/ColliderAIPossessionRight");
 		
@@ -99,7 +99,7 @@ public class Kickoff_Player : Player_Behaviour {
 		for(int i = 0; i < center_planes.Length; i++) {
 			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider, false);
 			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider, false);
-			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossession.collider, false);
+			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossessionCenter.collider, false);
 		}
 	}
 
@@ -107,7 +107,7 @@ public class Kickoff_Player : Player_Behaviour {
 	{
 		Physics.IgnoreCollision(circle, base_collider.collider, value);
 		Physics.IgnoreCollision(circle, shoot_collider.collider, value);
-		Physics.IgnoreCollision(circle, colliderAIPossession.collider, value);
+		Physics.IgnoreCollision(circle, colliderAIPossessionCenter.collider, value);
 		Physics.IgnoreCollision(circle, colliderAIPossessionLeft.collider, value);
 		Physics.IgnoreCollision(circle, colliderAIPossessionRight.collider, value);
 	}
@@ -129,19 +129,19 @@ public class Kickoff_Player : Player_Behaviour {
 		for (int i = 0; i < center_planes.Length; i++) {
 			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider);
 			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider);
-			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossession.collider);
+			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossessionCenter.collider);
 			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossessionLeft.collider);
 			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossessionRight.collider);
 		}
 		Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
 		Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
-		Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider);
+		Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossessionCenter.collider);
 		Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossessionLeft.collider);
 		Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossessionRight.collider);
 
 		Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
 		Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
-		Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider);
+		Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossessionCenter.collider);
 		Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossessionLeft.collider);
 		Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossessionRight.collider);
 	}

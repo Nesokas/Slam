@@ -27,8 +27,8 @@ public class PitchArea : MonoBehaviour {
 
 	void OnTriggerEnter(Collider collider)
 	{
-		if (collider.gameObject.CompareTag("player_collider")) {
-			Player_Behaviour player = collider.transform.parent.gameObject.GetComponent<Player_Behaviour>();
+		if (collider.gameObject.CompareTag("ColliderAIPossessionCenter")) {
+			Player_Behaviour player = collider.transform.parent.parent.gameObject.GetComponent<Player_Behaviour>();
 			Hero hero = player.GetHero();
 		//	player.SetCurrentArea(index); //every player knows where it is in the pitch;
 		//	Debug.Log("area: " + index + "player_area: " + player.getCurrentArea());
