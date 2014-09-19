@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class AI : Hero {
 
-	private AIManager ai_manager;
+
 //	private PlayerController controller;
-	Local_Player player;
+	Local_Player local_player;
 	private GameObject ball;
 	private Ball_Behaviour ball_behaviour;
 
@@ -17,6 +17,8 @@ public class AI : Hero {
 	private const int UP = 1, DOWN = 2;
 
 	private const int ABOVE = 1, BELOW = 2;
+
+	private const int MAX_DEPTH = 6;
 
 	//private const int RED = 1, BLUE = 2;
 
@@ -35,7 +37,7 @@ public class AI : Hero {
 
 	private int key = 0;
 
-	Transform colliderAIPossession;
+	Transform colliderAIPossessionCenter;
 	Transform colliderAIPossessionLeft;
 	Transform colliderAIPossessionRight;
 	Transform player_collider;
@@ -77,22 +79,25 @@ public class AI : Hero {
 	{
 		hero_prefab = Resources.Load<GameObject>("Heroes/Sam");
 		ai_manager = GameObject.Find("AIManager").GetComponent<AIManager>();
-		this.player = (Local_Player)player;
+		this.player = player;
+		this.local_player = (Local_Player)player;
+		Debug.Log(local_player);
 		player.SetIsAI(true);
+		is_ai = true;
 		ball = GameObject.FindGameObjectWithTag("ball");
 
 		ball_behaviour = ball.GetComponent<Ball_Behaviour>();
 
-		colliderAIPossession = player.transform.Find("ColliderAIPossession");
+		colliderAIPossessionCenter = player.transform.Find("ColliderAIPossession/ColliderAIPossessionCenter");
 		colliderAIPossessionLeft = player.transform.Find("ColliderAIPossession/ColliderAIPossessionLeft");
 		colliderAIPossessionRight = player.transform.Find("ColliderAIPossession/ColliderAIPossessionRight");
 		player_collider = player.transform.Find("Collider");
-		colliderAIPossession.gameObject.SetActive(true);
+		colliderAIPossessionCenter.gameObject.SetActive(true);
 
 	}
 	// Use this for initialization
 	public override void Start () {
-		ai_manager.InsertAI(this);
+		ai_manager.InsertHero(this);
 		this.team = player.team;
 		beliefs.team = GlobalConstants.RED;//player.team;
 		if (beliefs.team == GlobalConstants.RED) {
@@ -114,7 +119,7 @@ public class AI : Hero {
 
 	}
 
-	public void Update () 
+	public override void Update() 
 	{
 		
 		if (Input.GetKeyDown("0"))
@@ -142,7 +147,7 @@ public class AI : Hero {
 
 	//	Debug.Log(beliefs.hero_in_possession);
 
-
+		//DribbleToArea(0);
 
 //		if(beliefs.has_ball) {
 //			if (!CheckObstructedPath())
@@ -170,14 +175,19 @@ public class AI : Hero {
 		
 		if(Physics.Raycast(goal_ray, out goal_hit, Mathf.Infinity, layer_mask)) {
 			if (goal_hit.collider.CompareTag("goal_detection")) {
-				if (colliderAIPossession.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
-					player.player_controller.commands.shoot = 1;
+				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+					Shoot();
 				}
 			}
 		}
 
 		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
 		Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
+	}
+
+	private void Shoot()
+	{
+		local_player.player_controller.commands.shoot = 1;
 	}
 
 	private void Pass()
@@ -222,8 +232,8 @@ public class AI : Hero {
 
 		if(Physics.Raycast(teammate_ray, out teammate_hit, Mathf.Infinity, layer_mask)) {
 			if (teammate_hit.collider.CompareTag("colliderShoot")) {
-				if (colliderAIPossession.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
-					player.player_controller.commands.shoot = 1;
+				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+					Shoot();
 					Debug.Log("PASS!!!");
 
 				}
@@ -285,23 +295,62 @@ public class AI : Hero {
 	{
 		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks();
 
+		Hero hero = ai_manager.GetPlayersInPossession()[0];
+		int area_possession = hero.GetCurrentArea();
+		//Debug.Log(area_possession);
+		int current_flank = ai_manager.AreaToFlank(area_possession);
+		int new_depth = AreaToDepth(area_possession);
+		
+		if (beliefs.team == GlobalConstants.RED)
+			new_depth -= -2;
+		else
+			new_depth += 2;
+		
+		int area = DepthToArea(current_flank, new_depth );
+
+		int unmark_to_area = 0;
 		if (flanks.x == -1)
-			UnmarkTopFlank();
+			unmark_to_area = UnmarkToArea(area, GlobalConstants.TOP_FLANK);
+		else if (flanks.y == -1)
+			unmark_to_area = UnmarkToArea(area, GlobalConstants.MID_FLANK);
+		else if (flanks.z == -1)
+			unmark_to_area = UnmarkToArea(area, GlobalConstants.BOTTOM_FLANK);
+
+		Debug.Log(unmark_to_area);
+		//Debug.Log(AreaToDepth();
 	}
 
-
-	private void UnmarkTopFlank()
+	//area: current area with the added depth; flank: new flank to which to unmark
+	// return: new area to which to unmark
+	private int UnmarkToArea(int area, int flank)
 	{
-		Hero hero = ai_manager.GetPlayersInPossession()[0];
-//		int area_possession = beliefs.hero_in_possession.GetCurrentArea();
-		int area_possession = hero.GetCurrentArea();
-		int current_flank = ai_manager.AreaToFlank(area_possession);
-		int current_depth = AreaToDepth( current_flank, area_possession);
+		int current_flank = ai_manager.AreaToFlank(area);
 
-		int unmark_to_area = DepthToArea(current_flank, current_depth+2 );
 
-		Debug.Log(current_area + " - " + current_depth + " - " + unmark_to_area);
+
+		if (current_flank == flank)
+			return area;
 		
+		else if (current_flank == GlobalConstants.TOP_FLANK) {
+			if (flank == GlobalConstants.MID_FLANK)
+				return area-1;
+			else if (flank == GlobalConstants.BOTTOM_FLANK)
+				return area-2;
+		
+		} else if (current_flank == GlobalConstants.MID_FLANK) {
+			if (flank == GlobalConstants.TOP_FLANK)
+				return area+1;
+			else if (flank == GlobalConstants.BOTTOM_FLANK)
+				return area-1;
+
+		} else if (current_flank == GlobalConstants.BOTTOM_FLANK) {
+			if (flank == GlobalConstants.TOP_FLANK)
+				return area+2;
+			else if (flank == GlobalConstants.MID_FLANK)
+				return area+1;
+		}
+		//Debug.Log(area + " - " + current_flank + " - " + flank);
+		return -1; //happens if area < 0 || area > 17
 
 	}
 
@@ -309,6 +358,11 @@ public class AI : Hero {
 	// to the corresponding area 
 	private int DepthToArea(int flank, int depth)
 	{
+
+		if (depth > MAX_DEPTH)
+			depth = MAX_DEPTH;
+		else if (depth < 1)
+			depth = 1;
 
 		int area = 0;
 		int current_depth = 0;
@@ -324,11 +378,11 @@ public class AI : Hero {
 		return area-1;
 	}
 
-	private int AreaToDepth(int flank, int area)
+	private int AreaToDepth(int area)
 	{
 		int area_counter = 0;
 		int current_depth = 1;
-		
+		int flank = ai_manager.AreaToFlank(area);
 		while (area_counter < area){
 			
 			if (ai_manager.AreaToFlank(area_counter) == flank) {
@@ -339,6 +393,7 @@ public class AI : Hero {
 			area_counter++;
 		}
 		//Debug.Log(current_depth + " - " + area + " - " + flank);
+		//Debug.Log(current_depth);
 		return current_depth;
 
 	}
@@ -354,7 +409,7 @@ public class AI : Hero {
 		bool opponent_has_ball = false;
 		if (beliefs.distance_to_ball < possession_distance_threshold) {
 			beliefs.has_ball = true;
-			ai_manager.InsertPlayerInPossession(this);
+		//	ai_manager.InsertPlayerInPossession(this);
 		} else {
 			beliefs.has_ball = false;
 			ai_manager.RemovePlayerInPossession(this);
@@ -463,23 +518,23 @@ public class AI : Hero {
 	private void Move(int direction)
 	{
 		if (direction == UP)
-			player.player_controller.commands.vertical_direction = MOVE_UP;
+			local_player.player_controller.commands.vertical_direction = MOVE_UP;
 		else if (direction == DOWN)
-			player.player_controller.commands.vertical_direction = MOVE_DOWN;
+			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 		else if (direction == LEFT)
-			player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 		else if (direction == RIGHT)
-			player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 	}
 
 	private void StopMovingVertically()
 	{
-			player.player_controller.commands.vertical_direction = 0;
+		local_player.player_controller.commands.vertical_direction = 0;
 	}
 
 	private void StopMovingHorizontally()
 	{
-		player.player_controller.commands.horizontal_direction = 0;
+		local_player.player_controller.commands.horizontal_direction = 0;
 	}
 
 	private void DribbleToArea(int index)
@@ -506,21 +561,21 @@ public class AI : Hero {
 			int left_or_right = IsLeftOrRight(ball_behaviour.transform.position, ai_manager.GetPitchAreaCoords(index));
 
 			if (player_collider.collider.Raycast(ray, out hit, Mathf.Infinity)) {
-				if (colliderAIPossession.collider.Raycast(ray, out hit, Mathf.Infinity)) {
+				if (colliderAIPossessionCenter.collider.Raycast(ray, out hit, Mathf.Infinity)) {
 				//	Debug.Log("HIT");
 					if (below_or_above == ABOVE) //if ball's index is above the target's, that means player is above the ball so he must move down
-						player.player_controller.commands.vertical_direction = MOVE_DOWN;
+						local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 					else if (below_or_above == BELOW)
-						player.player_controller.commands.vertical_direction = MOVE_UP;
+						local_player.player_controller.commands.vertical_direction = MOVE_UP;
 					else
-						player.player_controller.commands.vertical_direction = 0;
+						local_player.player_controller.commands.vertical_direction = 0;
 					
 					if (left_or_right == LEFT)
-						player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+						local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 					else if (left_or_right == RIGHT)
-						player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+						local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 					else
-						player.player_controller.commands.horizontal_direction = 0;
+						local_player.player_controller.commands.horizontal_direction = 0;
 				
 				} else if (colliderAIPossessionLeft.collider.Raycast(ray, out hit, Mathf.Infinity)) {
 				//	Debug.Log("LEFT");
@@ -652,23 +707,23 @@ public class AI : Hero {
 		//if ray hit the left collider
 		if (left_or_right == LEFT) {
 			if(quadrant == 1)
-				player.player_controller.commands.vertical_direction = MOVE_UP;
+				local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			else if (quadrant == 2)
-				player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+				local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			else if (quadrant == 3)
-				player.player_controller.commands.vertical_direction = MOVE_DOWN;
+				local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 			else if (quadrant == 4)
-				player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+				local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 
 		} else { //if ray hit the right collider
 			if (quadrant == 1)
-				player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+				local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 			else if (quadrant == 2)
-				player.player_controller.commands.vertical_direction = MOVE_UP;
+				local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			else if (quadrant == 3)
-				player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+				local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			else if (quadrant == 4) {
-				player.player_controller.commands.vertical_direction = MOVE_DOWN;
+				local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 			//Debug.Log("moving down");
 			}
 		}
@@ -687,21 +742,21 @@ public class AI : Hero {
 
 	private void ResetControllers()
 	{
-		player.player_controller.commands.shoot = 0;
-		player.player_controller.commands.vertical_direction = 0;
-		player.player_controller.commands.horizontal_direction = 0;
+		local_player.player_controller.commands.shoot = 0;
+		local_player.player_controller.commands.vertical_direction = 0;
+		local_player.player_controller.commands.horizontal_direction = 0;
 	}
 
 	private void GoToBall()
 	{
-		if (player.transform.position.x > ball.transform.position.x)
-			player.player_controller.commands.vertical_direction = MOVE_DOWN;
-		if (player.transform.position.x < ball.transform.position.x)
-			player.player_controller.commands.vertical_direction = MOVE_UP;
-		if (player.transform.position.z > ball.transform.position.z)
-			player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
-		if (player.transform.position.z < ball.transform.position.z)
-			player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+		if (local_player.transform.position.x > ball.transform.position.x)
+			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
+		if (local_player.transform.position.x < ball.transform.position.x)
+			local_player.player_controller.commands.vertical_direction = MOVE_UP;
+		if (local_player.transform.position.z > ball.transform.position.z)
+			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+		if (local_player.transform.position.z < ball.transform.position.z)
+			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 	}
 
 	private void RotateAroundBallCounterclockwise()
@@ -712,23 +767,23 @@ public class AI : Hero {
 
 		if (quadrant == 1) {
 		
-			player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
-			player.player_controller.commands.vertical_direction = 0;
+			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+			local_player.player_controller.commands.vertical_direction = 0;
 		
 		} else if (quadrant == 2) {
 
-			player.player_controller.commands.vertical_direction = MOVE_UP;
-			player.player_controller.commands.horizontal_direction = 0;
+			local_player.player_controller.commands.vertical_direction = MOVE_UP;
+			local_player.player_controller.commands.horizontal_direction = 0;
 		
 		} else if (quadrant == 3) {
 		
-			player.player_controller.commands.horizontal_direction = MOVE_LEFT;
-			player.player_controller.commands.vertical_direction = 0;
+			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+			local_player.player_controller.commands.vertical_direction = 0;
 			
 		} else if (quadrant == 4) {
 
-			player.player_controller.commands.horizontal_direction = 0;
-			player.player_controller.commands.vertical_direction = MOVE_DOWN;
+			local_player.player_controller.commands.horizontal_direction = 0;
+			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 		
 		}
 	}
@@ -740,23 +795,23 @@ public class AI : Hero {
 		
 		if (quadrant == 1) {
 			
-			player.player_controller.commands.horizontal_direction = 0;
-			player.player_controller.commands.vertical_direction = MOVE_UP;
+			local_player.player_controller.commands.horizontal_direction = 0;
+			local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			
 		} else if (quadrant == 2) {
 			
-			player.player_controller.commands.vertical_direction = 0;
-			player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+			local_player.player_controller.commands.vertical_direction = 0;
+			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			
 		} else if (quadrant == 3) {
 			
-			player.player_controller.commands.horizontal_direction = 0;
-			player.player_controller.commands.vertical_direction = MOVE_DOWN;
+			local_player.player_controller.commands.horizontal_direction = 0;
+			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 			
 		} else if (quadrant == 4) {
 			
-			player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
-			player.player_controller.commands.vertical_direction = 0;
+			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+			local_player.player_controller.commands.vertical_direction = 0;
 			
 		}
 	}

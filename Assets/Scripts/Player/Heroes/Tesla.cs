@@ -91,6 +91,7 @@ public class Tesla : Hero {
 
 	public override void Start()
 	{
+		ai_manager.InsertHero(this);
 		magnet = player.transform.Find("Mesh").Find("Base").Find("Magnet");
 		magnet.particleSystem.Stop();
 		team = player.team;
@@ -108,5 +109,10 @@ public class Tesla : Hero {
 		last_power_key = power_key;
 
 		return is_down;
+	}
+
+	public override void Update ()
+	{
+		throw new System.NotImplementedException ();
 	}
 }

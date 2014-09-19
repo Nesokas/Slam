@@ -3,20 +3,27 @@ using System.Collections;
 
 public abstract class Hero {
 
+	protected AIManager ai_manager;
 	protected GameObject hero_prefab;
 	protected Player_Behaviour player;
 	public abstract void UsePower(PlayerController.Commands commands);
 	protected float power_cooldown;
 	protected int team;
+	protected bool is_ai = false;
 
 	protected int current_area = -1; //every player knows where it is in the pitch;
 
 	public abstract void Start();
 
+	public abstract void Update(); //HACK: Only AI will run this, but it must be implemented in every hero due to AIManager
+
 	public abstract void EmmitPowerFX(string type = "none");
 
 	public void InstantiateMesh(Transform player)
 	{
+		ai_manager = GameObject.Find("AIManager").GetComponent<AIManager>();
+
+
 		GameObject hero = (GameObject)MonoBehaviour.Instantiate(hero_prefab);
 		hero.transform.parent = player;
 
@@ -26,6 +33,8 @@ public abstract class Hero {
 		hero.transform.name = "Mesh";
 		
 	}
+
+
 
 	public int GetTeam()
 	{
@@ -44,12 +53,18 @@ public abstract class Hero {
 
 	public void SetCurrentArea(int current_area)
 	{
+//		Debug.Log(current_area);
 		this.current_area = current_area;
 	}
 
 	public Vector3 GetPosition()
 	{
 		return player.transform.position;
+	}
+
+	public bool IsAI()
+	{
+		return is_ai;
 	}
 
 }

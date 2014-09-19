@@ -8,8 +8,8 @@ public class AIManager : MonoBehaviour {
 	//The pitch is divided in 18 areas. This list relates the players to each area of the pitch
 	private List<Hero>[] pitch_area_list = new List<Hero>[18];
 
-	//The list of instantiated AI that will have their Update() function ran through the AIManager
-	private List<Hero> ai_list = new List<Hero>();
+	//The list of every hero instantiated. AI in this list will run the update()
+	private List<Hero> hero_list = new List<Hero>();
 
 	//which heroes are in each of the three flanks
 	private List<Hero>[] top_flank_heroes = new List<Hero>[6];
@@ -25,6 +25,10 @@ public class AIManager : MonoBehaviour {
 	private Hero red_going_for_ball;
 	private Hero blue_going_for_ball;
 
+	//distance from which the player is considered to be in possession
+	private float possession_distance_threshold = 1.25f;
+
+	private GameObject ball;
 
 	//in which of the 18 areas is the disk
 	private int disk_area;
@@ -41,13 +45,15 @@ public class AIManager : MonoBehaviour {
 
 	private GameObject blue_team_goal;
 
-	void Start () {
+	void Start() {
 
 		GameObject game_starter_object = GameObject.Find("GameStarter");
 		game_starter = game_starter_object.GetComponent<GameStarter>();
-		
+
 		game_starter.SetAIManager(this);
-		
+
+		ball = GameObject.FindGameObjectWithTag("ball");
+
 		AI_prefab = Resources.Load<GameObject>("Heroes/AI");
 
 		for (int i = 0; i <= 17; i++) {
@@ -116,8 +122,8 @@ public class AIManager : MonoBehaviour {
 		if (!players_in_possession.Contains(hero)) {
 			players_in_possession.Add(hero);
 		}
-		Debug.Log("inserting");
-		Debug.Log(players_in_possession.Count);
+	//	Debug.Log("inserting");
+//		Debug.Log(players_in_possession.Count);
 	}
 
 	public void RemovePlayerInPossession(Hero hero)
@@ -127,19 +133,27 @@ public class AIManager : MonoBehaviour {
 
 	public List<Hero> GetPlayersInPossession()
 	{
+	//	Debug.Log(players_in_possession.Count);
 		return players_in_possession;
 	}
 
-	public void InsertAI(Hero hero)
+	public void InsertHero(Hero hero)
 	{
-		ai_list.Add(hero);
+		hero_list.Add(hero);
 	}
 
-	void Update () 
+	void Update() 
 	{
-		foreach (AI ai in ai_list)
-			ai.Update();
+		foreach (Hero hero in hero_list) {
+			if (hero.IsAI())
+				hero.Update();
+			if (FindDistanceToBall(hero.GetPosition()) < possession_distance_threshold)
+				InsertPlayerInPossession(hero);
+			else
+				RemovePlayerInPossession(hero);
+		}
 		IsTeammateAloneInFlanks();
+//		Debug.Log(players_in_possession.Count);
 	}
 
 	public void InsertPitchAreaCoordinates(int index, Vector3 pos)
@@ -169,7 +183,7 @@ public class AIManager : MonoBehaviour {
 		pitch_area_list[index].Add(hero);
 		SetHeroeFlank(hero, index);
 		hero.SetCurrentArea(index);
-		
+	//	Debug.Log(index);
 	}
 	
 	public void RemoveHeroFromList(Hero hero, int index)
@@ -326,6 +340,20 @@ public class AIManager : MonoBehaviour {
 			return GlobalConstants.TOP_FLANK;
 		return -1;
 		
+	}
+
+	private float FindDistanceToBall(Vector3 position)
+	{
+		float x;
+		float z;
+
+		if (ball == null)
+			ball = GameObject.FindGameObjectWithTag("ball");
+		
+		x = position.x - ball.transform.position.x;
+		z = position.z - ball.transform.position.z;
+		
+		return Mathf.Abs(Mathf.Sqrt(x*x + z*z));
 	}
 
 

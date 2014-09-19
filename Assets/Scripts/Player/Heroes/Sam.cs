@@ -20,6 +20,7 @@ public class Sam : Hero {
 
 	public override void Start()
 	{
+		ai_manager.InsertHero(this);
 		dash_smoke = player.transform.Find("Mesh").Find("Dash_Smoke");
 		team = player.team;
 	}
@@ -47,6 +48,10 @@ public class Sam : Hero {
 		dash_smoke.particleSystem.Play();
 	}
 
+	public override void Update ()
+	{
+		throw new System.NotImplementedException ();
+	}
 
 
 //	protected void Dash(float dash, float horizontal_direction, float vertical_direction)
