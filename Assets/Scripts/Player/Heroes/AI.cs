@@ -56,6 +56,7 @@ public class AI : Hero {
 		public bool is_obstructed_path;
 		public float distance_to_ball;
 		public Hero hero_in_possession;
+		public Hero hero_closer_to_ball;
 		//public List<int> opponents_in_the_way;
 	}
 
@@ -99,7 +100,7 @@ public class AI : Hero {
 	public override void Start () {
 		ai_manager.InsertHero(this);
 		this.team = player.team;
-		beliefs.team = GlobalConstants.RED;//player.team;
+		beliefs.team = player.team;
 		if (beliefs.team == GlobalConstants.RED) {
 			beliefs.own_goal_position = ai_manager.GetRedTeamGoalPosition();
 			beliefs.opponent_goal_position = ai_manager.GetBlueTeamGoalPosition();
@@ -137,24 +138,35 @@ public class AI : Hero {
 
 		ResetControllers();
 	
-	//	UpdateBeliefs();
+		UpdateBeliefs();
 	//	UpdateDesires();
 
-	//	Debug.Log(DepthToArea(GlobalConstants.TOP_FLANK, key));
 		UpdatePossession();
-		if (ai_manager.GetPlayersInPossession().Count == 1)
-			Unmark();
+		if (beliefs.has_ball) {
+			Pass();
+		}
+		if (ai_manager.GetPlayersInPossession().Count == 0) {
+			if (beliefs.hero_closer_to_ball.Equals(this)) {
+				GoToBall();
+			}
+		} else if (!beliefs.has_ball && ai_manager.GetPlayersInPossession().Count == 1) {
+		//	Debug.Log("unmark");
+			Unmark ();
+		}
+
+//		if (ai_manager.GetPlayersInPossession().Count == 1)
+//			Unmark();
 
 	//	Debug.Log(beliefs.hero_in_possession);
 
 		//DribbleToArea(0);
 
-//		if(beliefs.has_ball) {
-//			if (!CheckObstructedPath())
-//				if (IsInArea(0))
-//				    Pass ();
-//				else
-//					DribbleToArea(0);
+	//	if(beliefs.has_ball) {
+		//	if (!CheckObstructedPath(17))
+				//if (IsInArea(0))
+	//			    Pass ();
+				//else
+				//	DribbleToArea(0);
 //		} else {
 //			GoToBall();
 //		}
@@ -181,8 +193,8 @@ public class AI : Hero {
 			}
 		}
 
-		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
-		Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
+	//	Debug.DrawRay(ball_vector, goal_pos - ball_vector);
+	//	Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
 	}
 
 	private void Shoot()
@@ -192,32 +204,43 @@ public class AI : Hero {
 
 	private void Pass()
 	{
-		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks();
-
-		if (flanks.x != team)
+		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks(this);
+		Debug.Log(flanks);
+		if (flanks.x == team) {
+		//	Debug.Log("top_flank");
 			PassToFlank(ai_manager.GetTopFlankHeroes());
-
-		else if (flanks.y == team)
+		//	Debug.Log("top_flank");
+		}
+		else if (flanks.y == team) {
 			PassToFlank(ai_manager.GetMidFlankHeroes());
-
-		else if (flanks.z == team)
+		}
+		else if (flanks.z == team) {
+		//	Debug.Log("bottom_flank");
 			PassToFlank(ai_manager.GetBottomFlankHeroes());
+		//	Debug.Log("bottom_flank");
+		}
 		
 	}
 
 	private void PassToFlank(List<Hero>[] flank_heroes)
 	{
 
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++) {
 			foreach(Hero hero in flank_heroes[i]) {
-				PassTeammate(hero);
+				if (!hero.Equals(this)) {
+					PassTeammate(hero);
+					Debug.Log(hero);
+				}
+
 				return;
+			}
 		}
 
 	}
 
 	private void PassTeammate(Hero hero)
 	{
+
 		int layer_mask = 1 << 28;
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
 
@@ -234,12 +257,12 @@ public class AI : Hero {
 			if (teammate_hit.collider.CompareTag("colliderShoot")) {
 				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
 					Shoot();
-					Debug.Log("PASS!!!");
+					//Debug.Log("PASS!!!");
 
 				}
 			}
 		}
-		
+		//Debug.Log(player_pos - ball_vector);
 		Debug.DrawRay(ball_vector, player_pos - ball_vector);
 		Debug.DrawRay(ball_vector, -1*(player_pos - ball_vector));
 	}
@@ -267,6 +290,7 @@ public class AI : Hero {
 	private void UpdateBeliefs()
 	{
 		UpdatePossession();
+		beliefs.hero_closer_to_ball = ai_manager.GetHeroCloserToBall();
 		if (beliefs.team == GlobalConstants.RED) {
 			beliefs.teammate_going_for_ball = ai_manager.GetGoingForBall(GlobalConstants.RED);
 			beliefs.opponent_going_for_ball = ai_manager.GetGoingForBall(GlobalConstants.BLUE);
@@ -293,7 +317,7 @@ public class AI : Hero {
 
 	private void Unmark()
 	{
-		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks();
+		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks(this);
 
 		Hero hero = ai_manager.GetPlayersInPossession()[0];
 		int area_possession = hero.GetCurrentArea();
@@ -316,7 +340,8 @@ public class AI : Hero {
 		else if (flanks.z == -1)
 			unmark_to_area = UnmarkToArea(area, GlobalConstants.BOTTOM_FLANK);
 
-		Debug.Log(unmark_to_area);
+//		Debug.Log(unmark_to_area);
+		GoToArea(unmark_to_area);
 		//Debug.Log(AreaToDepth();
 	}
 
@@ -407,22 +432,23 @@ public class AI : Hero {
 
 		bool teammate_has_ball = false;
 		bool opponent_has_ball = false;
-		if (beliefs.distance_to_ball < possession_distance_threshold) {
-			beliefs.has_ball = true;
+		beliefs.has_ball = ai_manager.HeroHasBall(this);
+//		if (beliefs.distance_to_ball < possession_distance_threshold) {
+//			beliefs.has_ball = true;
 		//	ai_manager.InsertPlayerInPossession(this);
-		} else {
-			beliefs.has_ball = false;
-			ai_manager.RemovePlayerInPossession(this);
-		}
-		foreach(Hero hero in ai_manager.GetPlayersInPossession()) {
-			if (hero.GetTeam() == this.team)
-				teammate_has_ball = true;
-			else if (hero.GetTeam() != this.team)
-				opponent_has_ball = true;
-		}
+//		} else {
+//			beliefs.has_ball = false;
+//			ai_manager.RemovePlayerInPossession(this);
+	//	}
+//		foreach(Hero hero in ai_manager.GetPlayersInPossession()) {
+//			if (hero.GetTeam() == this.team)
+//				teammate_has_ball = true;
+//			else if (hero.GetTeam() != this.team)
+//				opponent_has_ball = true;
+//		}
 
-		beliefs.teammate_has_ball = teammate_has_ball;
-		beliefs.opponent_has_ball = opponent_has_ball;
+//		beliefs.teammate_has_ball = teammate_has_ball;
+//		beliefs.opponent_has_ball = opponent_has_ball;
 
 	}
 
@@ -460,8 +486,8 @@ public class AI : Hero {
 			}
 		}
 		
-		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
-		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
+//		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
+//		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
 		beliefs.is_obstructed_path = false;
 		return false;
@@ -589,8 +615,8 @@ public class AI : Hero {
 				}
 			}
 		}
-		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
-		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
+//		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
+//		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
 
 	}

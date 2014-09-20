@@ -45,6 +45,8 @@ public class AIManager : MonoBehaviour {
 
 	private GameObject blue_team_goal;
 
+	private Hero hero_closer_to_ball;
+
 	void Start() {
 
 		GameObject game_starter_object = GameObject.Find("GameStarter");
@@ -145,15 +147,38 @@ public class AIManager : MonoBehaviour {
 	void Update() 
 	{
 		foreach (Hero hero in hero_list) {
-			if (hero.IsAI())
+			float distance_to_ball = FindDistanceToBall(hero.GetPosition());
+			if (hero.IsAI()) {
 				hero.Update();
-			if (FindDistanceToBall(hero.GetPosition()) < possession_distance_threshold)
+			}
+			if (distance_to_ball < possession_distance_threshold) {
 				InsertPlayerInPossession(hero);
-			else
+			} else {
 				RemovePlayerInPossession(hero);
+			}
+
+			if ((hero_closer_to_ball == null) || (distance_to_ball < FindDistanceToBall(hero_closer_to_ball.GetPosition()))) {
+				hero_closer_to_ball = hero;
+			}
+
 		}
-		IsTeammateAloneInFlanks();
+		//IsTeammateAloneInFlanks(hero);
 //		Debug.Log(players_in_possession.Count);
+	}
+
+	public bool HeroHasBall(Hero hero)
+	{
+		float distance_to_ball = FindDistanceToBall(hero.GetPosition());
+
+		if (distance_to_ball < possession_distance_threshold)
+			return true;
+		else
+			return false;
+	}
+
+	public Hero GetHeroCloserToBall()
+	{
+		return hero_closer_to_ball;
 	}
 
 	public void InsertPitchAreaCoordinates(int index, Vector3 pos)
@@ -246,13 +271,13 @@ public class AIManager : MonoBehaviour {
 
 	// The vector it returns will be (RED,0,-1) if the Top flank has at least a red teammate and
 	// no opponent in the flank, the Mid has both Red and Blue, and Bottom has no one.
-	public Vector3 IsTeammateAloneInFlanks()
+	public Vector3 IsTeammateAloneInFlanks(Hero hero)
 	{
 		Vector3 flanks = new Vector3(-1,-1,-1);
 
-		flanks.x = IsTeammateAloneInTopFlank();
-		flanks.y = IsTeammateAloneInMidFlank();
-		flanks.z = IsTeammateAloneInBottomFlank();
+		flanks.x = IsTeammateAloneInTopFlank(hero);
+		flanks.y = IsTeammateAloneInMidFlank(hero);
+		flanks.z = IsTeammateAloneInBottomFlank(hero);
 
 		//Debug.Log(flanks);
 
@@ -260,66 +285,72 @@ public class AIManager : MonoBehaviour {
 
 	}
 
-	private int IsTeammateAloneInTopFlank()
+	private int IsTeammateAloneInTopFlank(Hero self)
 	{
 		int flank = -1;
 
-		for (int i = 0; i < 6; i++)
-			foreach (Hero hero in top_flank_heroes[i])
-				if (hero.GetTeam() == GlobalConstants.RED)
-					if (flank == -1 || flank == GlobalConstants.RED)
-						flank = GlobalConstants.RED;
-					else
-						flank = 0;
-				else if (hero.GetTeam() == GlobalConstants.BLUE)
-					if (flank == -1 || flank == GlobalConstants.BLUE)
-						flank = GlobalConstants.BLUE;
-					else
-						flank = 0;
-
+		for (int i = 0; i < 6; i++) {
+			foreach (Hero hero in top_flank_heroes[i]) {
+				if (!hero.Equals(self)) {
+					if (hero.GetTeam() == GlobalConstants.RED) {
+						if (flank == -1 || flank == GlobalConstants.RED) {
+							flank = GlobalConstants.RED;
+						} else
+							flank = 0;
+					} else if (hero.GetTeam() == GlobalConstants.BLUE)
+						if (flank == -1 || flank == GlobalConstants.BLUE)
+							flank = GlobalConstants.BLUE;
+						else
+							flank = 0; 
+				}
+			} 
+		} 
 		return flank;
 
 	}
 
-	private int IsTeammateAloneInMidFlank()
+	private int IsTeammateAloneInMidFlank(Hero self) 
 	{
 		int flank = -1;
 		
 		for (int i = 0; i < 6; i++)
 			foreach (Hero hero in mid_flank_heroes[i]) {
-				if (hero.GetTeam() == GlobalConstants.RED)
-					if (flank == -1 || flank == GlobalConstants.RED)
-						flank = GlobalConstants.RED;
-					else
-						flank = 0;
-				else if (hero.GetTeam() == GlobalConstants.BLUE)
-					if (flank == -1 || flank == GlobalConstants.BLUE)
-						flank = GlobalConstants.BLUE;
-					else
-						flank = 0;
-		
+				if (!hero.Equals(self)) {
+					if (hero.GetTeam() == GlobalConstants.RED)
+						if (flank == -1 || flank == GlobalConstants.RED)
+							flank = GlobalConstants.RED;
+						else
+							flank = 0;
+					else if (hero.GetTeam() == GlobalConstants.BLUE)
+						if (flank == -1 || flank == GlobalConstants.BLUE)
+							flank = GlobalConstants.BLUE;
+						else
+							flank = 0;
+				}
 
 		}
 				return flank;
 		
 	}
 
-	private int IsTeammateAloneInBottomFlank()
+	private int IsTeammateAloneInBottomFlank(Hero self)
 	{
 		int flank = -1;
 		
 		for (int i = 0; i < 6; i++)
 			foreach (Hero hero in bottom_flank_heroes[i])
-				if (hero.GetTeam() == GlobalConstants.RED)
-					if (flank == -1 || flank == GlobalConstants.RED)
-						flank = GlobalConstants.RED;
-					else
-						flank = 0;
-				else if (hero.GetTeam() == GlobalConstants.BLUE)
-					if (flank == -1 || flank == GlobalConstants.BLUE)
-						flank = GlobalConstants.BLUE;
-					else
-						flank = 0;
+				if (!hero.Equals(self)) {
+					if (hero.GetTeam() == GlobalConstants.RED)
+						if (flank == -1 || flank == GlobalConstants.RED)
+							flank = GlobalConstants.RED;
+						else
+							flank = 0;
+					else if (hero.GetTeam() == GlobalConstants.BLUE)
+						if (flank == -1 || flank == GlobalConstants.BLUE)
+							flank = GlobalConstants.BLUE;
+						else
+							flank = 0;
+				}
 		
 		return flank;
 		
