@@ -45,7 +45,9 @@ public class AIManager : MonoBehaviour {
 
 	private GameObject blue_team_goal;
 
-	private Hero hero_closer_to_ball;
+	private Hero red_closer_to_ball;
+	private Hero blue_closer_to_ball;
+
 
 	void Start() {
 
@@ -144,10 +146,19 @@ public class AIManager : MonoBehaviour {
 		hero_list.Add(hero);
 	}
 
+	public void PrintHeroList()
+	{
+		foreach(Hero hero in hero_list)
+			Debug.Log(hero.GetTeam());
+		Debug.Log("----------------------------------");
+	}
+
 	void Update() 
 	{
+		int i = 0;
 		foreach (Hero hero in hero_list) {
 			float distance_to_ball = FindDistanceToBall(hero.GetPosition());
+			SetHeroCloserToBall(hero, distance_to_ball);
 			if (hero.IsAI()) {
 				hero.Update();
 			}
@@ -156,14 +167,31 @@ public class AIManager : MonoBehaviour {
 			} else {
 				RemovePlayerInPossession(hero);
 			}
-
-			if ((hero_closer_to_ball == null) || (distance_to_ball < FindDistanceToBall(hero_closer_to_ball.GetPosition()))) {
-				hero_closer_to_ball = hero;
-			}
+			i++;
+//			if ((hero_closer_to_ball == null) || (distance_to_ball < FindDistanceToBall(hero_closer_to_ball.GetPosition()))) {
+//				hero_closer_to_ball = hero;
+//			}
 
 		}
 		//IsTeammateAloneInFlanks(hero);
 //		Debug.Log(players_in_possession.Count);
+	}
+
+	private void SetHeroCloserToBall(Hero hero, float distance_to_ball)
+	{
+
+		if (hero.GetTeam() == GlobalConstants.RED) {
+		
+			if ((red_closer_to_ball == null) || (distance_to_ball < FindDistanceToBall(red_closer_to_ball.GetPosition())))
+				red_closer_to_ball = hero;
+		
+		} else if (hero.GetTeam() == GlobalConstants.BLUE) {
+			if ((blue_closer_to_ball == null) || (distance_to_ball < FindDistanceToBall(blue_closer_to_ball.GetPosition())))
+				blue_closer_to_ball = hero;
+		
+		}
+		
+
 	}
 
 	public bool HeroHasBall(Hero hero)
@@ -176,9 +204,12 @@ public class AIManager : MonoBehaviour {
 			return false;
 	}
 
-	public Hero GetHeroCloserToBall()
+	public Hero GetHeroCloserToBall(int team)
 	{
-		return hero_closer_to_ball;
+		if (team == GlobalConstants.RED)
+			return red_closer_to_ball;
+		else
+			return blue_closer_to_ball;
 	}
 
 	public void InsertPitchAreaCoordinates(int index, Vector3 pos)
@@ -267,6 +298,23 @@ public class AIManager : MonoBehaviour {
 	public List<Hero>[] GetBottomFlankHeroes()
 	{
 		return bottom_flank_heroes;
+	}
+
+	public int GetTeamInPossession()
+	{
+		int team = 0;
+
+		foreach(Hero hero in players_in_possession) {
+		
+			int hero_team = hero.GetTeam();
+
+			if (team == 0)
+				team = hero_team;
+			else if (hero_team != team)
+				return -1; //meaning more than one player is disputing the ball
+		}
+
+		return team;
 	}
 
 	// The vector it returns will be (RED,0,-1) if the Top flank has at least a red teammate and
