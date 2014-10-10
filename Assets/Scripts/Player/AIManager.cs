@@ -153,7 +153,7 @@ public class AIManager : MonoBehaviour {
 		Debug.Log("----------------------------------");
 	}
 
-	void Update() 
+	void FixedUpdate() 
 	{
 		int i = 0;
 		foreach (Hero hero in hero_list) {

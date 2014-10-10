@@ -246,6 +246,11 @@ public class Player_Behaviour : MonoBehaviour {
 				break;
 			case "Celebrate":
 				player_mesh.animation.CrossFade("Celebrate", 0.3f);
+				if (hero.GetType() == typeof(AI)) {
+					AI ai = (AI)hero;
+					ai.GoalScored();
+				}
+					
 				break;
 			case "Sad":
 				player_mesh.animation.CrossFade("Sad", 0.3f);
@@ -522,7 +527,7 @@ public class Player_Behaviour : MonoBehaviour {
 		
 		power_bar.rotation = Quaternion.Euler(0,180f,0);
 		viewport_dash_pos = Camera.main.WorldToViewportPoint(power_bar.position);
-		
+
 //		Debug.Log(Camera.main.WorldToViewportPoint(dash_bar.position));
 		
 		if(ball_collision && commands.shoot == 0) {

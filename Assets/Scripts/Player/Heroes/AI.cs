@@ -42,6 +42,9 @@ public class AI : Hero {
 	Transform colliderAIPossessionRight;
 	Transform player_collider;
 
+	private int emotion;
+
+
 	private struct Beliefs 
 	{
 		public Vector3 own_goal_position;
@@ -49,6 +52,7 @@ public class AI : Hero {
 		public float goal_width;
 		public bool opponent_has_ball;
 		public bool teammate_has_ball;
+		public bool is_in_scoring_depth;
 		public int team;
 		public bool has_ball;
 		public bool is_obstructed_path;
@@ -71,7 +75,16 @@ public class AI : Hero {
 		
 	}
 
+	private enum Expectations
+	{
+		PASS,
+		SCORE,
+		DEFEND,
+		NULL
+	}
+
 	Beliefs beliefs;
+	Expectations expectation;
 
 	// The desire to which the agent has commited will be the intention
 	Desires desire; 
@@ -93,10 +106,11 @@ public class AI : Hero {
 		colliderAIPossessionRight = player.transform.Find("ColliderAIPossession/ColliderAIPossessionRight");
 		player_collider = player.transform.Find("Collider");
 		colliderAIPossessionCenter.gameObject.SetActive(true);
-
 	}
 	// Use this for initialization
-	public override void Start () {
+	public override void Start () 
+	{
+
 		ai_manager.InsertHero(this);
 		this.team = player.team;
 		beliefs.team = player.team;
@@ -117,7 +131,10 @@ public class AI : Hero {
 
 		desire = Desires.TAKE_POSSESSION;
 
+		expectation = Expectations.DEFEND;
+	//	Debug.Log(expectation);
 	}
+
 
 	public override void Update() 
 	{
@@ -138,41 +155,113 @@ public class AI : Hero {
 		ResetControllers();
 	
 		UpdateBeliefs();
-	//	UpdateDesires();
-		
 		UpdatePossession();
+
+//		if(expectation == Expectations.PASS && beliefs.teammate_has_ball)
+//			Debug.Log("happy");
+//		else
+//			Debug.Log("Sad");
+		
+		//if (expectation == Expectations.SCORE && beliefs.teammate_has_ball)
+
 		if (beliefs.has_ball) {
-			if (ShootingDepth(current_area, team)) {
+			if (ai_manager.GetPlayersInPossession().Count > 1) {
+				//Shoot();
+				Score();
+			} else GoOpenFlank();
+			if (beliefs.is_in_scoring_depth) {
 				if(!Score()) { //returns false if can't find a clear opening to shoot to score
-					Debug.Log("PASS");
 					Pass();
+					expectation = Expectations.PASS; //If can't score will try to shoot
+				} else {
+					expectation = Expectations.SCORE;
 				}
 			} else
 				Pass();
+		} else {
+			if (ai_manager.GetPlayersInPossession().Count > 1 || !beliefs.teammate_closer_to_ball.Equals(this)) {
+				Defend();
+			}
 		}
+
 		if (beliefs.team_in_possession == 0 || beliefs.team_in_possession != team) {
 			if (beliefs.teammate_closer_to_ball.Equals(this)) {
 				GoToBall();
 			}
 		} else if (!beliefs.has_ball && beliefs.team_in_possession == team) {
 			Unmark ();
-		} 
+		//	expectation = Actions.PASS;
+		}
+
+	//	Debug.Log(expectation);
 		
 	}
 
-	private bool ShootingDepth(int current_depth, int team)
+	private bool GoOpenFlank()
 	{
+		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks(this);
+		int current_flank = ai_manager.AreaToFlank(current_area);
+		if (current_flank == GlobalConstants.TOP_FLANK) {
+			if (flanks.x == -1) {
+				DribbleToArea(DepthToArea(GlobalConstants.TOP_FLANK ,AreaToDepth(current_area)+1));
+				//return true;
+			}
+		} else if (current_flank == GlobalConstants.MID_FLANK) {
+			if (flanks.y == -1) {
+				DribbleToArea(DepthToArea(GlobalConstants.MID_FLANK, AreaToDepth(current_area)+1));
+			//	return true;
+			}
+		} else if (current_flank == GlobalConstants.BOTTOM_FLANK) {
+			if (flanks.z == -1) {
+				DribbleToArea(DepthToArea(GlobalConstants.BOTTOM_FLANK, AreaToDepth(current_area)+1));
+				//return true;
+			}
+		}
+	//	Debug.Log(DepthToArea(GlobalConstants.TOP_FLANK ,AreaToDepth(current_area)+1));
+		return false;
+
+	}
+
+
+	private bool DisputingBall()
+	{
+		if (ai_manager.GetPlayersInPossession().Count > 1)
+			return true;
+		else return false;
+	}
+
+	private void Defend()
+	{
+		int current_depth = AreaToDepth(beliefs.teammate_closer_to_ball.GetCurrentArea());
+		
+		if (team == GlobalConstants.RED)
+			current_depth += 2;
+		else
+			current_depth -= 2;
+		
+		int new_area = DepthToArea(GlobalConstants.MID_FLANK, current_depth);
+
+		//Debug.Log(current_depth);
+
+		GoToArea(new_area);
+		
+	}
+
+	private void UpdateScoringDepth()
+	{
+		int team = beliefs.team;
+
 		if (team == GlobalConstants.RED) {
 			if (AreaToDepth(current_area) <= 2) {
-				return true;
+				beliefs.is_in_scoring_depth = true;
 			} else {
-			return false;
+			beliefs.is_in_scoring_depth = false;
 			}
 		} else {
 			if (AreaToDepth(current_area) >= 5) {
-				return true;
+				beliefs.is_in_scoring_depth = true;
 			} else {
-				return false;
+				beliefs.is_in_scoring_depth = false;
 			}
 		}
 	}
@@ -199,7 +288,10 @@ public class AI : Hero {
 					return true;
 				}
 			} else {
-				return false; // path obstructed
+				if (beliefs.is_in_scoring_depth == false) {
+					Shoot(); // tries to clear the ball
+					return false; // path obstructed
+				}
 			}
 		}
 
@@ -301,6 +393,7 @@ public class AI : Hero {
 	private void UpdateBeliefs()
 	{
 		UpdatePossession();
+		UpdateScoringDepth();
 		beliefs.teammate_closer_to_ball = ai_manager.GetHeroCloserToBall(team);
 		if (team == GlobalConstants.RED)
 			beliefs.opponent_closer_to_ball = ai_manager.GetHeroCloserToBall(GlobalConstants.BLUE);
@@ -443,11 +536,18 @@ public class AI : Hero {
 
 		beliefs.distance_to_ball = FindDistanceToBall();
 		beliefs.team_in_possession = ai_manager.GetTeamInPossession();
+
 	//	Debug.Log(beliefs.distance_to_ball + " + " + possession_distance_threshold);
 
 		bool teammate_has_ball = false;
 		bool opponent_has_ball = false;
 		beliefs.has_ball = ai_manager.HeroHasBall(this);
+
+		if (beliefs.team_in_possession == beliefs.team && !beliefs.has_ball)
+			beliefs.teammate_has_ball = true;
+		else
+			beliefs.teammate_has_ball = false;
+
 //		if (beliefs.distance_to_ball < possession_distance_threshold) {
 //			beliefs.has_ball = true;
 		//	ai_manager.InsertPlayerInPossession(this);
@@ -904,5 +1004,10 @@ public class AI : Hero {
 	public override void UsePower(PlayerController.Commands commands){}
 
 	public override void EmmitPowerFX(string type = "none"){}
+
+	public void GoalScored()
+	{		
+		Debug.Log("GOAL NOTIFICATION");
+	}
 
 }
