@@ -60,15 +60,6 @@ public class GameStarter : MonoBehaviour {
 		
 	}
 
-	public void SetAIManager(AIManager ai_manager)
-	{
-		// For some fucking reason I can't seem to find the AIManager in Start()
-//		AIManager = ai_manager;
-//		for (int i = 0; i < red_bots; i++)
-//			AIManager.InstantiateBot(CalculatePosition(1), 1);
-		
-	}
-
 	private void StartLocalGame()
 	{
 		Instantiate(local_game_prefab, Vector3.zero, transform.rotation);

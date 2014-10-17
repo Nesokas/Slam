@@ -18,8 +18,6 @@ public class AIManager : MonoBehaviour {
 
 	//If more than one player is in possession, than the involved players are fighting for possession
 	private List<Hero> players_in_possession = new List<Hero>();
-	private int red_team_bots;
-	private int blue_team_bots;
 
 	//The player who is intending to grab possession
 	private Hero red_going_for_ball;
@@ -35,7 +33,7 @@ public class AIManager : MonoBehaviour {
 
 	private Game_Settings game_settings;
 
-	private GameStarter game_starter;
+	//private GameStarter game_starter;
 
 	protected GameObject AI_prefab;
 
@@ -49,12 +47,12 @@ public class AIManager : MonoBehaviour {
 	private Hero blue_closer_to_ball;
 
 
-	void Start() {
+	void Awake() {
 
-		GameObject game_starter_object = GameObject.Find("GameStarter");
-		game_starter = game_starter_object.GetComponent<GameStarter>();
+	//	GameObject game_starter_object = GameObject.Find("GameStarter");
+	//	game_starter = game_starter_object.GetComponent<GameStarter>();
 
-		game_starter.SetAIManager(this);
+	//	game_starter.SetAIManager(this);
 
 		ball = GameObject.FindGameObjectWithTag("ball");
 
@@ -72,8 +70,7 @@ public class AIManager : MonoBehaviour {
 			bottom_flank_heroes[i] = new List<Hero>();
 		}
 
-
-
+		
 		red_team_goal = GameObject.Find("Score_Team1");
 		blue_team_goal = GameObject.Find("Score_Team2");
 	}

@@ -112,7 +112,8 @@ public class Ball_Behaviour : MonoBehaviour {
 	
 	public void ReleasePlayers()
 	{
-		if (Application.loadedLevelName == "Main_Game" && game_restarted)
+	//	if (Application.loadedLevelName == "Main_Game" && game_restarted) //ELIMINEI PARA A TESE
+		if (game_restarted)
 		{
 			GameObject gbo = GameObject.FindGameObjectWithTag("GameController");
 			Game_Behaviour gb = gbo.GetComponent<Game_Behaviour>();
@@ -128,7 +129,7 @@ public class Ball_Behaviour : MonoBehaviour {
 		animationsType1 = new string[] {"look_left", "look_right", "look_up", "look_down"};
 		animationsType2 = new string[] {"Default"};
 		
-		if(Application.loadedLevelName == "Main_Game") {
+	//	if(Application.loadedLevelName == "Main_Game") {
 			GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 			GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
 			GameObject center_circle_rigth = GameObject.FindGameObjectWithTag("center-circle-right");
@@ -137,7 +138,7 @@ public class Ball_Behaviour : MonoBehaviour {
 				Physics.IgnoreCollision(center_planes[i].collider, transform.collider);
 			Physics.IgnoreCollision(center_circle_left.collider, transform.collider);
 			Physics.IgnoreCollision(center_circle_rigth.collider, transform.collider);
-		}
+	//	}
 		transform.animation.Stop();
 		transform.animation["Rolling_Eyes"].speed = 7.5f;
 		animation["Rolling_Eyes"].layer=1;
