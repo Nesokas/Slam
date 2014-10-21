@@ -112,7 +112,7 @@ public class Ball_Behaviour : MonoBehaviour {
 	
 	public void ReleasePlayers()
 	{
-	//	if (Application.loadedLevelName == "Main_Game" && game_restarted) //ELIMINEI PARA A TESE
+	//	if (Application.Name == "Main_Game" && game_restarted) //ELIMINEI PARA A TESE
 		if (game_restarted)
 		{
 			GameObject gbo = GameObject.FindGameObjectWithTag("GameController");
@@ -129,7 +129,7 @@ public class Ball_Behaviour : MonoBehaviour {
 		animationsType1 = new string[] {"look_left", "look_right", "look_up", "look_down"};
 		animationsType2 = new string[] {"Default"};
 		
-	//	if(Application.loadedLevelName == "Main_Game") {
+	//	if(Application.Name == "Main_Game") {
 			GameObject[] center_planes = GameObject.FindGameObjectsWithTag("center-plane");
 			GameObject center_circle_left = GameObject.FindGameObjectWithTag("center-circle-left");
 			GameObject center_circle_rigth = GameObject.FindGameObjectWithTag("center-circle-right");

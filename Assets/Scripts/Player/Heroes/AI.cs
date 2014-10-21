@@ -44,6 +44,8 @@ public class AI : Hero {
 
 	private int emotion;
 
+	private int script_step = -1;
+	private int current_step = 0;
 
 	private struct Beliefs 
 	{
@@ -61,6 +63,7 @@ public class AI : Hero {
 		public Hero hero_in_possession;
 		public Hero teammate_closer_to_ball;
 		public Hero opponent_closer_to_ball;
+		public AI teammate;
 		//public List<int> opponents_in_the_way;
 	}
 
@@ -110,10 +113,9 @@ public class AI : Hero {
 	// Use this for initialization
 	public override void Start () 
 	{
-
-		ai_manager.InsertHero(this);
 		this.team = player.team;
 		beliefs.team = player.team;
+		ai_manager.InsertHero(this);
 		if (beliefs.team == GlobalConstants.RED) {
 			beliefs.own_goal_position = ai_manager.GetRedTeamGoalPosition();
 			beliefs.opponent_goal_position = ai_manager.GetBlueTeamGoalPosition();
@@ -157,13 +159,30 @@ public class AI : Hero {
 		UpdateBeliefs();
 		UpdatePossession();
 
-//		if(expectation == Expectations.PASS && beliefs.teammate_has_ball)
-//			Debug.Log("happy");
-//		else
-//			Debug.Log("Sad");
-		
-		//if (expectation == Expectations.SCORE && beliefs.teammate_has_ball)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 		if (beliefs.has_ball) {
 			if (ai_manager.GetPlayersInPossession().Count > 1) {
 				//Shoot();
@@ -192,9 +211,8 @@ public class AI : Hero {
 			Unmark ();
 		//	expectation = Actions.PASS;
 		}
+		*/
 
-	//	Debug.Log(expectation);
-		
 	}
 
 	private bool GoOpenFlank()
@@ -302,24 +320,26 @@ public class AI : Hero {
 
 	private void Shoot()
 	{
-		local_player.player_controller.commands.shoot = 1;
+		if (beliefs.distance_to_ball < 1) {
+			local_player.player_controller.commands.shoot = 1;
+			if (current_step == script_step) {
+				script_step--;
+			}
+		}
 	}
 
-	private void Pass()
+	public void Pass()
 	{
 		Vector3 flanks = ai_manager.IsTeammateAloneInFlanks(this);
 
 		if (flanks.x == team) {
-		//	Debug.Log("top_flank");
 			PassToFlank(ai_manager.GetTopFlankHeroes());
-		//	Debug.Log("top_flank");
 		}
 		else if (flanks.y == team) {
 			PassToFlank(ai_manager.GetMidFlankHeroes());
 		}
 		else if (flanks.z == team) {
 			PassToFlank(ai_manager.GetBottomFlankHeroes());
-		//	Debug.Log("bottom_flank");
 		}
 		
 	}
@@ -341,9 +361,8 @@ public class AI : Hero {
 
 	}
 
-	private void PassTeammate(Hero hero)
+	public void PassTeammate(Hero hero)
 	{
-
 		int layer_mask = 1 << 28;
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
 
@@ -370,7 +389,32 @@ public class AI : Hero {
 		Debug.DrawRay(ball_vector, -1*(player_pos - ball_vector));
 	}
 
-
+	public void PassPos(Vector3 pos)
+	{
+		int layer_mask = 1 << 28;
+		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
+		
+		RaycastHit teammate_hit;
+		RaycastHit shoot_hit;
+		
+		Vector3 player_pos = new Vector3(pos.x, -0.1f, pos.z);
+		Ray teammate_ray = new Ray(ball_vector, player_pos - ball_vector);
+		Ray shoot_ray = new Ray(ball_vector, -1*(player_pos - ball_vector));
+		
+		RotateAroundBall(pos);
+		
+		if(Physics.Raycast(teammate_ray, out teammate_hit)) {
+		//	if (teammate_hit.collider.CompareTag("colliderShoot")) {
+				Debug.Log("PASS!!!");
+				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+					Shoot();
+				}
+			}
+		//}
+		//Debug.Log(player_pos - ball_vector);
+		Debug.DrawRay(ball_vector, player_pos - ball_vector);
+		Debug.DrawRay(ball_vector, -1*(player_pos - ball_vector));
+	}
 
 //	// The vector it returns will be (T,F,F) if the Top flank has at least a teammate and
 //	// no opponent in the flank, and the Mid and Bottom flanks have at least one opponent
@@ -635,7 +679,7 @@ public class AI : Hero {
 		return false;
 	}
 
-	private void GoToArea(int index)
+	public void GoToArea(int index)
 	{
 		int below_or_above = IsAboveOrBellow(player.transform.position, ai_manager.GetPitchAreaCoords(index));
 		int left_or_right = IsLeftOrRight(player.transform.position, ai_manager.GetPitchAreaCoords(index));
@@ -678,7 +722,7 @@ public class AI : Hero {
 		local_player.player_controller.commands.horizontal_direction = 0;
 	}
 
-	private void DribbleToArea(int index)
+	public void DribbleToArea(int index)
 	{
 
 		goto_area = index;
@@ -888,7 +932,7 @@ public class AI : Hero {
 		local_player.player_controller.commands.horizontal_direction = 0;
 	}
 
-	private void GoToBall()
+	public void GoToBall()
 	{
 		if (local_player.transform.position.x > ball.transform.position.x)
 			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
@@ -1010,4 +1054,26 @@ public class AI : Hero {
 		Debug.Log("GOAL NOTIFICATION");
 	}
 
+	public void SetScriptStep(int length)
+	{
+		if(script_step == -1) {
+			script_step = length;
+			current_step = script_step;
+		}
+	}
+
+	public int GetCurrentStep()
+	{
+		return script_step;
+	}
+
+	private void MayIPass()
+	{
+		//beliefs.tea
+	}
+
+	public void SetTeammate(AI ai)
+	{
+		beliefs.teammate = ai;
+	}
 }

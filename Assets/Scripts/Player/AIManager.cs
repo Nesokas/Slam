@@ -10,6 +10,8 @@ public class AIManager : MonoBehaviour {
 
 	//The list of every hero instantiated. AI in this list will run the update()
 	private List<Hero> hero_list = new List<Hero>();
+	private List<AI> red_list = new List<AI>();
+	private List<AI> blue_list = new List<AI>();
 
 	//which heroes are in each of the three flanks
 	private List<Hero>[] top_flank_heroes = new List<Hero>[6];
@@ -46,6 +48,7 @@ public class AIManager : MonoBehaviour {
 	private Hero red_closer_to_ball;
 	private Hero blue_closer_to_ball;
 
+	int current_scene;
 
 	void Awake() {
 
@@ -73,6 +76,26 @@ public class AIManager : MonoBehaviour {
 		
 		red_team_goal = GameObject.Find("Score_Team1");
 		blue_team_goal = GameObject.Find("Score_Team2");
+
+		if (Application.loadedLevelName == "scene_1") {
+			current_scene = 1;
+		}
+	}
+
+	public void script_1()
+	{
+		AI a1 = red_list[0];
+		AI a2 = red_list[1];
+
+		a1.SetScriptStep(1);
+		a2.SetScriptStep(2);
+
+		a1.PassPos(GetPitchAreaCoords(3));
+		a2.GoToArea(3);
+
+
+
+		Debug.Log(a1.GetCurrentStep());
 	}
 
 	public Vector3 GetRedTeamGoalPosition()
@@ -141,6 +164,17 @@ public class AIManager : MonoBehaviour {
 	public void InsertHero(Hero hero)
 	{
 		hero_list.Add(hero);
+		if (hero.IsAI()) {
+			if (hero.GetTeam() == GlobalConstants.RED)
+				red_list.Add((AI)hero);
+			else
+				blue_list.Add((AI)hero);
+		}
+
+		if (red_list.Count == 2) {
+			red_list[0].SetTeammate(red_list[1]);
+			red_list[1].SetTeammate(red_list[0]);
+		}
 	}
 
 	public void PrintHeroList()
@@ -170,8 +204,8 @@ public class AIManager : MonoBehaviour {
 //			}
 
 		}
-		//IsTeammateAloneInFlanks(hero);
-//		Debug.Log(players_in_possession.Count);
+		//Debug.Log(red_list.Count + " - " + hero_list.Count);
+		script_1();
 	}
 
 	private void SetHeroCloserToBall(Hero hero, float distance_to_ball)

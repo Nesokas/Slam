@@ -77,13 +77,13 @@ public class GameStarter_1 : MonoBehaviour {
 		//			                         );
 		//		}
 		
-		for (int i = 0; i < 2; i++) { //red bots
+		for (int i = 0; i < red_bots; i++) { //red bots
 			
 			InstantiateNewLocalPlayer(CalculatePosition(1), 1, "AI", i*(-1)-1, 4, 2); // bots have negative controller to differentiate
 			int x =  i*(-1)-1;
 		}
-		
-		for (int i = 0; i < 2; i++) { // blue
+		blue_bots = 0;
+		for (int i = 0; i < blue_bots; i++) { // blue
 			
 			InstantiateNewLocalPlayer(CalculatePosition(2), 2, "AI", (2 + i)*(-1)-1, 4, 2);
 			int x =  (2 + i)*(-1)-1;

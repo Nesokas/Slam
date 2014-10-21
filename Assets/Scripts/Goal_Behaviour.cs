@@ -23,7 +23,7 @@ public class Goal_Behaviour : MonoBehaviour {
 	void OnTriggerEnter(Collider collider)
 	{
 		if(collider.gameObject.tag == "ball") {
-			if(Application.loadedLevelName == "Main_Game") {
+		//	if(Application.Name == "Main_Game") {
 				Hashtable data = new Hashtable();
 				if(team == 1)
 					data["team"] = 2;
@@ -35,7 +35,7 @@ public class Goal_Behaviour : MonoBehaviour {
 					NotificationCenter.DefaultCenter.PostNotification(this, "OnGoal", data);
 				}
 			}
-		}
+		//}
 	}
 	
 }
