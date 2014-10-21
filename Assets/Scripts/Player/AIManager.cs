@@ -50,6 +50,12 @@ public class AIManager : MonoBehaviour {
 
 	int current_scene;
 
+	int script_step = -1;
+
+	bool response_1 = false;
+	bool response_2 = false;
+	bool running_script = false;
+
 	void Awake() {
 
 	//	GameObject game_starter_object = GameObject.Find("GameStarter");
@@ -82,20 +88,57 @@ public class AIManager : MonoBehaviour {
 		}
 	}
 
-	public void script_1()
+	public IEnumerator script_1()
 	{
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
 
-		a1.SetScriptStep(1);
-		a2.SetScriptStep(2);
-
-		a1.PassPos(GetPitchAreaCoords(3));
+		a1.DribbleToArea(8);
 		a2.GoToArea(3);
+		yield return null;
+		/*while(response_1 != true && response_2 != true){
+			yield return null;
+		}
+		response_1 = false;
+		response_2 = false;*/
+		Debug.Log("not waiting");
+		/*a2.Score();
+		WaitForAI();
+		yield return null;*/
+	}
 
+	/*public WaitForSeconds WaitForAI()
+	{
+		while(response_1 != true && response_2 != true){
+			return new WaitForSeconds(0.5f);
+		}
+		response_1 = false;
+		response_2 = false;
+		return null;
+	}*/
 
+	public void AgentResponse(AI agent)
+	{
+		int team = agent.GetTeam();
 
-		Debug.Log(a1.GetCurrentStep());
+		if (team == GlobalConstants.RED) {
+			if (object.ReferenceEquals(agent, red_list[0])) {
+			    response_1 = true;
+			}
+			else {
+				response_2 = true;
+			}
+		}
+
+	}
+
+	public void ScriptStepComplete()
+	{
+		AI a1 = red_list[0];
+		AI a2 = red_list[1];
+
+		if (a1.GetCurrentStep() <= script_step && a2.GetCurrentStep() <= script_step)
+			script_step--;
 	}
 
 	public Vector3 GetRedTeamGoalPosition()
@@ -205,7 +248,10 @@ public class AIManager : MonoBehaviour {
 
 		}
 		//Debug.Log(red_list.Count + " - " + hero_list.Count);
-		script_1();
+		if (!running_script) {
+			running_script = true;
+			StartCoroutine (script_1());
+		}
 	}
 
 	private void SetHeroCloserToBall(Hero hero, float distance_to_ball)

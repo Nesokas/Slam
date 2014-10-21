@@ -90,7 +90,7 @@ public class AI : Hero {
 	Expectations expectation;
 
 	// The desire to which the agent has commited will be the intention
-	Desires desire; 
+	Desires desire;
 
 	public AI(Player_Behaviour player)
 	{
@@ -284,7 +284,7 @@ public class AI : Hero {
 		}
 	}
 
-	private bool Score()
+	public bool Score()
 	{
 
 		RotateAroundBall(beliefs.opponent_goal_position);
@@ -303,6 +303,7 @@ public class AI : Hero {
 			if (goal_hit.collider.CompareTag("goal_detection")) {
 				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
 					Shoot();
+					script_step--;
 					return true;
 				}
 			} else {
@@ -322,9 +323,7 @@ public class AI : Hero {
 	{
 		if (beliefs.distance_to_ball < 1) {
 			local_player.player_controller.commands.shoot = 1;
-			if (current_step == script_step) {
-				script_step--;
-			}
+			ai_manager.AgentResponse(this);
 		}
 	}
 
@@ -391,6 +390,7 @@ public class AI : Hero {
 
 	public void PassPos(Vector3 pos)
 	{
+
 		int layer_mask = 1 << 28;
 		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
 		
@@ -405,7 +405,7 @@ public class AI : Hero {
 		
 		if(Physics.Raycast(teammate_ray, out teammate_hit)) {
 		//	if (teammate_hit.collider.CompareTag("colliderShoot")) {
-				Debug.Log("PASS!!!");
+//				Debug.Log("PASS!!!");
 				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
 					Shoot();
 				}
@@ -698,6 +698,9 @@ public class AI : Hero {
 		else
 			StopMovingHorizontally();
 
+		if(current_area == index)
+			script_step--;
+
 	}
 
 	private void Move(int direction)
@@ -774,6 +777,9 @@ public class AI : Hero {
 				}
 			}
 		}
+
+		if (current_area == index)
+			ai_manager.AgentResponse(this);
 //		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
 //		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
