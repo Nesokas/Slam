@@ -47,6 +47,24 @@ public class AI : Hero {
 	private int script_step = -1;
 	private int current_step = 0;
 
+	private enum Actions
+	{
+		GO_TO_AREA,
+		GO_TO_BALL,
+		DRIBBLE_TO_AREA,
+		PASS,
+		PASS_TO_AREA,
+		SCORE,
+		RECEIVE_PASS,
+		NULL
+	}
+
+	private struct Action
+	{
+		public Actions action;
+		public int args;
+	}
+
 	private struct Beliefs 
 	{
 		public Vector3 own_goal_position;
@@ -91,7 +109,7 @@ public class AI : Hero {
 
 	// The desire to which the agent has commited will be the intention
 	Desires desire;
-
+	Action current_action;
 	public AI(Player_Behaviour player)
 	{
 		hero_prefab = Resources.Load<GameObject>("Heroes/Sam");
@@ -135,6 +153,7 @@ public class AI : Hero {
 
 		expectation = Expectations.DEFEND;
 	//	Debug.Log(expectation);
+		current_action = new Action();
 	}
 
 
@@ -160,9 +179,21 @@ public class AI : Hero {
 		UpdatePossession();
 
 
-
-
-
+		
+		if(current_action.action == Actions.DRIBBLE_TO_AREA) {
+			DribbleToArea(current_action.args);
+		} else if (current_action.action == Actions.GO_TO_AREA) {
+			GoToArea(current_action.args);
+		} else if (current_action.action == Actions.PASS) {
+			//beliefs.teammate
+			Pass();
+		} else if (current_action.action == Actions.SCORE) {
+			Score();
+		} else if (current_action.action == Actions.RECEIVE_PASS) {
+			ReceivePass();
+		} else if (current_action.action == Actions.PASS_TO_AREA) {
+			PassPos(ai_manager.GetPitchAreaCoords(current_action.args));
+		}
 
 
 
@@ -213,6 +244,60 @@ public class AI : Hero {
 		}
 		*/
 
+	}
+
+	public void SetActionDribbleToArea(int area)
+	{
+		current_action.action = Actions.DRIBBLE_TO_AREA;
+		current_action.args = area;
+	}
+
+	public void SetActionGoToArea(int area)
+	{
+		current_action.action = Actions.GO_TO_AREA;
+		current_action.args = area;
+	}
+
+	public void SetActionPass()
+	{
+		current_action.action = Actions.PASS;
+		current_action.args = -1;
+	}
+
+	public void SetActionScore()
+	{
+		current_action.action = Actions.SCORE;
+		current_action.args = -1;
+	}
+
+	public void SetActionNull()
+	{
+		current_action.action = Actions.NULL;
+		ai_manager.AgentResponse(this);
+	}
+
+	public void SetActionReceivePass()
+	{
+		current_action.action = Actions.RECEIVE_PASS;
+	}
+
+	public void SetActionPassToArea(int index)
+	{
+		current_action.action = Actions.PASS_TO_AREA;
+		current_action.args = index;
+	}
+
+	public void ReceivePass()
+	{
+		if (beliefs.distance_to_ball < 3) {
+			ai_manager.AgentResponse(this);
+			Debug.Log(beliefs.distance_to_ball);
+		}
+
+//		if (this.GetPosition().z < ball.transform.position.z)
+//			Move(LEFT);
+//		if (this.GetPosition().z > ball.transform.position.z)
+//			Move(RIGHT);
 	}
 
 	private bool GoOpenFlank()
@@ -681,6 +766,11 @@ public class AI : Hero {
 
 	public void GoToArea(int index)
 	{
+		if (current_area == index) {
+			ai_manager.AgentResponse(this);
+			return;
+		}
+
 		int below_or_above = IsAboveOrBellow(player.transform.position, ai_manager.GetPitchAreaCoords(index));
 		int left_or_right = IsLeftOrRight(player.transform.position, ai_manager.GetPitchAreaCoords(index));
 
@@ -727,6 +817,10 @@ public class AI : Hero {
 
 	public void DribbleToArea(int index)
 	{
+		if (current_area == index && ball.GetComponent<Ball_Behaviour>().GetCurrentArea() == index && beliefs.has_ball) {
+		//	Debug.Log("here");
+			return;
+		}
 
 		goto_area = index;
 
@@ -1075,11 +1169,12 @@ public class AI : Hero {
 
 	private void MayIPass()
 	{
-		//beliefs.tea
+
 	}
 
 	public void SetTeammate(AI ai)
 	{
 		beliefs.teammate = ai;
 	}
+
 }
