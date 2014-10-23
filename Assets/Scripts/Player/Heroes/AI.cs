@@ -104,9 +104,18 @@ public class AI : Hero {
 		NULL
 	}
 
+	private enum Expressions 
+	{
+		REQUEST_PASS,
+		INTEND_TO_PASS,
+		OK,
+		NULL
+		
+	}
+
 	Beliefs beliefs;
 	Expectations expectation;
-
+	Expressions expression;
 	// The desire to which the agent has commited will be the intention
 	Desires desire;
 	Action current_action;
@@ -154,6 +163,10 @@ public class AI : Hero {
 		expectation = Expectations.DEFEND;
 	//	Debug.Log(expectation);
 		current_action = new Action();
+
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToPass");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnSignalOK");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRequestPass");
 	}
 
 
@@ -178,8 +191,7 @@ public class AI : Hero {
 		UpdateBeliefs();
 		UpdatePossession();
 
-
-		
+	//	Debug.Log(expression);		
 		if(current_action.action == Actions.DRIBBLE_TO_AREA) {
 			DribbleToArea(current_action.args);
 		} else if (current_action.action == Actions.GO_TO_AREA) {
@@ -1151,7 +1163,7 @@ public class AI : Hero {
 
 	public void GoalScored()
 	{		
-		Debug.Log("GOAL NOTIFICATION");
+//		Debug.Log("GOAL NOTIFICATION");
 	}
 
 	public void SetScriptStep(int length)
@@ -1167,9 +1179,35 @@ public class AI : Hero {
 		return script_step;
 	}
 
-	private void MayIPass()
+	public void OnIntentToPass()
 	{
+		expression = Expressions.INTEND_TO_PASS;
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToPass");
+	}
 
+	public void IntentToPass(NotificationCenter.Notification notification)
+	{
+		if (object.ReferenceEquals(this.player, notification.sender))
+		    Debug.Log("this is sender");
+		else {
+			Debug.Log("this is receiver");
+		}
+		//NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToPass");
+	}
+
+
+	public void OnRequestPass(NotificationCenter.Notification notification)
+	{
+		expression = Expressions.REQUEST_PASS;
+		Debug.Log(expression);
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnRequestPass");
+	}
+
+	public void OnSignalOK(NotificationCenter.Notification notification)
+	{
+		expression = Expressions.OK;
+		Debug.Log(expression);
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnRequestPass");
 	}
 
 	public void SetTeammate(AI ai)

@@ -116,7 +116,7 @@ public class AIManager : MonoBehaviour {
 		}
 		response_1 = false;
 		response_2 = false;
-		a1.SetActionNull();
+		a1.OnIntentToPass();
 		a2.SetActionScore();
 		while(response_1 != true || response_2 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;

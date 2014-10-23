@@ -571,4 +571,27 @@ public class Player_Behaviour : MonoBehaviour {
 		if(debug_mode)
 			DebugMode();
 	}
+
+
+	
+	public void OnIntentToPass(NotificationCenter.Notification notification)
+	{
+		AI ai = (AI)hero;
+		ai.IntentToPass(notification);
+		
+	}
+
+	public void OnRequestPass(NotificationCenter.Notification notification)
+	{
+		AI ai = (AI)hero;
+		ai.OnRequestPass(notification);
+		
+	}
+
+	public void OnSignalOK(NotificationCenter.Notification notification)
+	{
+		AI ai = (AI)hero;
+		ai.OnSignalOK(notification);
+		
+	}
 }
