@@ -584,14 +584,21 @@ public class Player_Behaviour : MonoBehaviour {
 	public void OnRequestPass(NotificationCenter.Notification notification)
 	{
 		AI ai = (AI)hero;
-		ai.OnRequestPass(notification);
+		ai.RequestPass(notification);
 		
 	}
 
 	public void OnSignalOK(NotificationCenter.Notification notification)
 	{
 		AI ai = (AI)hero;
-		ai.OnSignalOK(notification);
+		ai.SignalOK(notification);
 		
 	}
+
+	public void OnIntentToScore(NotificationCenter.Notification notification) 
+	{
+		AI ai = (AI)hero;
+		ai.IntentToScore(notification);
+	}
+
 }

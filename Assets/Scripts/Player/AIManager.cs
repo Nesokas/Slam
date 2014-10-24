@@ -93,9 +93,8 @@ public class AIManager : MonoBehaviour {
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
 
-		a1.SetActionDribbleToArea(8);
+		a1.SetActionDribbleToArea(5);
 		a2.SetActionGoToArea(3);
-		//yield return null;
 		while(response_1 != true || response_2 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;
 		}
@@ -103,24 +102,24 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		response_2 = false;
 		a1.SetActionPass();
-	//	a2.SetActionReceivePass();
-		while(response_1 != true || response_2 != true){ 
+		a2.SetActionReceivePass();
+		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
 		response_1 = false;
 		response_2 = false;
 		a1.SetActionNull();
-		a2.SetActionReceivePass();
-		while(response_1 != true || response_2 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
-			yield return null;
-		}
-		response_1 = false;
-		response_2 = false;
-		a1.OnIntentToPass();
 		a2.SetActionScore();
-		while(response_1 != true || response_2 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
+		while(response_1 != true || response_2 != true) {//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;
 		}
+//		response_1 = false;
+//		response_2 = false;
+//		a1.OnIntentToPass();
+//		a2.SetActionScore();
+//		while(response_1 != true || response_2 != true) {//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
+//			yield return null;
+//		}
 	}
 
 	/*public WaitForSeconds WaitForAI()

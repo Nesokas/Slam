@@ -82,6 +82,7 @@ public class AI : Hero {
 		public Hero teammate_closer_to_ball;
 		public Hero opponent_closer_to_ball;
 		public AI teammate;
+		public Expressions teammate_expression;
 		//public List<int> opponents_in_the_way;
 	}
 
@@ -108,6 +109,7 @@ public class AI : Hero {
 	{
 		REQUEST_PASS,
 		INTEND_TO_PASS,
+		INTEND_TO_SCORE,
 		OK,
 		NULL
 		
@@ -167,6 +169,7 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnSignalOK");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRequestPass");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToScore");
 	}
 
 
@@ -197,8 +200,8 @@ public class AI : Hero {
 		} else if (current_action.action == Actions.GO_TO_AREA) {
 			GoToArea(current_action.args);
 		} else if (current_action.action == Actions.PASS) {
-			//beliefs.teammate
-			Pass();
+			if(beliefs.teammate_expression == Expressions.OK)
+				Pass();
 		} else if (current_action.action == Actions.SCORE) {
 			Score();
 		} else if (current_action.action == Actions.RECEIVE_PASS) {
@@ -272,12 +275,14 @@ public class AI : Hero {
 
 	public void SetActionPass()
 	{
+		OnIntentToPass();
 		current_action.action = Actions.PASS;
 		current_action.args = -1;
 	}
 
 	public void SetActionScore()
 	{
+		OnIntentToScore();
 		current_action.action = Actions.SCORE;
 		current_action.args = -1;
 	}
@@ -290,6 +295,7 @@ public class AI : Hero {
 
 	public void SetActionReceivePass()
 	{
+		OnSignalOK();
 		current_action.action = Actions.RECEIVE_PASS;
 	}
 
@@ -301,9 +307,11 @@ public class AI : Hero {
 
 	public void ReceivePass()
 	{
+	//	Debug.Log(ball.GetComponent<Ball_Behaviour>().rigidbody.velocity.magnitude);
+		//Debug.Log(beliefs.distance_to_ball + " -- " + ball.GetComponent<Ball_Behaviour>().rigidbody.velocity.magnitude);
 		if (beliefs.distance_to_ball < 3) {
 			ai_manager.AgentResponse(this);
-			Debug.Log(beliefs.distance_to_ball);
+		//	Debug.Log(beliefs.distance_to_ball);
 		}
 
 //		if (this.GetPosition().z < ball.transform.position.z)
@@ -829,7 +837,7 @@ public class AI : Hero {
 
 	public void DribbleToArea(int index)
 	{
-		if (current_area == index && ball.GetComponent<Ball_Behaviour>().GetCurrentArea() == index && beliefs.has_ball) {
+		if (ball.GetComponent<Ball_Behaviour>().GetCurrentArea() == index && beliefs.has_ball) {
 		//	Debug.Log("here");
 			return;
 		}
@@ -1188,26 +1196,60 @@ public class AI : Hero {
 	public void IntentToPass(NotificationCenter.Notification notification)
 	{
 		if (object.ReferenceEquals(this.player, notification.sender))
-		    Debug.Log("this is sender");
+		    Debug.Log("CAN I PASS?");
 		else {
-			Debug.Log("this is receiver");
+	//		Debug.Log("this is receiver");
+			beliefs.teammate_expression = Expressions.INTEND_TO_PASS;
 		}
-		//NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToPass");
 	}
 
 
-	public void OnRequestPass(NotificationCenter.Notification notification)
+	public void OnRequestPass()
 	{
 		expression = Expressions.REQUEST_PASS;
-		Debug.Log(expression);
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnRequestPass");
 	}
 
-	public void OnSignalOK(NotificationCenter.Notification notification)
+	public void RequestPass(NotificationCenter.Notification notification)
+	{
+		if (object.ReferenceEquals(this.player, notification.sender))
+			Debug.Log("PASS ME THE BALL");
+		else {
+		//	Debug.Log("this is receiver");
+			beliefs.teammate_expression = Expressions.REQUEST_PASS;
+		}
+	}
+
+	public void OnSignalOK()
 	{
 		expression = Expressions.OK;
-		Debug.Log(expression);
-		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnRequestPass");
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnSignalOK");
+	}
+
+	public void SignalOK(NotificationCenter.Notification notification)
+	{
+		if (object.ReferenceEquals(this.player, notification.sender))
+			Debug.Log("OK");
+		else {
+			beliefs.teammate_expression = Expressions.OK;
+		//	Debug.Log("this is receiver");
+		}
+	}
+
+	public void OnIntentToScore()
+	{
+		expression = Expressions.INTEND_TO_SCORE;
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToScore");
+	}
+	
+	public void IntentToScore(NotificationCenter.Notification notification)
+	{
+		if (object.ReferenceEquals(this.player, notification.sender))
+			Debug.Log("GOING FOR IT!");
+		else {
+			beliefs.teammate_expression = Expressions.OK;
+			Debug.Log("HOPE FOR THE BEST");
+		}
 	}
 
 	public void SetTeammate(AI ai)
