@@ -591,14 +591,14 @@ public class Player_Behaviour : MonoBehaviour {
 	public void OnSignalOK(NotificationCenter.Notification notification)
 	{
 		AI ai = (AI)hero;
-		ai.SignalOK(notification);
+		StartCoroutine(ai.SignalOK(notification));
 		
 	}
 
 	public void OnIntentToScore(NotificationCenter.Notification notification) 
 	{
 		AI ai = (AI)hero;
-		ai.IntentToScore(notification);
+		StartCoroutine(ai.IntentToScore(notification));
 	}
 
 }

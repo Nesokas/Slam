@@ -309,10 +309,10 @@ public class AI : Hero {
 	{
 	//	Debug.Log(ball.GetComponent<Ball_Behaviour>().rigidbody.velocity.magnitude);
 		//Debug.Log(beliefs.distance_to_ball + " -- " + ball.GetComponent<Ball_Behaviour>().rigidbody.velocity.magnitude);
-		if (beliefs.distance_to_ball < 3) {
+		//if (beliefs.distance_to_ball < 3) {
 			ai_manager.AgentResponse(this);
 		//	Debug.Log(beliefs.distance_to_ball);
-		}
+		//}
 
 //		if (this.GetPosition().z < ball.transform.position.z)
 //			Move(LEFT);
@@ -1222,14 +1222,16 @@ public class AI : Hero {
 
 	public void OnSignalOK()
 	{
-		expression = Expressions.OK;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnSignalOK");
 	}
 
-	public void SignalOK(NotificationCenter.Notification notification)
+	public IEnumerator SignalOK(NotificationCenter.Notification notification)
 	{
-		if (object.ReferenceEquals(this.player, notification.sender))
+		yield return new WaitForSeconds(0.5f);
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+			expression = Expressions.OK;
 			Debug.Log("OK");
+		}
 		else {
 			beliefs.teammate_expression = Expressions.OK;
 		//	Debug.Log("this is receiver");
@@ -1242,8 +1244,9 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToScore");
 	}
 	
-	public void IntentToScore(NotificationCenter.Notification notification)
+	public IEnumerator IntentToScore(NotificationCenter.Notification notification)
 	{
+		yield return new WaitForSeconds(0.5f);
 		if (object.ReferenceEquals(this.player, notification.sender))
 			Debug.Log("GOING FOR IT!");
 		else {
