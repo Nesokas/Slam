@@ -572,7 +572,6 @@ public class Player_Behaviour : MonoBehaviour {
 			DebugMode();
 	}
 
-
 	
 	public void OnIntentToPass(NotificationCenter.Notification notification)
 	{
@@ -599,6 +598,12 @@ public class Player_Behaviour : MonoBehaviour {
 	{
 		AI ai = (AI)hero;
 		StartCoroutine(ai.IntentToScore(notification));
+	}
+
+	public void OnScore(NotificationCenter.Notification notification)
+	{
+		AI ai = (AI)hero;
+		StartCoroutine(ai.Score(notification));
 	}
 
 }

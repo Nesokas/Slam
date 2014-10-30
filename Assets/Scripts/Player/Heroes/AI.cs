@@ -83,6 +83,7 @@ public class AI : Hero {
 		public Hero opponent_closer_to_ball;
 		public AI teammate;
 		public Expressions teammate_expression;
+		public bool has_shot;
 		//public List<int> opponents_in_the_way;
 	}
 
@@ -111,6 +112,7 @@ public class AI : Hero {
 		INTEND_TO_PASS,
 		INTEND_TO_SCORE,
 		OK,
+		EXPECT_SCORE,
 		NULL
 		
 	}
@@ -156,9 +158,7 @@ public class AI : Hero {
 		beliefs.goal_width = ai_manager.GoalWidth();
 
 		beliefs.distance_to_ball = 0;
-
-	//	beliefs.teammate_going_for_ball = false;
-	//	beliefs.opponent_going_for_ball = false;
+		beliefs.has_shot = false;
 
 		desire = Desires.TAKE_POSSESSION;
 
@@ -170,6 +170,7 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnSignalOK");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRequestPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToScore");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnScore"); //When he shoots in fact
 	}
 
 
@@ -310,14 +311,10 @@ public class AI : Hero {
 	//	Debug.Log(ball.GetComponent<Ball_Behaviour>().rigidbody.velocity.magnitude);
 		//Debug.Log(beliefs.distance_to_ball + " -- " + ball.GetComponent<Ball_Behaviour>().rigidbody.velocity.magnitude);
 		//if (beliefs.distance_to_ball < 3) {
-			ai_manager.AgentResponse(this);
+		ai_manager.AgentResponse(this);
 		//	Debug.Log(beliefs.distance_to_ball);
 		//}
-
-//		if (this.GetPosition().z < ball.transform.position.z)
-//			Move(LEFT);
-//		if (this.GetPosition().z > ball.transform.position.z)
-//			Move(RIGHT);
+	
 	}
 
 	private bool GoOpenFlank()
@@ -426,11 +423,24 @@ public class AI : Hero {
 
 	private void Shoot()
 	{
-		if (beliefs.distance_to_ball < 1) {
+		if (beliefs.distance_to_ball < 1 && beliefs.has_shot == false) {
+			beliefs.has_shot = true;
 			local_player.player_controller.commands.shoot = 1;
 			ai_manager.AgentResponse(this);
+
+
+			if (current_action.action == Actions.SCORE) {
+				OnScore();
+			}
+//				NotificationCenter.DefaultCenter.PostNotification("ExpectingScore");
+//				ExpectingScore();
+//			}
 		}
+
+
 	}
+
+
 
 	public void Pass()
 	{
@@ -1246,12 +1256,36 @@ public class AI : Hero {
 	
 	public IEnumerator IntentToScore(NotificationCenter.Notification notification)
 	{
-		yield return new WaitForSeconds(0.5f);
-		if (object.ReferenceEquals(this.player, notification.sender))
+		if (object.ReferenceEquals(this.player, notification.sender)) {
 			Debug.Log("GOING FOR IT!");
+		}
 		else {
+			yield return new WaitForSeconds(0.5f);
 			beliefs.teammate_expression = Expressions.OK;
 			Debug.Log("HOPE FOR THE BEST");
+
+//			if(beliefs.teammate_has_ball == false && beliefs.opponent_has_ball == false && beliefs.has_shot) {
+//				Debug.Log("has shot");
+//				yield return new WaitForSeconds(2f);
+//				Debug.Log("FAILED!!!!!!");
+//				beliefs.has_shot = false;
+//			}
+		}
+	}
+
+	public void OnScore()
+	{
+		expression = Expressions.EXPECT_SCORE;
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnScore");
+	}
+
+	public IEnumerator Score(NotificationCenter.Notification notification)
+	{
+		yield return new WaitForSeconds(2);
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+			Debug.Log("YOU STUPID SHIT!!");
+		} else {
+			Debug.Log("GODDAMMIT");
 		}
 	}
 
