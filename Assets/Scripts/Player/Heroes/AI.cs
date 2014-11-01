@@ -171,6 +171,7 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRequestPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToScore");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnScore"); //When he shoots in fact
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnShoot");
 	}
 
 
@@ -308,12 +309,19 @@ public class AI : Hero {
 
 	public void ReceivePass()
 	{
-	//	Debug.Log(ball.GetComponent<Ball_Behaviour>().rigidbody.velocity.magnitude);
-		//Debug.Log(beliefs.distance_to_ball + " -- " + ball.GetComponent<Ball_Behaviour>().rigidbody.velocity.magnitude);
-		//if (beliefs.distance_to_ball < 3) {
-		ai_manager.AgentResponse(this);
-		//	Debug.Log(beliefs.distance_to_ball);
-		//}
+		float x_prediction = ReceiveBallHorizontally();
+		Debug.Log(x_prediction);
+		if (Mathf.Abs(x_prediction - player.transform.position.z) > 1) { 
+			if (x_prediction < player.transform.position.z) {
+				Move(LEFT);
+			} else {
+				Move(RIGHT);
+			}
+			if (beliefs.distance_to_ball < 3) {
+				Debug.Log("response");
+				ai_manager.AgentResponse(this);
+			}
+		}
 	
 	}
 
@@ -1279,6 +1287,16 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnScore");
 	}
 
+	public void OnShoot()
+	{
+		//expression = Expressions.EXPECT_SCORE;
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnShoot");
+	}
+
+	public IEnumerator Shoot(NotificationCenter.Notification notification)
+	{
+	}
+
 	public IEnumerator Score(NotificationCenter.Notification notification)
 	{
 		yield return new WaitForSeconds(2);
@@ -1287,6 +1305,25 @@ public class AI : Hero {
 		} else {
 			Debug.Log("GODDAMMIT");
 		}
+	}
+
+	public float ReceiveBallHorizontally()
+	{
+		float Ybi, Xpi; // initial Y position of the ball and X of the player
+		float Ybf, Xpf; // final Y and X position of the ball, which will be equal to the player's
+		float T; // Time that will take for the ball to reach the player's Y 
+		Ybi = ball.transform.position.x;
+		Ybf = this.player.transform.position.x;
+
+		T = (Ybf - Ybi)/ball.rigidbody.velocity.x;
+
+		Xpi = this.player.transform.position.z;
+		Xpf = Xpi + this.player.rigidbody.velocity.z * T;
+
+		return Xpf;
+
+
+
 	}
 
 	public void SetTeammate(AI ai)
