@@ -50,11 +50,12 @@ public class Forcefield : MonoBehaviour {
 
     public void OnHit(Vector3 hitPoint)
     {
-        UpdateMask(hitPoint);      
+        UpdateMask(hitPoint);
     }
 	
 	public void BallCollition(Vector3 point)
 	{
+		NotificationCenter.DefaultCenter.PostNotification(this,"OnWallHit");
 		UpdateMask(point);
 		AudioSource.PlayClipAtPoint(wall_sound, point, 0.3f);	
 	}

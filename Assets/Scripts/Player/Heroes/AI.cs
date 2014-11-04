@@ -53,6 +53,7 @@ public class AI : Hero {
 		GO_TO_BALL,
 		DRIBBLE_TO_AREA,
 		PASS,
+		PASSED,
 		PASS_TO_AREA,
 		SCORE,
 		RECEIVE_PASS,
@@ -84,6 +85,8 @@ public class AI : Hero {
 		public AI teammate;
 		public Expressions teammate_expression;
 		public bool has_shot;
+		public bool teammate_has_passed;
+		public float ball_z_prediction;
 		//public List<int> opponents_in_the_way;
 	}
 
@@ -159,7 +162,7 @@ public class AI : Hero {
 
 		beliefs.distance_to_ball = 0;
 		beliefs.has_shot = false;
-
+		beliefs.teammate_has_passed = false;
 		desire = Desires.TAKE_POSSESSION;
 
 		expectation = Expectations.DEFEND;
@@ -171,7 +174,8 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRequestPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToScore");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnScore"); //When he shoots in fact
-		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnShoot");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnPass");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnWallHit");
 	}
 
 
@@ -206,7 +210,7 @@ public class AI : Hero {
 				Pass();
 		} else if (current_action.action == Actions.SCORE) {
 			Score();
-		} else if (current_action.action == Actions.RECEIVE_PASS) {
+		} else if (current_action.action == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
 			ReceivePass();
 		} else if (current_action.action == Actions.PASS_TO_AREA) {
 			PassPos(ai_manager.GetPitchAreaCoords(current_action.args));
@@ -309,20 +313,18 @@ public class AI : Hero {
 
 	public void ReceivePass()
 	{
-		float x_prediction = ReceiveBallHorizontally();
-		Debug.Log(x_prediction);
-		if (Mathf.Abs(x_prediction - player.transform.position.z) > 1) { 
-			if (x_prediction < player.transform.position.z) {
-				Move(LEFT);
-			} else {
-				Move(RIGHT);
-			}
-			if (beliefs.distance_to_ball < 3) {
-				Debug.Log("response");
-				ai_manager.AgentResponse(this);
-			}
+	//	Debug.Log(beliefs.ball_z_prediction + " - " + player.transform.position.z );
+		if (beliefs.ball_z_prediction > player.transform.position.z) {
+			Move(LEFT);
+	//		Debug.Log("left");
+		} else {
+	//		Debug.Log("right");
+			Move(RIGHT);
 		}
-	
+		if (beliefs.distance_to_ball < 2) {
+	//		Debug.Log("response");
+			ai_manager.AgentResponse(this);
+		}
 	}
 
 	private bool GoOpenFlank()
@@ -416,12 +418,13 @@ public class AI : Hero {
 					script_step--;
 					return true;
 				}
-			} else {
+			}/* else {
 				if (beliefs.is_in_scoring_depth == false) {
+					Debug.Log("else in score()");
 					Shoot(); // tries to clear the ball
 					return false; // path obstructed
 				}
-			}
+			}*/
 		}
 
 		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
@@ -440,6 +443,11 @@ public class AI : Hero {
 			if (current_action.action == Actions.SCORE) {
 				OnScore();
 			}
+
+			if (current_action.action == Actions.PASS) {
+				OnPass();
+			}
+
 //				NotificationCenter.DefaultCenter.PostNotification("ExpectingScore");
 //				ExpectingScore();
 //			}
@@ -1287,16 +1295,32 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnScore");
 	}
 
-	public void OnShoot()
+	public void OnPass()
 	{
-		//expression = Expressions.EXPECT_SCORE;
-		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnShoot");
+
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnPass");
+	}
+
+	public IEnumerator Pass(NotificationCenter.Notification notification)
+	{
+
+		yield return new WaitForSeconds(0.1f);
+
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+		
+		} else {
+			beliefs.teammate_has_passed = true;
+			beliefs.ball_z_prediction = PredictBallZPosition();
+		}
+	//	NotificationCenter.DefaultCenter.PostNotification(this.player,"OnPass");
 	}
 
 	public IEnumerator Shoot(NotificationCenter.Notification notification)
 	{
+		yield return new WaitForSeconds(2f);
+		Debug.Log("MISSED GOAL");
 	}
-
+	/*
 	public IEnumerator Score(NotificationCenter.Notification notification)
 	{
 		yield return new WaitForSeconds(2);
@@ -1305,24 +1329,35 @@ public class AI : Hero {
 		} else {
 			Debug.Log("GODDAMMIT");
 		}
+	}*/
+
+	public void OnWallHit()
+	{
+		if (current_action.action == Actions.SCORE) {
+			Debug.Log("GODDAMMIT!!");
+		} else if (beliefs.teammate.current_action.action == Actions.SCORE) {
+			Debug.Log("YOU STUPID SHIT!!");
+		}
 	}
 
-	public float ReceiveBallHorizontally()
+	private float GetDistanceBetweenTwoCoords(float z1, float z2)
 	{
-		float Ybi, Xpi; // initial Y position of the ball and X of the player
-		float Ybf, Xpf; // final Y and X position of the ball, which will be equal to the player's
-		float T; // Time that will take for the ball to reach the player's Y 
-		Ybi = ball.transform.position.x;
-		Ybf = this.player.transform.position.x;
+		//Debug.Log( Mathf.Abs( Mathf.Abs(z1) - Mathf.Abs(z2)));
+		return Mathf.Abs(z1 - z2);
+	}
 
-		T = (Ybf - Ybi)/ball.rigidbody.velocity.x;
+	public float PredictBallZPosition()
+	{
+		float X = GetDistanceBetweenTwoCoords(ball.transform.position.x, player.transform.position.x);
 
-		Xpi = this.player.transform.position.z;
-		Xpf = Xpi + this.player.rigidbody.velocity.z * T;
+		float Vxball = ball.rigidbody.velocity.x;
+		float Vyball = ball.rigidbody.velocity.z;
 
-		return Xpf;
+		float T = X/Vxball;
 
+		float Zprediction = Vyball*T;
 
+		return Zprediction;
 
 	}
 

@@ -599,11 +599,23 @@ public class Player_Behaviour : MonoBehaviour {
 		AI ai = (AI)hero;
 		StartCoroutine(ai.IntentToScore(notification));
 	}
-
+	/*
 	public void OnScore(NotificationCenter.Notification notification)
 	{
 		AI ai = (AI)hero;
 		StartCoroutine(ai.Score(notification));
+	}
+	*/
+	public void OnPass(NotificationCenter.Notification notification)
+	{
+		AI ai = (AI)hero;
+		StartCoroutine(ai.Pass(notification));
+	}
+
+	public void OnWallHit(NotificationCenter.Notification notification)
+	{
+		AI ai = (AI)hero;
+		ai.OnWallHit();
 	}
 
 }
