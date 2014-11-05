@@ -313,6 +313,7 @@ public class AI : Hero {
 
 	public void ReceivePass()
 	{
+//		Debug.Log(beliefs.ball_z_prediction);
 	//	Debug.Log(beliefs.ball_z_prediction + " - " + player.transform.position.z );
 		if (beliefs.ball_z_prediction > player.transform.position.z) {
 			Move(LEFT);
@@ -321,7 +322,7 @@ public class AI : Hero {
 	//		Debug.Log("right");
 			Move(RIGHT);
 		}
-		if (beliefs.distance_to_ball < 2) {
+		if (beliefs.distance_to_ball < 2.5) {
 	//		Debug.Log("response");
 			ai_manager.AgentResponse(this);
 		}
@@ -1093,26 +1094,25 @@ public class AI : Hero {
 	private void RotateAroundBallCounterclockwise()
 	{
 		int quadrant = GetQuadrant();
-
-	//	Debug.Log(quadrant);
+		
 
 		if (quadrant == 1) {
-		
+		//	Debug.Log(1);
 			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 			local_player.player_controller.commands.vertical_direction = 0;
 		
 		} else if (quadrant == 2) {
-
+		//	Debug.Log(2);
 			local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			local_player.player_controller.commands.horizontal_direction = 0;
 		
 		} else if (quadrant == 3) {
-		
+		//	Debug.Log(3);
 			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			local_player.player_controller.commands.vertical_direction = 0;
 			
 		} else if (quadrant == 4) {
-
+		//	Debug.Log(4);
 			local_player.player_controller.commands.horizontal_direction = 0;
 			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 		
@@ -1125,22 +1125,22 @@ public class AI : Hero {
 
 		
 		if (quadrant == 1) {
-			
+		//	Debug.Log(1);
 			local_player.player_controller.commands.horizontal_direction = 0;
 			local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			
 		} else if (quadrant == 2) {
-			
+		//	Debug.Log(2);
 			local_player.player_controller.commands.vertical_direction = 0;
 			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			
 		} else if (quadrant == 3) {
-			
+		//	Debug.Log(3);
 			local_player.player_controller.commands.horizontal_direction = 0;
 			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 			
 		} else if (quadrant == 4) {
-			
+		//	Debug.Log(4);
 			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 			local_player.player_controller.commands.vertical_direction = 0;
 			
@@ -1162,7 +1162,7 @@ public class AI : Hero {
 
 		float Zb = ball.transform.position.z;
 		float Zp = player.transform.position.z;
-
+	//	Debug.Log(Xb + " - " + Xp);
 		if (Xb > Xp)
 		
 			if (Zb < Zp) 
@@ -1349,14 +1349,14 @@ public class AI : Hero {
 	public float PredictBallZPosition()
 	{
 		float X = GetDistanceBetweenTwoCoords(ball.transform.position.x, player.transform.position.x);
-
+	//	Debug.Log("distance -> " + ball.transform.position.x + " - " + player.transform.position.x);
 		float Vxball = ball.rigidbody.velocity.x;
-		float Vyball = ball.rigidbody.velocity.z;
+		float Vzball = ball.rigidbody.velocity.z;
 
 		float T = X/Vxball;
-
-		float Zprediction = Vyball*T;
-
+	//	Debug.Log(Vzball*T + " - " + 0.5f*T*T);
+		float Zprediction = Vzball*T + 0.5f*5f*T*T;
+		Debug.Log(Zprediction);
 		return Zprediction;
 
 	}
