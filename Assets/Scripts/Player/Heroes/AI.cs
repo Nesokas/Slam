@@ -1348,16 +1348,18 @@ public class AI : Hero {
 
 	public float PredictBallZPosition()
 	{
-		float X = GetDistanceBetweenTwoCoords(ball.transform.position.x, player.transform.position.x);
-	//	Debug.Log("distance -> " + ball.transform.position.x + " - " + player.transform.position.x);
-		float Vxball = ball.rigidbody.velocity.x;
-		float Vzball = ball.rigidbody.velocity.z;
 
-		float T = X/Vxball;
-	//	Debug.Log(Vzball*T + " - " + 0.5f*T*T);
-		float Zprediction = Vzball*T + 0.5f*5f*T*T;
-		Debug.Log(Zprediction);
-		return Zprediction;
+		Vector3 prediction = ball.transform.position;
+		Vector3 velocity_normalized = ball.rigidbody.velocity.normalized;
+		Debug.Log(Mathf.Abs(prediction.x - player.transform.position.x));
+		float flag = Mathf.Abs(prediction.x - player.transform.position.x);
+		while (Mathf.Abs(prediction.x - player.transform.position.x) > 0.1f && flag <= Mathf.Abs(prediction.x - player.transform.position.x)) {
+			prediction.x += velocity_normalized.x*0.1f;
+			prediction.z += velocity_normalized.z*0.1f;
+			flag = Mathf.Abs(prediction.x - player.transform.position.x);
+			Debug.Log(prediction);
+		}
+		return prediction.z;
 
 	}
 
