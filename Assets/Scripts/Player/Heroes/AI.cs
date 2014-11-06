@@ -865,7 +865,7 @@ public class AI : Hero {
 	public void DribbleToArea(int index)
 	{
 		if (ball.GetComponent<Ball_Behaviour>().GetCurrentArea() == index && beliefs.has_ball) {
-		//	Debug.Log("here");
+			ai_manager.AgentResponse(this);
 			return;
 		}
 
@@ -892,7 +892,7 @@ public class AI : Hero {
 			if (player_collider.collider.Raycast(ray, out hit, Mathf.Infinity)) {
 				if (colliderAIPossessionCenter.collider.Raycast(ray, out hit, Mathf.Infinity)) {
 				//	Debug.Log("HIT");
-					if (below_or_above == ABOVE) //if ball's index is above the target's, that means player is above the ball so he must move down
+			/*		if (below_or_above == ABOVE) //if ball's index is above the target's, that means player is above the ball so he must move down
 						local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 					else if (below_or_above == BELOW)
 						local_player.player_controller.commands.vertical_direction = MOVE_UP;
@@ -904,10 +904,10 @@ public class AI : Hero {
 					else if (left_or_right == RIGHT)
 						local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 					else
-						local_player.player_controller.commands.horizontal_direction = 0;
-				
-				} else if (colliderAIPossessionLeft.collider.Raycast(ray, out hit, Mathf.Infinity)) {
-				//	Debug.Log("LEFT");
+						local_player.player_controller.commands.horizontal_direction = 0;*/
+					AdjustAccordingToQuadrant(LEFT);
+				}/*	 else if (colliderAIPossessionLeft.collider.Raycast(ray, out hit, Mathf.Infinity)) {
+								//	Debug.Log("LEFT");
 					ResetControllers();
 					AdjustAccordingToQuadrant(LEFT);
 				
@@ -915,14 +915,14 @@ public class AI : Hero {
 				//	Debug.Log("RIGHT");
 					ResetControllers();
 					AdjustAccordingToQuadrant(RIGHT);
-				}
+				}*/
 			}
 		}
 
 		if (current_area == index)
 			ai_manager.AgentResponse(this);
-//		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
-//		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
+		Debug.DrawRay(ball_vector, ai_manager.GetPitchAreaCoords(index) - ball_vector);
+		Debug.DrawRay(ball_vector, -100*(ai_manager.GetPitchAreaCoords(index) - ball_vector));
 
 
 	}
@@ -1034,10 +1034,25 @@ public class AI : Hero {
 	{
 		int quadrant = GetQuadrant();
 
-		//Debug.Log("quadrant -> " + quadrant + " left_or_right-> " + left_or_right);
+
 		ResetControllers();
 		//if ray hit the left collider
+
+		if (quadrant == 14) {
+			Debug.Log("14");
+			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
+			local_player.player_controller.commands.vertical_direction = 0;
+			return;
+		} else if (quadrant == 23) {
+			Debug.Log("23");
+			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+			local_player.player_controller.commands.vertical_direction = 0;
+			return;
+		
+		}
+
 		if (left_or_right == LEFT) {
+
 			if(quadrant == 1)
 				local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			else if (quadrant == 2)
@@ -1094,52 +1109,53 @@ public class AI : Hero {
 	private void RotateAroundBallCounterclockwise()
 	{
 		int quadrant = GetQuadrant();
-		
 
-		if (quadrant == 1) {
+		if (quadrant == 1 || quadrant == 12) {
 		//	Debug.Log(1);
 			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 			local_player.player_controller.commands.vertical_direction = 0;
 		
-		} else if (quadrant == 2) {
+		} else if (quadrant == 2 || quadrant == 23) {
 		//	Debug.Log(2);
 			local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			local_player.player_controller.commands.horizontal_direction = 0;
 		
-		} else if (quadrant == 3) {
+		} else if (quadrant == 3 || quadrant == 34) {
 		//	Debug.Log(3);
 			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			local_player.player_controller.commands.vertical_direction = 0;
 			
-		} else if (quadrant == 4) {
+		} else if (quadrant == 4 || quadrant == 14) {
 		//	Debug.Log(4);
 			local_player.player_controller.commands.horizontal_direction = 0;
 			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
-		
-		}
+
+		} 
+
+
 	}
 
 	private void RotateAroundBallClockwise()
 	{
 		int quadrant = GetQuadrant();
 
+	//	Debug.Log(quadrant);
 		
-		if (quadrant == 1) {
+		if (quadrant == 1 || quadrant == 14) {
 		//	Debug.Log(1);
 			local_player.player_controller.commands.horizontal_direction = 0;
 			local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			
-		} else if (quadrant == 2) {
-		//	Debug.Log(2);
+		} else if (quadrant == 2 || quadrant == 12) {
 			local_player.player_controller.commands.vertical_direction = 0;
 			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			
-		} else if (quadrant == 3) {
+		} else if (quadrant == 3 || quadrant == 23) {
 		//	Debug.Log(3);
 			local_player.player_controller.commands.horizontal_direction = 0;
 			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 			
-		} else if (quadrant == 4) {
+		} else if (quadrant == 4 || quadrant == 34) {
 		//	Debug.Log(4);
 			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 			local_player.player_controller.commands.vertical_direction = 0;
@@ -1163,6 +1179,26 @@ public class AI : Hero {
 		float Zb = ball.transform.position.z;
 		float Zp = player.transform.position.z;
 	//	Debug.Log(Xb + " - " + Xp);
+
+		if(Mathf.Abs(Xb - Xp) < 0.1f) {
+		
+			if (Zb < Zp) 
+				return 14;
+			else
+				return 23;
+
+		} else if (Mathf.Abs(Zb - Zp) < 0.1f) {
+		
+			if (Xb > Xp) {
+				//Debug.Log("12");
+				return 12;
+			} else {
+				//Debug.Log("34");
+				return 34;
+			}
+		
+		}
+
 		if (Xb > Xp)
 		
 			if (Zb < Zp) 
@@ -1351,13 +1387,13 @@ public class AI : Hero {
 
 		Vector3 prediction = ball.transform.position;
 		Vector3 velocity_normalized = ball.rigidbody.velocity.normalized;
-		Debug.Log(Mathf.Abs(prediction.x - player.transform.position.x));
+//		Debug.Log(Mathf.Abs(prediction.x - player.transform.position.x));
 		float flag = Mathf.Abs(prediction.x - player.transform.position.x);
 		while (Mathf.Abs(prediction.x - player.transform.position.x) > 0.1f && flag <= Mathf.Abs(prediction.x - player.transform.position.x)) {
 			prediction.x += velocity_normalized.x*0.1f;
 			prediction.z += velocity_normalized.z*0.1f;
 			flag = Mathf.Abs(prediction.x - player.transform.position.x);
-			Debug.Log(prediction);
+//			Debug.Log(prediction);
 		}
 		return prediction.z;
 

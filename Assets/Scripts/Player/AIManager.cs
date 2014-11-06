@@ -93,7 +93,7 @@ public class AIManager : MonoBehaviour {
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
 
-		a1.SetActionDribbleToArea(8);
+		a1.SetActionDribbleToArea(5);
 		a2.SetActionGoToArea(3);
 		while(response_1 != true || response_2 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;
