@@ -116,16 +116,25 @@ public class AI : Hero {
 		INTEND_TO_SCORE,
 		OK,
 		EXPECT_SCORE,
+		GOING_TO_AREA,
+		GOING_TO_BALL,
 		NULL
 		
 	}
 
+	private struct Expression
+	{
+		public Expressions expression;
+		public int args;
+	}
+
 	Beliefs beliefs;
 	Expectations expectation;
-	Expressions expression;
+	//Expressions expression;
 	// The desire to which the agent has commited will be the intention
 	Desires desire;
 	Action current_action;
+	Expression current_expression;
 	public AI(Player_Behaviour player)
 	{
 		hero_prefab = Resources.Load<GameObject>("Heroes/Sam");
@@ -176,6 +185,8 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnScore"); //When he shoots in fact
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnWallHit");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnGoingToArea");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnGoingToBall");
 	}
 
 
@@ -275,6 +286,7 @@ public class AI : Hero {
 
 	public void SetActionGoToArea(int area)
 	{
+		OnGoingToArea(area);
 		current_action.action = Actions.GO_TO_AREA;
 		current_action.args = area;
 	}
@@ -1249,9 +1261,46 @@ public class AI : Hero {
 		return script_step;
 	}
 
+	public void OnGoingToArea(int area)
+	{
+		current_expression.expression = Expressions.GOING_TO_AREA;
+		current_expression.args = area;
+		Hashtable data = new Hashtable();
+		data["index"] = area;
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnGoingToArea", data);
+	}
+
+	public IEnumerator GoingToArea(NotificationCenter.Notification notification)
+	{
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+			Debug.Log("Agent 2 - I'm moving to position " + notification.data["index"]);
+		} else {
+			yield return new WaitForSeconds(1f);
+			Debug.Log("Agent 1 - OK!");
+		}
+		
+	}
+
+	public void OnGoingToBall()
+	{
+		current_expression.expression = Expressions.GOING_TO_BALL;
+		NotificationCenter.DefaultCenter.PostNotification(this.player, "OnGoingToBall");
+	}
+
+	public void GoingToBall(NotificationCenter.Notification notification)
+	{
+		if (object.ReferenceEquals(this.player, notification.sender))
+			Debug.Log("Agent 1: Going for the ball");
+		else {
+			//Debug.Log("go");
+		//	beliefs.teammate_expression = Expressions.INTEND_TO_PASS;
+		}
+	}
+
 	public void OnIntentToPass()
 	{
-		expression = Expressions.INTEND_TO_PASS;
+//		expression = Expressions.INTEND_TO_PASS;
+		current_expression.expression = Expressions.INTEND_TO_PASS;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToPass");
 	}
 
@@ -1268,7 +1317,8 @@ public class AI : Hero {
 
 	public void OnRequestPass()
 	{
-		expression = Expressions.REQUEST_PASS;
+		//expression = Expressions.REQUEST_PASS;
+		current_expression.expression = Expressions.REQUEST_PASS;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnRequestPass");
 	}
 
@@ -1291,7 +1341,8 @@ public class AI : Hero {
 	{
 		yield return new WaitForSeconds(0.5f);
 		if (object.ReferenceEquals(this.player, notification.sender)) {
-			expression = Expressions.OK;
+		//	expression = Expressions.OK;
+			current_expression.expression = Expressions.OK;
 			Debug.Log("OK");
 		}
 		else {
@@ -1302,7 +1353,8 @@ public class AI : Hero {
 
 	public void OnIntentToScore()
 	{
-		expression = Expressions.INTEND_TO_SCORE;
+	//	expression = Expressions.INTEND_TO_SCORE;
+		current_expression.expression = Expressions.INTEND_TO_SCORE;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToScore");
 	}
 	
@@ -1327,7 +1379,8 @@ public class AI : Hero {
 
 	public void OnScore()
 	{
-		expression = Expressions.EXPECT_SCORE;
+		//expression = Expressions.EXPECT_SCORE;
+		current_expression.expression = Expressions.EXPECT_SCORE;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnScore");
 	}
 

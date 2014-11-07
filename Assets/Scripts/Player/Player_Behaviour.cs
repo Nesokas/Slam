@@ -599,6 +599,18 @@ public class Player_Behaviour : MonoBehaviour {
 		AI ai = (AI)hero;
 		StartCoroutine(ai.IntentToScore(notification));
 	}
+
+	public void OnGoingToArea(NotificationCenter.Notification notification) 
+	{
+		AI ai = (AI)hero;
+		StartCoroutine(ai.GoingToArea(notification));
+	}
+
+	public void OnGoingToBall(NotificationCenter.Notification notification) 
+	{
+		AI ai = (AI)hero;
+		ai.GoingToArea(notification);
+	}
 	/*
 	public void OnScore(NotificationCenter.Notification notification)
 	{
