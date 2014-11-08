@@ -212,7 +212,9 @@ public class AI : Hero {
 		UpdatePossession();
 
 	//	Debug.Log(expression);		
-		if(current_action.action == Actions.DRIBBLE_TO_AREA) {
+		if (current_action.action == Actions.GO_TO_BALL) {
+			GoToBall();
+		} else if(current_action.action == Actions.DRIBBLE_TO_AREA) {
 			DribbleToArea(current_action.args);
 		} else if (current_action.action == Actions.GO_TO_AREA) {
 			GoToArea(current_action.args);
@@ -230,10 +232,7 @@ public class AI : Hero {
 
 
 
-
-
-
-
+		
 
 
 
@@ -289,6 +288,13 @@ public class AI : Hero {
 		OnGoingToArea(area);
 		current_action.action = Actions.GO_TO_AREA;
 		current_action.args = area;
+	}
+
+	public void SetActionGoingToBall()
+	{
+		OnGoingToBall();
+		current_action.action = Actions.GO_TO_BALL;
+		//current_action.args = area;
 	}
 
 	public void SetActionPass()
@@ -730,7 +736,6 @@ public class AI : Hero {
 		bool teammate_has_ball = false;
 		bool opponent_has_ball = false;
 		beliefs.has_ball = ai_manager.HeroHasBall(this);
-
 		if (beliefs.team_in_possession == beliefs.team && !beliefs.has_ball)
 			beliefs.teammate_has_ball = true;
 		else
@@ -1116,6 +1121,9 @@ public class AI : Hero {
 			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 		if (local_player.transform.position.z < ball.transform.position.z)
 			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
+
+		if (current_action.action == Actions.GO_TO_BALL && beliefs.has_ball)
+			ai_manager.AgentResponse(this);
 	}
 
 	private void RotateAroundBallCounterclockwise()
@@ -1307,7 +1315,7 @@ public class AI : Hero {
 	public void IntentToPass(NotificationCenter.Notification notification)
 	{
 		if (object.ReferenceEquals(this.player, notification.sender))
-		    Debug.Log("CAN I PASS?");
+		    Debug.Log("Agent 1 - CAN I PASS?");
 		else {
 	//		Debug.Log("this is receiver");
 			beliefs.teammate_expression = Expressions.INTEND_TO_PASS;
@@ -1343,7 +1351,7 @@ public class AI : Hero {
 		if (object.ReferenceEquals(this.player, notification.sender)) {
 		//	expression = Expressions.OK;
 			current_expression.expression = Expressions.OK;
-			Debug.Log("OK");
+			Debug.Log("Agent 2 - OK");
 		}
 		else {
 			beliefs.teammate_expression = Expressions.OK;
@@ -1361,12 +1369,12 @@ public class AI : Hero {
 	public IEnumerator IntentToScore(NotificationCenter.Notification notification)
 	{
 		if (object.ReferenceEquals(this.player, notification.sender)) {
-			Debug.Log("GOING FOR IT!");
+			Debug.Log("Agent 2 - I'll try to score!");
 		}
 		else {
 			yield return new WaitForSeconds(0.5f);
 			beliefs.teammate_expression = Expressions.OK;
-			Debug.Log("HOPE FOR THE BEST");
+			Debug.Log("Agent 1 - Go for it!");
 
 //			if(beliefs.teammate_has_ball == false && beliefs.opponent_has_ball == false && beliefs.has_shot) {
 //				Debug.Log("has shot");

@@ -93,9 +93,16 @@ public class AIManager : MonoBehaviour {
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
 
-		a1.SetActionDribbleToArea(5);
+		response_1 = false;
+		a1.SetActionGoingToBall();
 		a2.SetActionGoToArea(3);
-		while(response_1 != true || response_2 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
+		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
+			yield return null;
+		}
+
+		response_1 = false;
+		a1.SetActionDribbleToArea(5);
+		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
 
@@ -134,6 +141,7 @@ public class AIManager : MonoBehaviour {
 
 	public void AgentResponse(AI agent)
 	{
+
 		int team = agent.GetTeam();
 
 		if (team == GlobalConstants.RED) {

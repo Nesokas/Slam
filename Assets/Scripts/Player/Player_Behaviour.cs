@@ -609,7 +609,7 @@ public class Player_Behaviour : MonoBehaviour {
 	public void OnGoingToBall(NotificationCenter.Notification notification) 
 	{
 		AI ai = (AI)hero;
-		ai.GoingToArea(notification);
+		ai.GoingToBall(notification);
 	}
 	/*
 	public void OnScore(NotificationCenter.Notification notification)
