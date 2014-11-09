@@ -57,6 +57,7 @@ public class AI : Hero {
 		PASS_TO_AREA,
 		SCORE,
 		RECEIVE_PASS,
+		POSITION_TO_SHOOT,
 		NULL
 	}
 
@@ -219,17 +220,26 @@ public class AI : Hero {
 		} else if (current_action.action == Actions.GO_TO_AREA) {
 			GoToArea(current_action.args);
 		} else if (current_action.action == Actions.PASS) {
-			if(beliefs.teammate_expression == Expressions.OK)
+			if(beliefs.teammate_expression == Expressions.OK) {
 				Pass();
+			}
+		} else if (current_action.action == Actions.PASS_TO_AREA) {
+			if (beliefs.teammate_expression == Expressions.OK) {
+				PassPos(ai_manager.GetPitchAreaCoords(current_action.args));
+			} else if (beliefs.has_ball != true) {
+				RotateAroundBall(ai_manager.GetPitchAreaCoords(current_action.args));
+			}
 		} else if (current_action.action == Actions.SCORE) {
 			Score();
 		} else if (current_action.action == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
 			ReceivePass();
-		} else if (current_action.action == Actions.PASS_TO_AREA) {
-			PassPos(ai_manager.GetPitchAreaCoords(current_action.args));
 		}
-
-
+		
+		/*
+		if (current_action.action == Actions.PASS || current_action.action == Actions.PASS_TO_AREA) {
+			if (beliefs.has_ball != true)
+				GoToBall();
+		}*/
 
 
 		
@@ -299,7 +309,7 @@ public class AI : Hero {
 
 	public void SetActionPass()
 	{
-		OnIntentToPass();
+		OnIntentToPass(beliefs.teammate.GetCurrentArea());
 		current_action.action = Actions.PASS;
 		current_action.args = -1;
 	}
@@ -325,6 +335,7 @@ public class AI : Hero {
 
 	public void SetActionPassToArea(int index)
 	{
+		OnIntentToPass(index);
 		current_action.action = Actions.PASS_TO_AREA;
 		current_action.args = index;
 	}
@@ -463,7 +474,7 @@ public class AI : Hero {
 				OnScore();
 			}
 
-			if (current_action.action == Actions.PASS) {
+			if (current_action.action == Actions.PASS || current_action.action == Actions.PASS_TO_AREA) {
 				OnPass();
 			}
 
@@ -1305,19 +1316,26 @@ public class AI : Hero {
 		}
 	}
 
-	public void OnIntentToPass()
+	public void OnIntentToPass(int area)
 	{
-//		expression = Expressions.INTEND_TO_PASS;
+		Hashtable data = new Hashtable();
+		data["index"] = area;
 		current_expression.expression = Expressions.INTEND_TO_PASS;
-		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToPass");
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToPass", data);
 	}
 
 	public void IntentToPass(NotificationCenter.Notification notification)
 	{
-		if (object.ReferenceEquals(this.player, notification.sender))
-		    Debug.Log("Agent 1 - CAN I PASS?");
-		else {
-	//		Debug.Log("this is receiver");
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+			Debug.Log("Agent 1 - May I pass to? " + notification.data["index"]);
+			//current_action.action = Actions.POSITION_TO_SHOOT;
+			current_action.args = (int)notification.data["index"];
+			ai_manager.AgentResponse(this);
+		} else {
+			if (current_action.action == Actions.RECEIVE_PASS || current_area == (int)notification.data["index"])
+				Debug.Log("Agent 2 - Yes");
+			else
+				Debug.Log("Agent 2 - Wait");
 			beliefs.teammate_expression = Expressions.INTEND_TO_PASS;
 		}
 	}

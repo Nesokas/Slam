@@ -142,18 +142,23 @@ public class AIManager : MonoBehaviour {
 		
 		response_1 = false;
 		response_2 = false;
-		a1.SetActionPassToArea(1);
-		a2.SetActionReceivePass();
+		a1.SetActionPassToArea(0);
+		a2.SetActionGoToArea(0);
+		//a2.SetActionReceivePass();
 		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
-		response_1 = false;
+	//	response_1 = false;
 		response_2 = false;
-		a1.SetActionNull();
-		a2.SetActionScore();
-		while(response_1 != true || response_2 != true) {
+		//a1.SetActionNull();
+		//a2.SetActionScore();
+		a2.SetActionReceivePass();
+		while(response_2 != true) {
 			yield return null;
 		}
+		response_1 = false;
+		a1.SetActionGoToArea(2);
+		a2.SetActionScore();
 	}
 
 	public void AgentResponse(AI agent)
