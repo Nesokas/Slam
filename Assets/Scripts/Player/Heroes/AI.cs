@@ -230,11 +230,11 @@ public class AI : Hero {
 				RotateAroundBall(ai_manager.GetPitchAreaCoords(current_action.args));
 			}
 		} else if (current_action.action == Actions.SCORE) {
-			Score();
+				Score();
 		} else if (current_action.action == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
 			ReceivePass();
 		}
-		
+
 		/*
 		if (current_action.action == Actions.PASS || current_action.action == Actions.PASS_TO_AREA) {
 			if (beliefs.has_ball != true)
@@ -428,7 +428,6 @@ public class AI : Hero {
 
 	public bool Score()
 	{
-
 		RotateAroundBall(beliefs.opponent_goal_position);
 
 		int layer_mask = 1 << 29 | 1 << 28 | 1 << 27;
@@ -440,23 +439,34 @@ public class AI : Hero {
 		Vector3 goal_pos = new Vector3(beliefs.opponent_goal_position.x, -0.1f, beliefs.opponent_goal_position.z);
 		Ray goal_ray = new Ray(ball_vector, beliefs.opponent_goal_position - ball_vector);
 		Ray shoot_ray = new Ray(ball_vector, -1*(goal_pos - ball_vector));
-		
+
+
+//		if (player_collider.collider.Raycast(ray, out hit, Mathf.Infinity)) {
+//			if (colliderAIPossessionCenter.collider.Raycast(ray, out hit, Mathf.Infinity)) {
+//				
+//				AdjustAccordingToQuadrant();
+//			}
+//		}
+
+
 		if(Physics.Raycast(goal_ray, out goal_hit, Mathf.Infinity, layer_mask)) {
 			if (goal_hit.collider.CompareTag("goal_detection")) {
+				if (player_collider.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+					AdjustAccordingToQuadrant();
+					Debug.Log("HERE");
+				
+				
 				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
-					Shoot();
+					if (beliefs.has_ball != true) {
+						GoToBall();
+					} else {
+						Shoot();
+					}
 					script_step--;
-					return true;
-				}
-			}/* else {
-				if (beliefs.is_in_scoring_depth == false) {
-					Debug.Log("else in score()");
-					Shoot(); // tries to clear the ball
-					return false; // path obstructed
-				}
-			}*/
+					//return true;
+					}}
+			}
 		}
-
 		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
 		Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
 		return true; // keep trying
@@ -464,7 +474,7 @@ public class AI : Hero {
 
 	private void Shoot()
 	{
-		if (beliefs.distance_to_ball < 1 && beliefs.has_shot == false) {
+		if (player.IsCollidingWithBall() && beliefs.has_shot == false) {
 			beliefs.has_shot = true;
 			local_player.player_controller.commands.shoot = 1;
 			ai_manager.AgentResponse(this);
@@ -919,31 +929,9 @@ public class AI : Hero {
 
 			if (player_collider.collider.Raycast(ray, out hit, Mathf.Infinity)) {
 				if (colliderAIPossessionCenter.collider.Raycast(ray, out hit, Mathf.Infinity)) {
-				//	Debug.Log("HIT");
-			/*		if (below_or_above == ABOVE) //if ball's index is above the target's, that means player is above the ball so he must move down
-						local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
-					else if (below_or_above == BELOW)
-						local_player.player_controller.commands.vertical_direction = MOVE_UP;
-					else
-						local_player.player_controller.commands.vertical_direction = 0;
-					
-					if (left_or_right == LEFT)
-						local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
-					else if (left_or_right == RIGHT)
-						local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
-					else
-						local_player.player_controller.commands.horizontal_direction = 0;*/
-					AdjustAccordingToQuadrant(LEFT);
-				}/*	 else if (colliderAIPossessionLeft.collider.Raycast(ray, out hit, Mathf.Infinity)) {
-								//	Debug.Log("LEFT");
-					ResetControllers();
-					AdjustAccordingToQuadrant(LEFT);
-				
-				} else if (colliderAIPossessionRight.collider.Raycast(ray, out hit, Mathf.Infinity)) {
-				//	Debug.Log("RIGHT");
-					ResetControllers();
-					AdjustAccordingToQuadrant(RIGHT);
-				}*/
+
+					AdjustAccordingToQuadrant();
+				}
 			}
 		}
 
@@ -958,6 +946,7 @@ public class AI : Hero {
 
 	private void RotateAroundBall(Vector3 target)
 	{
+
 		int ball_below_or_above_target = IsAboveOrBellow(ball_behaviour.transform.position, target);
 		int ball_left_or_right_target = IsLeftOrRight(ball_behaviour.transform.position, target);
 
@@ -1058,10 +1047,9 @@ public class AI : Hero {
 
 
 	//called when AI is controlling the ball but it slips to either of its left or right possession colliders
-	private void AdjustAccordingToQuadrant(int left_or_right)
+	private void AdjustAccordingToQuadrant()
 	{
 		int quadrant = GetQuadrant();
-
 
 		ResetControllers();
 		//if ray hit the left collider
@@ -1076,10 +1064,17 @@ public class AI : Hero {
 			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			local_player.player_controller.commands.vertical_direction = 0;
 			return;
-		
+		} else if (quadrant == 12) {
+			Debug.Log("12");
+			local_player.player_controller.commands.vertical_direction = MOVE_UP;
+			local_player.player_controller.commands.horizontal_direction = 0;
+		} else if (quadrant == 34) {
+			Debug.Log("34");
+			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
+			local_player.player_controller.commands.horizontal_direction = 0;
 		}
 
-		if (left_or_right == LEFT) {
+		//if (left_or_right == LEFT) {
 
 			if(quadrant == 1)
 				local_player.player_controller.commands.vertical_direction = MOVE_UP;
@@ -1089,8 +1084,7 @@ public class AI : Hero {
 				local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 			else if (quadrant == 4)
 				local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
-
-		} else { //if ray hit the right collider
+		} /*else { //if ray hit the right collider
 			if (quadrant == 1)
 				local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 			else if (quadrant == 2)
@@ -1099,10 +1093,10 @@ public class AI : Hero {
 				local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			else if (quadrant == 4) {
 				local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
-			//Debug.Log("moving down");
+			Debug.Log("RIGHT");
 			}
 		}
-	}
+	}*/
 
 	private int IsAboveOrBellow(Vector3 ball_pos, Vector3 target_pos)
 	{
@@ -1124,6 +1118,7 @@ public class AI : Hero {
 
 	public void GoToBall()
 	{
+
 		if (local_player.transform.position.x > ball.transform.position.x)
 			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 		if (local_player.transform.position.x < ball.transform.position.x)

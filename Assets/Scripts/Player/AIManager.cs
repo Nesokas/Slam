@@ -129,21 +129,21 @@ public class AIManager : MonoBehaviour {
 		
 		response_1 = false;
 		a1.SetActionGoingToBall();
-		a2.SetActionGoToArea(3);
+		a2.SetActionGoToArea(0); //a2.SetActionGoToArea(4);
 		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;
 		}
 		
 		response_1 = false;
-		a1.SetActionDribbleToArea(5);
+		a1.SetActionDribbleToArea(5); //a1.SetActionDribbleToArea(5);
 		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
 		
 		response_1 = false;
 		response_2 = false;
-		a1.SetActionPassToArea(0);
-		a2.SetActionGoToArea(0);
+		a1.SetActionPassToArea(1);
+		a2.SetActionGoToArea(1);
 		//a2.SetActionReceivePass();
 		while(response_1 != true || response_2 != true) { 
 			yield return null;
@@ -157,9 +157,44 @@ public class AIManager : MonoBehaviour {
 			yield return null;
 		}
 		response_1 = false;
-		a1.SetActionGoToArea(2);
+		a1.SetActionNull();
 		a2.SetActionScore();
 	}
+
+	public IEnumerator script_3()
+	{
+		AI a1 = red_list[0];
+		AI a2 = red_list[1];
+		
+		response_1 = false;
+		a1.SetActionGoingToBall();
+		a2.SetActionGoToArea(3);
+		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
+			yield return null;
+		}
+		
+		response_1 = false;
+		a1.SetActionDribbleToArea(4);
+		while(response_1 != true || response_2 != true) { 
+			yield return null;
+		}
+		
+		response_1 = false;
+		response_2 = false;
+		a1.SetActionScore();
+		a2.SetActionReceivePass();
+		while(response_1 != true || response_2 != true) { 
+			yield return null;
+		}
+		response_1 = false;
+		response_2 = false;
+		a1.SetActionNull();
+		a2.SetActionScore();
+		while(response_1 != true || response_2 != true) {
+			yield return null;
+		}
+	}
+
 
 	public void AgentResponse(AI agent)
 	{
@@ -297,6 +332,7 @@ public class AIManager : MonoBehaviour {
 			running_script = true;
 			//StartCoroutine (script_1());
 			StartCoroutine (script_2());
+			//StartCoroutine(script_3());
 		}
 	}
 
