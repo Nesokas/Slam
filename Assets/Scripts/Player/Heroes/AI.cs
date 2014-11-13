@@ -38,8 +38,7 @@ public class AI : Hero {
 	private int key = 0;
 
 	Transform colliderAIPossessionCenter;
-	Transform colliderAIPossessionLeft;
-	Transform colliderAIPossessionRight;
+	Transform colliderAIPossessionRotation;
 	Transform player_collider;
 
 	private int emotion;
@@ -149,8 +148,7 @@ public class AI : Hero {
 		ball_behaviour = ball.GetComponent<Ball_Behaviour>();
 
 		colliderAIPossessionCenter = player.transform.Find("ColliderAIPossession/ColliderAIPossessionCenter");
-		colliderAIPossessionLeft = player.transform.Find("ColliderAIPossession/ColliderAIPossessionLeft");
-		colliderAIPossessionRight = player.transform.Find("ColliderAIPossession/ColliderAIPossessionRight");
+		colliderAIPossessionRotation = player.transform.Find("ColliderAIPossession/ColliderAIPossessionRotation");
 		player_collider = player.transform.Find("Collider");
 		colliderAIPossessionCenter.gameObject.SetActive(true);
 	}
@@ -440,31 +438,20 @@ public class AI : Hero {
 		Ray goal_ray = new Ray(ball_vector, beliefs.opponent_goal_position - ball_vector);
 		Ray shoot_ray = new Ray(ball_vector, -1*(goal_pos - ball_vector));
 
-
-//		if (player_collider.collider.Raycast(ray, out hit, Mathf.Infinity)) {
-//			if (colliderAIPossessionCenter.collider.Raycast(ray, out hit, Mathf.Infinity)) {
-//				
-//				AdjustAccordingToQuadrant();
-//			}
-//		}
-
-
 		if(Physics.Raycast(goal_ray, out goal_hit, Mathf.Infinity, layer_mask)) {
 			if (goal_hit.collider.CompareTag("goal_detection")) {
 				if (player_collider.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
-					AdjustAccordingToQuadrant();
-					Debug.Log("HERE");
-				
-				
-				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
-					if (beliefs.has_ball != true) {
-						GoToBall();
-					} else {
-						Shoot();
+					AdjustAccordingToQuadrant();	
+					if (colliderAIPossessionRotation.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+						if (beliefs.has_ball != true) {
+							GoToBall();
+						} else {
+							Shoot();
+						}
+						script_step--;
+						//return true;
 					}
-					script_step--;
-					//return true;
-					}}
+				}
 			}
 		}
 		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
@@ -1055,21 +1042,17 @@ public class AI : Hero {
 		//if ray hit the left collider
 
 		if (quadrant == 14) {
-			Debug.Log("14");
 			local_player.player_controller.commands.horizontal_direction = MOVE_RIGHT;
 			local_player.player_controller.commands.vertical_direction = 0;
 			return;
 		} else if (quadrant == 23) {
-			Debug.Log("23");
 			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 			local_player.player_controller.commands.vertical_direction = 0;
 			return;
 		} else if (quadrant == 12) {
-			Debug.Log("12");
 			local_player.player_controller.commands.vertical_direction = MOVE_UP;
 			local_player.player_controller.commands.horizontal_direction = 0;
 		} else if (quadrant == 34) {
-			Debug.Log("34");
 			local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
 			local_player.player_controller.commands.horizontal_direction = 0;
 		}
