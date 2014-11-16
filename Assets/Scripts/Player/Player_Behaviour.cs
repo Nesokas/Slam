@@ -581,7 +581,7 @@ public class Player_Behaviour : MonoBehaviour {
 	public void OnRequestPass(NotificationCenter.Notification notification)
 	{
 		AI ai = (AI)hero;
-		ai.RequestPass(notification);
+		StartCoroutine(ai.RequestPass(notification));
 		
 	}
 

@@ -129,7 +129,7 @@ public class AIManager : MonoBehaviour {
 		
 		response_1 = false;
 		a1.SetActionGoingToBall();
-		a2.SetActionGoToArea(0); //a2.SetActionGoToArea(4);
+		a2.SetActionGoToArea(3); //a2.SetActionGoToArea(4);
 		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;
 		}
@@ -168,13 +168,13 @@ public class AIManager : MonoBehaviour {
 		
 		response_1 = false;
 		a1.SetActionGoingToBall();
-		a2.SetActionGoToArea(3);
+		a2.SetActionGoToArea(3); //a2.SetActionGoToArea(4);
 		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;
 		}
 		
 		response_1 = false;
-		a1.SetActionDribbleToArea(4);
+		a1.SetActionDribbleToArea(5); //a1.SetActionDribbleToArea(5);
 		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
@@ -182,17 +182,7 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		response_2 = false;
 		a1.SetActionScore();
-		a2.SetActionReceivePass();
-		while(response_1 != true || response_2 != true) { 
-			yield return null;
-		}
-		response_1 = false;
-		response_2 = false;
-		a1.SetActionNull();
-		a2.SetActionScore();
-		while(response_1 != true || response_2 != true) {
-			yield return null;
-		}
+		a2.SetActionRequestPass(4);
 	}
 
 
@@ -331,8 +321,8 @@ public class AIManager : MonoBehaviour {
 		if (!running_script) {
 			running_script = true;
 			//StartCoroutine (script_1());
-			StartCoroutine (script_2());
-			//StartCoroutine(script_3());
+			//StartCoroutine (script_2());
+			StartCoroutine(script_3());
 		}
 	}
 

@@ -285,6 +285,11 @@ public class AI : Hero {
 
 	}
 
+	public void SetActionRequestPass(int area)
+	{
+		OnRequestPass(area);
+	}
+
 	public void SetActionDribbleToArea(int area)
 	{
 		current_action.action = Actions.DRIBBLE_TO_AREA;
@@ -1319,19 +1324,21 @@ public class AI : Hero {
 	}
 
 
-	public void OnRequestPass()
+	public void OnRequestPass(int area)
 	{
 		//expression = Expressions.REQUEST_PASS;
 		current_expression.expression = Expressions.REQUEST_PASS;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnRequestPass");
 	}
 
-	public void RequestPass(NotificationCenter.Notification notification)
+	public IEnumerator RequestPass(NotificationCenter.Notification notification)
 	{
 		if (object.ReferenceEquals(this.player, notification.sender))
-			Debug.Log("PASS ME THE BALL");
+			Debug.Log("Agent 2 - Pass me the ball!");
 		else {
-		//	Debug.Log("this is receiver");
+			yield return new WaitForSeconds(1f);
+		/*	if (current_action.action == Actions.SCORE)
+				Debug.Log("Agent 1 - No!");*/
 			beliefs.teammate_expression = Expressions.REQUEST_PASS;
 		}
 	}
@@ -1370,7 +1377,11 @@ public class AI : Hero {
 		else {
 			yield return new WaitForSeconds(0.5f);
 			beliefs.teammate_expression = Expressions.OK;
-			Debug.Log("Agent 1 - Go for it!");
+			if (current_expression.expression == Expressions.REQUEST_PASS) {
+				Debug.Log("Agent 2 - No!!");
+			} else {
+				Debug.Log("Agent 1 - Go for it!!");
+			}
 
 //			if(beliefs.teammate_has_ball == false && beliefs.opponent_has_ball == false && beliefs.has_shot) {
 //				Debug.Log("has shot");
@@ -1427,10 +1438,14 @@ public class AI : Hero {
 	public void OnWallHit()
 	{
 		if (current_action.action == Actions.SCORE) {
-			Debug.Log("GODDAMMIT!!");
+			Debug.Log("I missed!!");
 		} else if (beliefs.teammate.current_action.action == Actions.SCORE) {
-			Debug.Log("YOU STUPID SHIT!!");
-		}
+			if (current_expression.expression == Expressions.REQUEST_PASS) {
+				Debug.Log("I told you to pass!!");
+			} else {
+				Debug.Log("You missed!!");
+			}
+		} 
 	}
 
 	private float GetDistanceBetweenTwoCoords(float z1, float z2)
