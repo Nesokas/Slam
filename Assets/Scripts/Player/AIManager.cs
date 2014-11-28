@@ -96,7 +96,7 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		a1.SetActionGoingToBall();
 		a2.SetActionGoToArea(3);
-		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
+		while(response_1 != true){
 			yield return null;
 		}
 
@@ -206,9 +206,7 @@ public class AIManager : MonoBehaviour {
 	{
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
-
-		if (a1.GetCurrentStep() <= script_step && a2.GetCurrentStep() <= script_step)
-			script_step--;
+		
 	}
 
 	public Vector3 GetRedTeamGoalPosition()
@@ -320,11 +318,12 @@ public class AIManager : MonoBehaviour {
 		//Debug.Log(red_list.Count + " - " + hero_list.Count);
 		if (!running_script) {
 			running_script = true;
-			//StartCoroutine (script_1());
+			StartCoroutine (script_1());
 			//StartCoroutine (script_2());
-			StartCoroutine(script_3());
+			//StartCoroutine(script_3());
 		}
 	}
+
 
 	private void SetHeroCloserToBall(Hero hero, float distance_to_ball)
 	{

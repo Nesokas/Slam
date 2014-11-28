@@ -215,10 +215,12 @@ public class Player_Behaviour : MonoBehaviour {
 
 	void UpdateRotation()
 	{
-		if(!ball)
+		if(!ball) //TODO: Should not be in update!!!!
 			ball = GameObject.FindGameObjectWithTag("ball");
-		var rotation = Quaternion.LookRotation(ball.transform.position - transform.position);
-	    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1000);
+		if (!hero.IsAI()) {
+			Quaternion rotation = Quaternion.LookRotation(ball.transform.position - transform.position);
+	    	transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1000);
+		}
 	}
 	
 	void UpdateAnimationSpeed()

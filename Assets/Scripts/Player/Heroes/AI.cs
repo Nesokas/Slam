@@ -43,8 +43,11 @@ public class AI : Hero {
 
 	private int emotion;
 
-	private int script_step = -1;
-	private int current_step = 0;
+	private Vector3 look_target;
+
+
+
+	Transform hands;
 
 	private enum Actions
 	{
@@ -135,9 +138,10 @@ public class AI : Hero {
 	Desires desire;
 	Action current_action;
 	Expression current_expression;
+
 	public AI(Player_Behaviour player)
 	{
-		hero_prefab = Resources.Load<GameObject>("Heroes/Sam");
+		hero_prefab = Resources.Load<GameObject>("Heroes/Tom");
 		ai_manager = GameObject.Find("AIManager").GetComponent<AIManager>();
 		this.player = player;
 		this.local_player = (Local_Player)player;
@@ -151,6 +155,8 @@ public class AI : Hero {
 		colliderAIPossessionRotation = player.transform.Find("ColliderAIPossession/ColliderAIPossessionRotation");
 		player_collider = player.transform.Find("Collider");
 		colliderAIPossessionCenter.gameObject.SetActive(true);
+
+
 	}
 	// Use this for initialization
 	public override void Start () 
@@ -177,6 +183,16 @@ public class AI : Hero {
 	//	Debug.Log(expectation);
 		current_action = new Action();
 
+		Transform mesh = player.transform.Find("Mesh");
+		hands = mesh.Find("Hands");
+		if (hands == null)
+			Debug.Log("WHATAFUCK");
+
+
+		//hands.transform.animation["Point"].time = Random.Range(0.0f, player.transform.animation["Point"].length);
+
+		look_target = ball.transform.position;
+
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnSignalOK");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRequestPass");
@@ -191,7 +207,7 @@ public class AI : Hero {
 
 	public override void Update() 
 	{
-		
+		hands.transform.animation.Play("Point");
 		if (Input.GetKeyDown("0"))
 		    key = 0;
 		else if (Input.GetKeyDown("1"))
@@ -210,7 +226,8 @@ public class AI : Hero {
 		UpdateBeliefs();
 		UpdatePossession();
 
-	//	Debug.Log(expression);		
+		look_target = ball.transform.position;
+
 		if (current_action.action == Actions.GO_TO_BALL) {
 			GoToBall();
 		} else if(current_action.action == Actions.DRIBBLE_TO_AREA) {
@@ -218,6 +235,8 @@ public class AI : Hero {
 		} else if (current_action.action == Actions.GO_TO_AREA) {
 			GoToArea(current_action.args);
 		} else if (current_action.action == Actions.PASS) {
+			Debug.Log(beliefs.teammate.GetPosition());
+			look_target = beliefs.teammate.GetPosition();
 			if(beliefs.teammate_expression == Expressions.OK) {
 				Pass();
 			}
@@ -232,6 +251,8 @@ public class AI : Hero {
 		} else if (current_action.action == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
 			ReceivePass();
 		}
+
+		UpdateLookAt(look_target);
 
 		/*
 		if (current_action.action == Actions.PASS || current_action.action == Actions.PASS_TO_AREA) {
@@ -283,6 +304,14 @@ public class AI : Hero {
 		}
 		*/
 
+	}
+
+	public void UpdateLookAt(Vector3 target) 
+	{
+		//Quaternion rotation = Quaternion.LookRotation(ai_manager.GetPitchAreaCoords(area) - player.transform.position);
+		//player.transform.rotation = Quaternion.Slerp(player.transform.rotation, rotation, Time.deltaTime * 1000);
+		Quaternion rotation = Quaternion.LookRotation(target - player.transform.position);
+		player.transform.rotation = Quaternion.Slerp(player.transform.rotation, rotation, Time.deltaTime * 5);
 	}
 
 	public void SetActionRequestPass(int area)
@@ -453,7 +482,6 @@ public class AI : Hero {
 						} else {
 							Shoot();
 						}
-						script_step--;
 						//return true;
 					}
 				}
@@ -864,9 +892,7 @@ public class AI : Hero {
 			Move (LEFT);
 		else
 			StopMovingHorizontally();
-
-		if(current_area == index)
-			script_step--;
+	
 
 	}
 
@@ -1250,18 +1276,10 @@ public class AI : Hero {
 //		Debug.Log("GOAL NOTIFICATION");
 	}
 
-	public void SetScriptStep(int length)
-	{
-		if(script_step == -1) {
-			script_step = length;
-			current_step = script_step;
-		}
-	}
 
-	public int GetCurrentStep()
-	{
-		return script_step;
-	}
+
+
+
 
 	public void OnGoingToArea(int area)
 	{
@@ -1301,6 +1319,9 @@ public class AI : Hero {
 
 	public void OnIntentToPass(int area)
 	{
+	//	Quaternion rotation = Quaternion.LookRotation(ai_manager.GetPitchAreaCoords(area) - player.transform.position);
+	//	player.transform.rotation = Quaternion.Slerp(player.transform.rotation, rotation, Time.deltaTime * 1000);
+
 		Hashtable data = new Hashtable();
 		data["index"] = area;
 		current_expression.expression = Expressions.INTEND_TO_PASS;
