@@ -185,8 +185,7 @@ public class AI : Hero {
 
 		Transform mesh = player.transform.Find("Mesh");
 		hands = mesh.Find("Hands");
-		if (hands == null)
-			Debug.Log("WHATAFUCK");
+		hands.gameObject.SetActive(false);
 
 
 		//hands.transform.animation["Point"].time = Random.Range(0.0f, player.transform.animation["Point"].length);
@@ -207,7 +206,7 @@ public class AI : Hero {
 
 	public override void Update() 
 	{
-		hands.transform.animation.Play("Point");
+
 		if (Input.GetKeyDown("0"))
 		    key = 0;
 		else if (Input.GetKeyDown("1"))
@@ -235,12 +234,12 @@ public class AI : Hero {
 		} else if (current_action.action == Actions.GO_TO_AREA) {
 			GoToArea(current_action.args);
 		} else if (current_action.action == Actions.PASS) {
-			Debug.Log(beliefs.teammate.GetPosition());
 			look_target = beliefs.teammate.GetPosition();
 			if(beliefs.teammate_expression == Expressions.OK) {
 				Pass();
 			}
 		} else if (current_action.action == Actions.PASS_TO_AREA) {
+			look_target = ai_manager.GetPitchAreaCoords(current_action.args);
 			if (beliefs.teammate_expression == Expressions.OK) {
 				PassPos(ai_manager.GetPitchAreaCoords(current_action.args));
 			} else if (beliefs.has_ball != true) {
@@ -1331,7 +1330,10 @@ public class AI : Hero {
 	public void IntentToPass(NotificationCenter.Notification notification)
 	{
 		if (object.ReferenceEquals(this.player, notification.sender)) {
-			Debug.Log("Agent 1 - May I pass to? " + notification.data["index"]);
+			hands.gameObject.SetActive(true);
+
+			Point();
+			//hands.transform.animation.Play("Point");
 			//current_action.action = Actions.POSITION_TO_SHOOT;
 			current_action.args = (int)notification.data["index"];
 			ai_manager.AgentResponse(this);
@@ -1413,6 +1415,20 @@ public class AI : Hero {
 		}
 	}
 
+	private void Point()
+	{
+		hands.animation["Point"].speed = 1f;
+		//hands.animation["Point"].time = hands.animation["Point"].length;
+		hands.animation.Play("Point");
+	}
+
+	private void StopPointing()
+	{
+		hands.animation["Point"].speed = -1f;
+		hands.animation["Point"].time = hands.animation["Point"].length;
+		hands.animation.Play("Point");
+	}
+
 	public void OnScore()
 	{
 		//expression = Expressions.EXPECT_SCORE;
@@ -1432,7 +1448,9 @@ public class AI : Hero {
 		yield return new WaitForSeconds(0.1f);
 
 		if (object.ReferenceEquals(this.player, notification.sender)) {
-		
+		//	hands.gameObject.SetActive(false);
+			
+			StopPointing();
 		} else {
 			beliefs.teammate_has_passed = true;
 			beliefs.ball_z_prediction = PredictBallZPosition();

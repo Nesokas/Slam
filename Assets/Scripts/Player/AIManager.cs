@@ -318,8 +318,8 @@ public class AIManager : MonoBehaviour {
 		//Debug.Log(red_list.Count + " - " + hero_list.Count);
 		if (!running_script) {
 			running_script = true;
-			StartCoroutine (script_1());
-			//StartCoroutine (script_2());
+			//StartCoroutine (script_1());
+			StartCoroutine (script_2());
 			//StartCoroutine(script_3());
 		}
 	}
