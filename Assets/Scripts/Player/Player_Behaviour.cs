@@ -572,6 +572,11 @@ public class Player_Behaviour : MonoBehaviour {
 			DebugMode();
 	}
 
+	public void HideHands()
+	{
+		AI ai = (AI)hero;
+		StartCoroutine(ai.HideHands());
+	}
 	
 	public void OnIntentToPass(NotificationCenter.Notification notification)
 	{
@@ -591,7 +596,6 @@ public class Player_Behaviour : MonoBehaviour {
 	{
 		AI ai = (AI)hero;
 		StartCoroutine(ai.SignalOK(notification));
-		
 	}
 
 	public void OnIntentToScore(NotificationCenter.Notification notification) 

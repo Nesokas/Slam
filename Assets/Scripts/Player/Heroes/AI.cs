@@ -20,10 +20,6 @@ public class AI : Hero {
 
 	private const int MAX_DEPTH = 6;
 
-	//private const int RED = 1, BLUE = 2;
-
-//	private bool has_ball = false;
-
 	private bool is_clockwise_rotation = true;
 
 	private bool touched_ball = false;
@@ -44,8 +40,6 @@ public class AI : Hero {
 	private int emotion;
 
 	private Vector3 look_target;
-
-
 
 	Transform hands;
 
@@ -1330,7 +1324,6 @@ public class AI : Hero {
 	public void IntentToPass(NotificationCenter.Notification notification)
 	{
 		if (object.ReferenceEquals(this.player, notification.sender)) {
-			hands.gameObject.SetActive(true);
 
 			Point();
 			//hands.transform.animation.Play("Point");
@@ -1356,8 +1349,10 @@ public class AI : Hero {
 
 	public IEnumerator RequestPass(NotificationCenter.Notification notification)
 	{
-		if (object.ReferenceEquals(this.player, notification.sender))
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+			AskForBall();
 			Debug.Log("Agent 2 - Pass me the ball!");
+		}
 		else {
 			yield return new WaitForSeconds(1f);
 		/*	if (current_action.action == Actions.SCORE)
@@ -1417,6 +1412,7 @@ public class AI : Hero {
 
 	private void Point()
 	{
+		hands.gameObject.SetActive(true);
 		hands.animation["Point"].speed = 1f;
 		//hands.animation["Point"].time = hands.animation["Point"].length;
 		hands.animation.Play("Point");
@@ -1427,6 +1423,28 @@ public class AI : Hero {
 		hands.animation["Point"].speed = -1f;
 		hands.animation["Point"].time = hands.animation["Point"].length;
 		hands.animation.Play("Point");
+		player.HideHands();
+	}
+
+	public IEnumerator HideHands()
+	{
+		yield return new WaitForSeconds(hands.animation["Point"].length);
+		hands.gameObject.SetActive(false);
+	}
+
+	private void AskForBall()
+	{
+		hands.gameObject.SetActive(true);
+		hands.animation["AskForBall"].speed = 1f;
+		hands.animation.Play("AskForBall");
+	}
+
+	private void StopAskingForBall()
+	{
+		hands.animation["AskForBall"].speed = -1f;
+		hands.animation["AskForBall"].time = hands.animation["AskForBall"].length;
+		hands.animation.Play("AskForBall");
+		player.HideHands();
 	}
 
 	public void OnScore()
@@ -1450,7 +1468,7 @@ public class AI : Hero {
 		if (object.ReferenceEquals(this.player, notification.sender)) {
 		//	hands.gameObject.SetActive(false);
 			
-			StopPointing();
+		StopPointing();
 		} else {
 			beliefs.teammate_has_passed = true;
 			beliefs.ball_z_prediction = PredictBallZPosition();
