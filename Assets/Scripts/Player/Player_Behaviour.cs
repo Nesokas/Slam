@@ -571,12 +571,6 @@ public class Player_Behaviour : MonoBehaviour {
 		if(debug_mode)
 			DebugMode();
 	}
-
-	public void HideHands()
-	{
-		AI ai = (AI)hero;
-		StartCoroutine(ai.HideHands());
-	}
 	
 	public void OnIntentToPass(NotificationCenter.Notification notification)
 	{
