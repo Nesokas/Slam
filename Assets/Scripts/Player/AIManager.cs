@@ -135,7 +135,7 @@ public class AIManager : MonoBehaviour {
 		}
 		
 		response_1 = false;
-		a1.SetActionDribbleToArea(5); //a1.SetActionDribbleToArea(5);
+		a1.SetActionDribbleToArea(2); //a1.SetActionDribbleToArea(5);
 		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
@@ -318,8 +318,8 @@ public class AIManager : MonoBehaviour {
 		//Debug.Log(red_list.Count + " - " + hero_list.Count);
 		if (!running_script) {
 			running_script = true;
-			StartCoroutine (script_1());
-			//StartCoroutine (script_2());
+			//StartCoroutine (script_1());
+			StartCoroutine (script_2());
 			//StartCoroutine(script_3());
 		}
 	}

@@ -47,6 +47,9 @@ public class AI : Hero {
 	private int Hide_state;
 	private int Point_state;
 	private int PointEnd_state;
+	private int OKStart_state;
+	private int OKEnd_state;
+	private int Celebrate_state;
 	private int AskForBallStart_state;
 	private int AskForBallEnd_state;
 
@@ -195,9 +198,12 @@ public class AI : Hero {
 		hand_animator = hands.GetComponent<Animator>();
 		Point_state = Animator.StringToHash("Base Layer.Point");
 		PointEnd_state = Animator.StringToHash("Base Layer.PointEnd");
+		OKStart_state = Animator.StringToHash("Base Layer.OKStart");
+		OKEnd_state = Animator.StringToHash("Base Layer.OKEnd");
 		AskForBallStart_state = Animator.StringToHash("Base Layer.AskForBallStart");
 		AskForBallEnd_state = Animator.StringToHash("Base Layer.AskForBallEnd");
 		Hide_state = Animator.StringToHash("Base Layer.Hide");
+		Celebrate_state = Animator.StringToHash("Base Layer.Celebrate");
 
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnSignalOK");
@@ -256,6 +262,7 @@ public class AI : Hero {
 				Score();
 		} else if (current_action.action == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
 			ReceivePass();
+			ThumbsUpEnd();
 		}
 
 		UpdateLookAt(look_target);
@@ -1284,8 +1291,9 @@ public class AI : Hero {
 	public override void EmmitPowerFX(string type = "none"){}
 
 	public void GoalScored()
-	{		
-//		Debug.Log("GOAL NOTIFICATION");
+	{	
+		hands.gameObject.SetActive(true);
+		hand_animator.Play(Celebrate_state);
 	}
 
 
@@ -1340,7 +1348,7 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToPass", data);
 	}
 
-	public void IntentToPass(NotificationCenter.Notification notification)
+	public IEnumerator IntentToPass(NotificationCenter.Notification notification)
 	{
 		if (object.ReferenceEquals(this.player, notification.sender)) {
 
@@ -1350,10 +1358,13 @@ public class AI : Hero {
 			current_action.args = (int)notification.data["index"];
 			ai_manager.AgentResponse(this);
 		} else {
+			yield return new WaitForSeconds(0.5f);
 			if (current_action.action == Actions.RECEIVE_PASS || current_area == (int)notification.data["index"])
 				Debug.Log("Agent 2 - Yes");
-			else
+			else {
+				ThumbsUp();
 				Debug.Log("Agent 2 - Wait");
+			}
 			beliefs.teammate_expression = Expressions.INTEND_TO_PASS;
 		}
 	}
@@ -1389,8 +1400,8 @@ public class AI : Hero {
 	{
 		yield return new WaitForSeconds(0.5f);
 		if (object.ReferenceEquals(this.player, notification.sender)) {
-		//	expression = Expressions.OK;
 			current_expression.expression = Expressions.OK;
+			AskForBall();
 			Debug.Log("Agent 2 - OK");
 		}
 		else {
@@ -1473,6 +1484,17 @@ public class AI : Hero {
 		hands.animation.Play("AskForBall");
 		player.HideHands();
 		*/
+	}
+
+	private void ThumbsUp()
+	{
+		hands.gameObject.SetActive(true);
+		hand_animator.Play(OKStart_state);
+	}
+
+	private void ThumbsUpEnd()
+	{
+		hand_animator.Play(OKEnd_state);
 	}
 
 	public void OnScore()
