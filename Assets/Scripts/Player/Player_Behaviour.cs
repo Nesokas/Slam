@@ -625,7 +625,7 @@ public class Player_Behaviour : MonoBehaviour {
 	public void OnWallHit(NotificationCenter.Notification notification)
 	{
 		AI ai = (AI)hero;
-		ai.OnWallHit();
+		StartCoroutine(ai.OnWallHit());
 	}
 
 }

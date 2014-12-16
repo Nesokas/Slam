@@ -9,7 +9,7 @@ public class AI : Hero {
 	Local_Player local_player;
 	private GameObject ball;
 	private Ball_Behaviour ball_behaviour;
-
+	private Transform angry_steam;
 	private const int BOTTOM_FLANK = 0, MID_FLANK = 1, TOP_FLANK = 2, LEFT = 3, RIGHT = 4;
 
 	private const int MOVE_UP = 1, MOVE_DOWN = -1, MOVE_LEFT = 1, MOVE_RIGHT = -1;
@@ -163,7 +163,7 @@ public class AI : Hero {
 
 	}
 	// Use this for initialization
-	public override void Start () 
+	public override void Start() 
 	{
 		this.team = player.team;
 		beliefs.team = player.team;
@@ -191,7 +191,11 @@ public class AI : Hero {
 		hands = mesh.Find("Hands");
 		hands.gameObject.SetActive(false);
 
-
+		angry_steam = player.transform.Find("Mesh").Find("Angry_Steam");
+		foreach (Transform child in angry_steam) {
+			child.particleSystem.Stop();
+		}
+		
 		//hands.transform.animation["Point"].time = Random.Range(0.0f, player.transform.animation["Point"].length);
 
 		look_target = ball.transform.position;
@@ -1453,37 +1457,22 @@ public class AI : Hero {
 	private void StopPointing()
 	{
 		hand_animator.Play(PointEnd_state);
-		/*hands.animation["Point"].speed = -1f;
-		hands.animation["Point"].time = hands.animation["Point"].length;
-		hands.animation.Play("Point");
-		player.HideHands();*/
 	}
 
 	public void HideHands()
 	{
-	/*	yield return new WaitForSeconds(hands.animation["Point"].length);
-		hands.gameObject.SetActive(false);
-		*/
+
 	}
 
 	private void AskForBall()
 	{
 		hands.gameObject.SetActive(true);
 		hand_animator.Play(AskForBallStart_state);
-		/*	hands.gameObject.SetActive(true);
-		hands.animation["AskForBall"].speed = 1f;
-		hands.animation.Play("AskForBall");
-		*/
 	}
 
 	private void StopAskingForBall()
 	{
 		hand_animator.Play(AskForBallEnd_state);
-		/*hands.animation["AskForBall"].speed = -1f;
-		hands.animation["AskForBall"].time = hands.animation["AskForBall"].length;
-		hands.animation.Play("AskForBall");
-		player.HideHands();
-		*/
 	}
 
 	private void ThumbsUp()
@@ -1495,6 +1484,13 @@ public class AI : Hero {
 	private void ThumbsUpEnd()
 	{
 		hand_animator.Play(OKEnd_state);
+	}
+
+	private void GetAngry()
+	{
+		foreach (Transform child in angry_steam) {
+			child.particleSystem.Play();
+		}
 	}
 
 	public void OnScore()
@@ -1542,13 +1538,15 @@ public class AI : Hero {
 		}
 	}*/
 
-	public void OnWallHit()
+	public IEnumerator OnWallHit()
 	{
 		if (current_action.action == Actions.SCORE) {
 			Debug.Log("I missed!!");
 		} else if (beliefs.teammate.current_action.action == Actions.SCORE) {
 			if (current_expression.expression == Expressions.REQUEST_PASS) {
 				StopAskingForBall();
+				yield return new WaitForSeconds(0.1f);
+				GetAngry();
 				Debug.Log("I told you to pass!!");
 			} else {
 				Debug.Log("You missed!!");

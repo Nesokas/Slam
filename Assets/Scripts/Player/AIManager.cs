@@ -319,8 +319,8 @@ public class AIManager : MonoBehaviour {
 		if (!running_script) {
 			running_script = true;
 			//StartCoroutine (script_1());
-			StartCoroutine (script_2());
-			//StartCoroutine(script_3());
+			//StartCoroutine (script_2());
+			StartCoroutine(script_3());
 		}
 	}
 
