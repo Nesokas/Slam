@@ -10,6 +10,7 @@ public class AI : Hero {
 	private GameObject ball;
 	private Ball_Behaviour ball_behaviour;
 	private Transform angry_steam;
+	private Transform sweat;
 	private const int BOTTOM_FLANK = 0, MID_FLANK = 1, TOP_FLANK = 2, LEFT = 3, RIGHT = 4;
 
 	private const int MOVE_UP = 1, MOVE_DOWN = -1, MOVE_LEFT = 1, MOVE_RIGHT = -1;
@@ -104,8 +105,8 @@ public class AI : Hero {
 		DRIBBLE,
 		TACKLE,
 		MOVE_TO_AREA,
-		TAKE_POSSESSION
-		
+		TAKE_POSSESSION,
+		RECEIVE_BALL
 	}
 
 	private enum Expectations
@@ -191,6 +192,8 @@ public class AI : Hero {
 		hands = mesh.Find("Hands");
 		hands.gameObject.SetActive(false);
 
+		sweat = player.transform.Find("Mesh").Find("Sweat");
+		sweat.particleSystem.Stop();
 		angry_steam = player.transform.Find("Mesh").Find("Angry_Steam");
 		foreach (Transform child in angry_steam) {
 			child.particleSystem.Stop();
@@ -263,7 +266,8 @@ public class AI : Hero {
 				RotateAroundBall(ai_manager.GetPitchAreaCoords(current_action.args));
 			}
 		} else if (current_action.action == Actions.SCORE) {
-				Score();
+			look_target = beliefs.opponent_goal_position;
+			Score();
 		} else if (current_action.action == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
 			ReceivePass();
 			ThumbsUpEnd();
@@ -393,6 +397,11 @@ public class AI : Hero {
 		OnIntentToPass(index);
 		current_action.action = Actions.PASS_TO_AREA;
 		current_action.args = index;
+	}
+
+	public void SetDesireReceiveBall()
+	{
+		desire = Desires.RECEIVE_BALL;
 	}
 
 	public void ReceivePass()
@@ -1377,7 +1386,7 @@ public class AI : Hero {
 	public void OnRequestPass(int area)
 	{
 		//expression = Expressions.REQUEST_PASS;
-		current_expression.expression = Expressions.REQUEST_PASS;
+	//	current_expression.expression = Expressions.REQUEST_PASS;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnRequestPass");
 	}
 
@@ -1385,7 +1394,7 @@ public class AI : Hero {
 	{
 		if (object.ReferenceEquals(this.player, notification.sender)) {
 			AskForBall();
-			Debug.Log("Agent 2 - Pass me the ball!");
+		//	Debug.Log("Agent 2 - Pass me the ball!");
 		}
 		else {
 			yield return new WaitForSeconds(1f);
@@ -1425,12 +1434,14 @@ public class AI : Hero {
 	{
 		if (object.ReferenceEquals(this.player, notification.sender)) {
 			Debug.Log("Agent 2 - I'll try to score!");
+			Point();
 		}
 		else {
 			yield return new WaitForSeconds(0.5f);
 			beliefs.teammate_expression = Expressions.OK;
-			if (current_expression.expression == Expressions.REQUEST_PASS) {
+			if (current_expression.expression == Expressions.REQUEST_PASS || desire == Desires.RECEIVE_BALL) {
 				Debug.Log("Agent 2 - No!!");
+				AskForBall();
 			} else {
 				Debug.Log("Agent 1 - Go for it!!");
 			}
@@ -1468,6 +1479,7 @@ public class AI : Hero {
 	{
 		hands.gameObject.SetActive(true);
 		hand_animator.Play(AskForBallStart_state);
+		current_expression.expression = Expressions.REQUEST_PASS;
 	}
 
 	private void StopAskingForBall()
@@ -1542,6 +1554,7 @@ public class AI : Hero {
 	{
 		if (current_action.action == Actions.SCORE) {
 			Debug.Log("I missed!!");
+			sweat.particleSystem.Play();
 		} else if (beliefs.teammate.current_action.action == Actions.SCORE) {
 			if (current_expression.expression == Expressions.REQUEST_PASS) {
 				StopAskingForBall();

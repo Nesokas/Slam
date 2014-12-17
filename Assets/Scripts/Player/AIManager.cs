@@ -182,7 +182,8 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		response_2 = false;
 		a1.SetActionScore();
-		a2.SetActionRequestPass(4);
+		//a2.SetActionRequestPass(4);
+		a2.SetDesireReceiveBall();
 	}
 
 
