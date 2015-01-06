@@ -51,6 +51,7 @@ public class AI : Hero {
 	private int OKStart_state;
 	private int OKEnd_state;
 	private int Celebrate_state;
+	private int Sad_state;
 	private int AskForBallStart_state;
 	private int AskForBallEnd_state;
 
@@ -70,7 +71,7 @@ public class AI : Hero {
 
 	private struct Action
 	{
-		public Actions action;
+		public Actions intent;
 		public int args;
 	}
 
@@ -141,7 +142,7 @@ public class AI : Hero {
 	//Expressions expression;
 	// The desire to which the agent has commited will be the intention
 	Desires desire;
-	Action current_action;
+	Action current_intention;
 	Expression current_expression;
 
 	public AI(Player_Behaviour player)
@@ -186,7 +187,7 @@ public class AI : Hero {
 
 		expectation = Expectations.DEFEND;
 	//	Debug.Log(expectation);
-		current_action = new Action();
+		current_intention = new Action();
 
 		Transform mesh = player.transform.Find("Mesh");
 		hands = mesh.Find("Hands");
@@ -211,6 +212,7 @@ public class AI : Hero {
 		AskForBallEnd_state = Animator.StringToHash("Base Layer.AskForBallEnd");
 		Hide_state = Animator.StringToHash("Base Layer.Hide");
 		Celebrate_state = Animator.StringToHash("Base Layer.Celebrate");
+		Sad_state = Animator.StringToHash("Base Layer.Sad");
 
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnSignalOK");
@@ -247,28 +249,28 @@ public class AI : Hero {
 
 		look_target = ball.transform.position;
 
-		if (current_action.action == Actions.GO_TO_BALL) {
+		if (current_intention.intent == Actions.GO_TO_BALL) {
 			GoToBall();
-		} else if(current_action.action == Actions.DRIBBLE_TO_AREA) {
-			DribbleToArea(current_action.args);
-		} else if (current_action.action == Actions.GO_TO_AREA) {
-			GoToArea(current_action.args);
-		} else if (current_action.action == Actions.PASS) {
+		} else if(current_intention.intent == Actions.DRIBBLE_TO_AREA) {
+			DribbleToArea(current_intention.args);
+		} else if (current_intention.intent == Actions.GO_TO_AREA) {
+			GoToArea(current_intention.args);
+		} else if (current_intention.intent == Actions.PASS) {
 			look_target = beliefs.teammate.GetPosition();
 			if(beliefs.teammate_expression == Expressions.OK) {
 				Pass();
 			}
-		} else if (current_action.action == Actions.PASS_TO_AREA) {
-			look_target = ai_manager.GetPitchAreaCoords(current_action.args);
+		} else if (current_intention.intent == Actions.PASS_TO_AREA) {
+			look_target = ai_manager.GetPitchAreaCoords(current_intention.args);
 			if (beliefs.teammate_expression == Expressions.OK) {
-				PassPos(ai_manager.GetPitchAreaCoords(current_action.args));
+				PassPos(ai_manager.GetPitchAreaCoords(current_intention.args));
 			} else if (beliefs.has_ball != true) {
-				RotateAroundBall(ai_manager.GetPitchAreaCoords(current_action.args));
+				RotateAroundBall(ai_manager.GetPitchAreaCoords(current_intention.args));
 			}
-		} else if (current_action.action == Actions.SCORE) {
+		} else if (current_intention.intent == Actions.SCORE) {
 			look_target = beliefs.opponent_goal_position;
 			Score();
-		} else if (current_action.action == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
+		} else if (current_intention.intent == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
 			ReceivePass();
 			ThumbsUpEnd();
 		}
@@ -348,55 +350,55 @@ public class AI : Hero {
 
 	public void SetActionDribbleToArea(int area)
 	{
-		current_action.action = Actions.DRIBBLE_TO_AREA;
-		current_action.args = area;
+		current_intention.intent = Actions.DRIBBLE_TO_AREA;
+		current_intention.args = area;
 	}
 
 	public void SetActionGoToArea(int area)
 	{
 		OnGoingToArea(area);
-		current_action.action = Actions.GO_TO_AREA;
-		current_action.args = area;
+		current_intention.intent = Actions.GO_TO_AREA;
+		current_intention.args = area;
 	}
 
 	public void SetActionGoingToBall()
 	{
 		OnGoingToBall();
-		current_action.action = Actions.GO_TO_BALL;
+		current_intention.intent = Actions.GO_TO_BALL;
 		//current_action.args = area;
 	}
 
 	public void SetActionPass()
 	{
 		OnIntentToPass(beliefs.teammate.GetCurrentArea());
-		current_action.action = Actions.PASS;
-		current_action.args = -1;
+		current_intention.intent = Actions.PASS;
+		current_intention.args = -1;
 	}
 
 	public void SetActionScore()
 	{
 		OnIntentToScore();
-		current_action.action = Actions.SCORE;
-		current_action.args = -1;
+		current_intention.intent = Actions.SCORE;
+		current_intention.args = -1;
 	}
 
 	public void SetActionNull()
 	{
-		current_action.action = Actions.NULL;
+		current_intention.intent = Actions.NULL;
 		ai_manager.AgentResponse(this);
 	}
 
 	public void SetActionReceivePass()
 	{
 		OnSignalOK();
-		current_action.action = Actions.RECEIVE_PASS;
+		current_intention.intent = Actions.RECEIVE_PASS;
 	}
 
 	public void SetActionPassToArea(int index)
 	{
 		OnIntentToPass(index);
-		current_action.action = Actions.PASS_TO_AREA;
-		current_action.args = index;
+		current_intention.intent = Actions.PASS_TO_AREA;
+		current_intention.args = index;
 	}
 
 	public void SetDesireReceiveBall()
@@ -532,11 +534,11 @@ public class AI : Hero {
 			ai_manager.AgentResponse(this);
 
 
-			if (current_action.action == Actions.SCORE) {
+			if (current_intention.intent == Actions.SCORE) {
 				OnScore();
 			}
 
-			if (current_action.action == Actions.PASS || current_action.action == Actions.PASS_TO_AREA) {
+			if (current_intention.intent == Actions.PASS || current_intention.intent == Actions.PASS_TO_AREA) {
 				OnPass();
 			}
 
@@ -1174,7 +1176,7 @@ public class AI : Hero {
 		if (local_player.transform.position.z < ball.transform.position.z)
 			local_player.player_controller.commands.horizontal_direction = MOVE_LEFT;
 
-		if (current_action.action == Actions.GO_TO_BALL && beliefs.has_ball)
+		if (current_intention.intent == Actions.GO_TO_BALL && beliefs.has_ball)
 			ai_manager.AgentResponse(this);
 	}
 
@@ -1352,9 +1354,6 @@ public class AI : Hero {
 
 	public void OnIntentToPass(int area)
 	{
-	//	Quaternion rotation = Quaternion.LookRotation(ai_manager.GetPitchAreaCoords(area) - player.transform.position);
-	//	player.transform.rotation = Quaternion.Slerp(player.transform.rotation, rotation, Time.deltaTime * 1000);
-
 		Hashtable data = new Hashtable();
 		data["index"] = area;
 		current_expression.expression = Expressions.INTEND_TO_PASS;
@@ -1364,15 +1363,14 @@ public class AI : Hero {
 	public IEnumerator IntentToPass(NotificationCenter.Notification notification)
 	{
 		if (object.ReferenceEquals(this.player, notification.sender)) {
-
 			Point();
 			//hands.transform.animation.Play("Point");
 			//current_action.action = Actions.POSITION_TO_SHOOT;
-			current_action.args = (int)notification.data["index"];
+			current_intention.args = (int)notification.data["index"];
 			ai_manager.AgentResponse(this);
 		} else {
 			yield return new WaitForSeconds(0.5f);
-			if (current_action.action == Actions.RECEIVE_PASS || current_area == (int)notification.data["index"])
+			if (current_intention.intent == Actions.RECEIVE_PASS || current_area == (int)notification.data["index"])
 				Debug.Log("Agent 2 - Yes");
 			else {
 				ThumbsUp();
@@ -1552,10 +1550,13 @@ public class AI : Hero {
 
 	public IEnumerator OnWallHit()
 	{
-		if (current_action.action == Actions.SCORE) {
+		if (current_intention.intent == Actions.SCORE) {
 			Debug.Log("I missed!!");
 			sweat.particleSystem.Play();
-		} else if (beliefs.teammate.current_action.action == Actions.SCORE) {
+			StopPointing();
+			//hand_animator.Play(Sad_state);
+			//SetActionNull();
+		} else if (beliefs.teammate.current_intention.intent == Actions.SCORE) {
 			if (current_expression.expression == Expressions.REQUEST_PASS) {
 				StopAskingForBall();
 				yield return new WaitForSeconds(0.1f);
