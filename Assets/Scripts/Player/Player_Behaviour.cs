@@ -572,10 +572,10 @@ public class Player_Behaviour : MonoBehaviour {
 			DebugMode();
 	}
 	
-	public void OnIntentToPass(NotificationCenter.Notification notification)
+	public void AnticipateToPass(NotificationCenter.Notification notification)
 	{
 		AI ai = (AI)hero;
-		StartCoroutine(ai.IntentToPass(notification));
+		StartCoroutine(ai.AnticipateToPassReaction(notification));
 		
 	}
 
@@ -592,10 +592,10 @@ public class Player_Behaviour : MonoBehaviour {
 		StartCoroutine(ai.SignalOK(notification));
 	}
 
-	public void OnIntentToScore(NotificationCenter.Notification notification) 
+	public void AnticipateToScore(NotificationCenter.Notification notification) 
 	{
 		AI ai = (AI)hero;
-		StartCoroutine(ai.IntentToScore(notification));
+		StartCoroutine(ai.AnticipateToScoreReaction(notification));
 	}
 
 	public void OnGoingToArea(NotificationCenter.Notification notification) 

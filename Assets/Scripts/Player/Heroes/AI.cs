@@ -214,10 +214,10 @@ public class AI : Hero {
 		Celebrate_state = Animator.StringToHash("Base Layer.Celebrate");
 		Sad_state = Animator.StringToHash("Base Layer.Sad");
 
-		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToPass");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "AnticipateToPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnSignalOK");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRequestPass");
-		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnIntentToScore");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "AnticipateToScore");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnScore"); //When he shoots in fact
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnWallHit");
@@ -370,14 +370,14 @@ public class AI : Hero {
 
 	public void SetActionPass()
 	{
-		OnIntentToPass(beliefs.teammate.GetCurrentArea());
+		AnticipateToPass(beliefs.teammate.GetCurrentArea());
 		current_intention.intent = Actions.PASS;
 		current_intention.args = -1;
 	}
 
 	public void SetActionScore()
 	{
-		OnIntentToScore();
+		AnticipateToScore();
 		current_intention.intent = Actions.SCORE;
 		current_intention.args = -1;
 	}
@@ -396,7 +396,7 @@ public class AI : Hero {
 
 	public void SetActionPassToArea(int index)
 	{
-		OnIntentToPass(index);
+		AnticipateToPass(index);
 		current_intention.intent = Actions.PASS_TO_AREA;
 		current_intention.args = index;
 	}
@@ -1352,23 +1352,20 @@ public class AI : Hero {
 		}
 	}
 
-	public void OnIntentToPass(int area)
+	public void AnticipateToPass(int area)
 	{
 		Hashtable data = new Hashtable();
 		data["index"] = area;
 		current_expression.expression = Expressions.INTEND_TO_PASS;
-		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToPass", data);
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"AnticipateToPass", data);
+		Point();
+		current_intention.args = area;
+		ai_manager.AgentResponse(this);
 	}
 
-	public IEnumerator IntentToPass(NotificationCenter.Notification notification)
+	public IEnumerator AnticipateToPassReaction(NotificationCenter.Notification notification)
 	{
-		if (object.ReferenceEquals(this.player, notification.sender)) {
-			Point();
-			//hands.transform.animation.Play("Point");
-			//current_action.action = Actions.POSITION_TO_SHOOT;
-			current_intention.args = (int)notification.data["index"];
-			ai_manager.AgentResponse(this);
-		} else {
+		if (!object.ReferenceEquals(this.player, notification.sender)) {
 			yield return new WaitForSeconds(0.5f);
 			if (current_intention.intent == Actions.RECEIVE_PASS || current_area == (int)notification.data["index"])
 				Debug.Log("Agent 2 - Yes");
@@ -1421,36 +1418,29 @@ public class AI : Hero {
 		}
 	}
 
-	public void OnIntentToScore()
+	public void AnticipateToScore()
 	{
 	//	expression = Expressions.INTEND_TO_SCORE;
 		current_expression.expression = Expressions.INTEND_TO_SCORE;
-		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnIntentToScore");
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"AnticipateToScore");
+		Point();
 	}
 	
-	public IEnumerator IntentToScore(NotificationCenter.Notification notification)
+	public IEnumerator AnticipateToScoreReaction(NotificationCenter.Notification notification)
 	{
-		if (object.ReferenceEquals(this.player, notification.sender)) {
-			Debug.Log("Agent 2 - I'll try to score!");
-			Point();
-		}
-		else {
+		//Debug.Log("ANTICIPATING SOCRE!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		if (!object.ReferenceEquals(this.player, notification.sender)) {
 			yield return new WaitForSeconds(0.5f);
 			beliefs.teammate_expression = Expressions.OK;
 			if (current_expression.expression == Expressions.REQUEST_PASS || desire == Desires.RECEIVE_BALL) {
 				Debug.Log("Agent 2 - No!!");
+				Debug.Log("asking for ball");
 				AskForBall();
 			} else {
 				Debug.Log("Agent 1 - Go for it!!");
 			}
-
-//			if(beliefs.teammate_has_ball == false && beliefs.opponent_has_ball == false && beliefs.has_shot) {
-//				Debug.Log("has shot");
-//				yield return new WaitForSeconds(2f);
-//				Debug.Log("FAILED!!!!!!");
-//				beliefs.has_shot = false;
-//			}
 		}
+	
 	}
 
 	private void Point()
