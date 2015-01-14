@@ -131,11 +131,20 @@ public class AI : Hero {
 		
 	}
 
+	private enum EnvironmentMessages
+	{
+		WALL_HIT,
+		NULL
+	}
+
 	private struct Expression
 	{
 		public Expressions expression;
 		public int args;
 	}
+
+	int CONFIDENCE_THRESHOLD = 50; // Threshold (%) from which the action may or may not be interrupted
+	int current_confidence = 0;
 
 	Beliefs beliefs;
 	Expectations expectation;
@@ -186,7 +195,6 @@ public class AI : Hero {
 		desire = Desires.TAKE_POSSESSION;
 
 		expectation = Expectations.DEFEND;
-	//	Debug.Log(expectation);
 		current_intention = new Action();
 
 		Transform mesh = player.transform.Find("Mesh");
@@ -199,8 +207,6 @@ public class AI : Hero {
 		foreach (Transform child in angry_steam) {
 			child.particleSystem.Stop();
 		}
-		
-		//hands.transform.animation["Point"].time = Random.Range(0.0f, player.transform.animation["Point"].length);
 
 		look_target = ball.transform.position;
 		hand_animator = hands.GetComponent<Animator>();
@@ -267,7 +273,7 @@ public class AI : Hero {
 			} else if (beliefs.has_ball != true) {
 				RotateAroundBall(ai_manager.GetPitchAreaCoords(current_intention.args));
 			}
-		} else if (current_intention.intent == Actions.SCORE) {
+		} else if (current_intention.intent == Actions.SCORE && current_confidence >= CONFIDENCE_THRESHOLD) {
 			look_target = beliefs.opponent_goal_position;
 			Score();
 		} else if (current_intention.intent == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
@@ -337,8 +343,6 @@ public class AI : Hero {
 
 	public void UpdateLookAt(Vector3 target) 
 	{
-		//Quaternion rotation = Quaternion.LookRotation(ai_manager.GetPitchAreaCoords(area) - player.transform.position);
-		//player.transform.rotation = Quaternion.Slerp(player.transform.rotation, rotation, Time.deltaTime * 1000);
 		Quaternion rotation = Quaternion.LookRotation(target - player.transform.position);
 		player.transform.rotation = Quaternion.Slerp(player.transform.rotation, rotation, Time.deltaTime * 5);
 	}
@@ -375,8 +379,9 @@ public class AI : Hero {
 		current_intention.args = -1;
 	}
 
-	public void SetActionScore()
+	public void SetActionScore(int confidence)
 	{
+		current_confidence = confidence;
 		AnticipateToScore();
 		current_intention.intent = Actions.SCORE;
 		current_intention.args = -1;
@@ -515,6 +520,7 @@ public class AI : Hero {
 							GoToBall();
 						} else {
 							Shoot();
+
 						}
 						//return true;
 					}
@@ -1383,20 +1389,58 @@ public class AI : Hero {
 		//expression = Expressions.REQUEST_PASS;
 	//	current_expression.expression = Expressions.REQUEST_PASS;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnRequestPass");
+		AskForBall();
 	}
 
 	public IEnumerator RequestPass(NotificationCenter.Notification notification)
 	{
-		if (object.ReferenceEquals(this.player, notification.sender)) {
-			AskForBall();
-		//	Debug.Log("Agent 2 - Pass me the ball!");
-		}
-		else {
-			yield return new WaitForSeconds(1f);
-		/*	if (current_action.action == Actions.SCORE)
-				Debug.Log("Agent 1 - No!");*/
+		if (!object.ReferenceEquals(this.player, notification.sender)) {
+			yield return new WaitForSeconds(0.5f);
 			beliefs.teammate_expression = Expressions.REQUEST_PASS;
+			Appraise();
 		}
+	}
+
+	private void Appraise(EnvironmentMessages message = EnvironmentMessages.NULL)
+	{
+		if (current_intention.intent == Actions.SCORE && beliefs.teammate_expression == Expressions.OK) {
+			if (current_confidence > 50) {
+				current_confidence += 30;
+			} else {
+				current_confidence += 15;
+			}
+		} else if (current_intention.intent == Actions.SCORE && beliefs.teammate_expression == Expressions.REQUEST_PASS) {
+			if (current_confidence > 50) {
+				current_confidence -= 15;
+			} else {
+				current_confidence -= 30;
+			}
+		}
+
+		if (current_expression.expression == Expressions.REQUEST_PASS && beliefs.teammate_expression == Expressions.INTEND_TO_SCORE) {
+			AskForBall();
+		} else if (current_expression.expression == Expressions.REQUEST_PASS && beliefs.teammate_expression == Expressions.OK) {
+			OnSignalOK();
+		}
+
+
+
+		if (message == EnvironmentMessages.WALL_HIT) {
+			if (current_intention.intent == Actions.SCORE) {
+				Debug.Log("I missed!!");
+				GetFrustrated();
+				StopPointing();
+			} else if (beliefs.teammate.current_intention.intent == Actions.SCORE) {
+				if (current_expression.expression == Expressions.REQUEST_PASS) {
+					StopAskingForBall();
+					GetAngry();
+					Debug.Log("I told you to pass!!");
+				} else {
+					Debug.Log("You missed!!");
+				}
+			}
+		}
+		Debug.Log(current_confidence);
 	}
 
 	public void OnSignalOK()
@@ -1409,7 +1453,8 @@ public class AI : Hero {
 		yield return new WaitForSeconds(0.5f);
 		if (object.ReferenceEquals(this.player, notification.sender)) {
 			current_expression.expression = Expressions.OK;
-			AskForBall();
+			//AskForBall();
+			ThumbsUp();
 			Debug.Log("Agent 2 - OK");
 		}
 		else {
@@ -1421,6 +1466,7 @@ public class AI : Hero {
 	public void AnticipateToScore()
 	{
 	//	expression = Expressions.INTEND_TO_SCORE;
+		beliefs.teammate_expression = Expressions.NULL;
 		current_expression.expression = Expressions.INTEND_TO_SCORE;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"AnticipateToScore");
 		Point();
@@ -1428,15 +1474,16 @@ public class AI : Hero {
 	
 	public IEnumerator AnticipateToScoreReaction(NotificationCenter.Notification notification)
 	{
-		//Debug.Log("ANTICIPATING SOCRE!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		if (!object.ReferenceEquals(this.player, notification.sender)) {
 			yield return new WaitForSeconds(0.5f);
-			beliefs.teammate_expression = Expressions.OK;
+			//beliefs.teammate_expression = Expressions.OK;
 			if (current_expression.expression == Expressions.REQUEST_PASS || desire == Desires.RECEIVE_BALL) {
 				Debug.Log("Agent 2 - No!!");
 				Debug.Log("asking for ball");
-				AskForBall();
+				OnRequestPass(current_area);
+				//AskForBall();
 			} else {
+				beliefs.teammate.beliefs.teammate_expression = Expressions.OK;
 				Debug.Log("Agent 1 - Go for it!!");
 			}
 		}
@@ -1492,6 +1539,10 @@ public class AI : Hero {
 			child.particleSystem.Play();
 		}
 	}
+	private void GetFrustrated()
+	{
+		sweat.particleSystem.Play();
+	}
 
 	public void OnScore()
 	{
@@ -1500,11 +1551,28 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnScore");
 	}
 
+	public IEnumerator Score(NotificationCenter.Notification notification)
+	{
+		
+		yield return new WaitForSeconds(0.1f);
+		
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+			//	hands.gameObject.SetActive(false);
+			
+			StopPointing();
+		} else {
+		//	beliefs.teammate_has_passed = true;
+		//	beliefs.ball_z_prediction = PredictBallZPosition();
+		}
+		//	NotificationCenter.DefaultCenter.PostNotification(this.player,"OnPass");
+	}
+
 	public void OnPass()
 	{
 
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnPass");
 	}
+
 
 	public IEnumerator Pass(NotificationCenter.Notification notification)
 	{
@@ -1540,22 +1608,23 @@ public class AI : Hero {
 
 	public IEnumerator OnWallHit()
 	{
-		if (current_intention.intent == Actions.SCORE) {
-			Debug.Log("I missed!!");
-			sweat.particleSystem.Play();
-			StopPointing();
-			//hand_animator.Play(Sad_state);
-			//SetActionNull();
-		} else if (beliefs.teammate.current_intention.intent == Actions.SCORE) {
-			if (current_expression.expression == Expressions.REQUEST_PASS) {
-				StopAskingForBall();
+		Appraise(EnvironmentMessages.WALL_HIT);	
+//		if (current_intention.intent == Actions.SCORE) {
+//			Debug.Log("I missed!!");
+//			GetFrustrated();
+//			StopPointing();
+//			//hand_animator.Play(Sad_state);
+//			//SetActionNull();
+//		} else if (beliefs.teammate.current_intention.intent == Actions.SCORE) {
+//			if (current_expression.expression == Expressions.REQUEST_PASS) {
+//				StopAskingForBall();
 				yield return new WaitForSeconds(0.1f);
-				GetAngry();
-				Debug.Log("I told you to pass!!");
-			} else {
-				Debug.Log("You missed!!");
-			}
-		} 
+//				GetAngry();
+//				Debug.Log("I told you to pass!!");
+//			} else {
+//				Debug.Log("You missed!!");
+//			}
+//		} 
 	}
 
 	private float GetDistanceBetweenTwoCoords(float z1, float z2)

@@ -116,7 +116,7 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		response_2 = false;
 		a1.SetActionNull();
-		a2.SetActionScore();
+		a2.SetActionScore(50);
 		while(response_1 != true || response_2 != true) {
 			yield return null;
 		}
@@ -158,7 +158,7 @@ public class AIManager : MonoBehaviour {
 		}
 		response_1 = false;
 		a1.SetActionNull();
-		a2.SetActionScore();
+		a2.SetActionScore(50);
 	}
 
 	public IEnumerator script_3()
@@ -181,7 +181,7 @@ public class AIManager : MonoBehaviour {
 		
 		response_1 = false;
 		response_2 = false;
-		a1.SetActionScore();
+		a1.SetActionScore(90);
 		//a2.SetActionRequestPass(4);
 		a2.SetDesireReceiveBall();
 	}
@@ -311,17 +311,13 @@ public class AIManager : MonoBehaviour {
 				RemovePlayerInPossession(hero);
 			}
 			i++;
-//			if ((hero_closer_to_ball == null) || (distance_to_ball < FindDistanceToBall(hero_closer_to_ball.GetPosition()))) {
-//				hero_closer_to_ball = hero;
-//			}
 
 		}
-		//Debug.Log(red_list.Count + " - " + hero_list.Count);
 		if (!running_script) {
 			running_script = true;
-			StartCoroutine (script_1());
+			//StartCoroutine (script_1());
 			//StartCoroutine (script_2());
-			//StartCoroutine(script_3());
+			StartCoroutine(script_3());
 		}
 	}
 
