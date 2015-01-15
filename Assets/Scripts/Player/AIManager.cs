@@ -148,10 +148,7 @@ public class AIManager : MonoBehaviour {
 		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
-	//	response_1 = false;
 		response_2 = false;
-		//a1.SetActionNull();
-		//a2.SetActionScore();
 		a2.SetActionReceivePass();
 		while(response_2 != true) {
 			yield return null;
@@ -181,9 +178,27 @@ public class AIManager : MonoBehaviour {
 		
 		response_1 = false;
 		response_2 = false;
-		a1.SetActionScore(90);
+		a1.SetActionScore(50);
 		//a2.SetActionRequestPass(4);
 		a2.SetDesireReceiveBall();
+		while(response_1 != true) { 
+			yield return null;
+		}
+		response_1 = false;
+		response_2 = false;
+		a1.SetActionPass();
+		a2.SetActionReceivePass();
+		while(response_1 != true || response_2 != true){
+			yield return null;
+		}
+		a2.SetActionScore(50);
+		a1.SetActionNull();
+		response_2 = false;
+		while(response_1 != true || response_2 != true){
+			yield return null;
+		}
+
+		a2.SetActionNull();
 	}
 
 

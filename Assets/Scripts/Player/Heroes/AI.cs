@@ -66,6 +66,7 @@ public class AI : Hero {
 		SCORE,
 		RECEIVE_PASS,
 		POSITION_TO_SHOOT,
+		HESITATE_SHOOT,
 		NULL
 	}
 
@@ -229,6 +230,7 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnWallHit");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnGoingToArea");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnGoingToBall");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnCancelAction");
 	}
 
 
@@ -273,14 +275,21 @@ public class AI : Hero {
 			} else if (beliefs.has_ball != true) {
 				RotateAroundBall(ai_manager.GetPitchAreaCoords(current_intention.args));
 			}
-		} else if (current_intention.intent == Actions.SCORE && current_confidence >= CONFIDENCE_THRESHOLD) {
+		} else if (current_intention.intent == Actions.SCORE) {
 			look_target = beliefs.opponent_goal_position;
-			Score();
+			if (current_confidence >= CONFIDENCE_THRESHOLD) {
+				Score();
+			} else {
+				OnCancelAction();
+			//	GetFrustrated();
+			//	SetActionPass();
+			}
 		} else if (current_intention.intent == Actions.RECEIVE_PASS && beliefs.teammate_has_passed) {
 			ReceivePass();
 			ThumbsUpEnd();
+		} else if (current_intention.intent == Actions.HESITATE_SHOOT) {
+			look_target = beliefs.opponent_goal_position;
 		}
-
 		UpdateLookAt(look_target);
 
 		if(hand_animator.GetCurrentAnimatorStateInfo(0).nameHash == Hide_state) {
@@ -347,6 +356,30 @@ public class AI : Hero {
 		player.transform.rotation = Quaternion.Slerp(player.transform.rotation, rotation, Time.deltaTime * 5);
 	}
 
+	public void OnCancelAction()
+	{
+		GetFrustrated();
+		current_intention.intent = Actions.HESITATE_SHOOT;
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnCancelAction");
+
+
+	}
+
+	public IEnumerator CancelAction(NotificationCenter.Notification notification) 
+	{
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+			yield return new WaitForSeconds(0.5f);
+			StopPointing();
+			//ai_manager.AgentResponse(this);
+		}
+		if (object.ReferenceEquals(this.player, notification.sender)) {
+			yield return new WaitForSeconds(0.5f);
+			ai_manager.AgentResponse(this);
+		}
+
+
+	}
+
 	public void SetActionRequestPass(int area)
 	{
 		OnRequestPass(area);
@@ -374,6 +407,7 @@ public class AI : Hero {
 
 	public void SetActionPass()
 	{
+		Debug.Log("SET ACTION PASS");
 		AnticipateToPass(beliefs.teammate.GetCurrentArea());
 		current_intention.intent = Actions.PASS;
 		current_intention.args = -1;
@@ -1410,6 +1444,7 @@ public class AI : Hero {
 				current_confidence += 15;
 			}
 		} else if (current_intention.intent == Actions.SCORE && beliefs.teammate_expression == Expressions.REQUEST_PASS) {
+			GetFrustrated();
 			if (current_confidence > 50) {
 				current_confidence -= 15;
 			} else {
@@ -1422,9 +1457,7 @@ public class AI : Hero {
 		} else if (current_expression.expression == Expressions.REQUEST_PASS && beliefs.teammate_expression == Expressions.OK) {
 			OnSignalOK();
 		}
-
-
-
+		
 		if (message == EnvironmentMessages.WALL_HIT) {
 			if (current_intention.intent == Actions.SCORE) {
 				Debug.Log("I missed!!");
@@ -1434,13 +1467,12 @@ public class AI : Hero {
 				if (current_expression.expression == Expressions.REQUEST_PASS) {
 					StopAskingForBall();
 					GetAngry();
-					Debug.Log("I told you to pass!!");
-				} else {
-					Debug.Log("You missed!!");
+				} else if (current_confidence < 50){
+					GetAngry();
 				}
 			}
 		}
-		Debug.Log(current_confidence);
+//		Debug.Log(current_confidence);
 	}
 
 	public void OnSignalOK()
