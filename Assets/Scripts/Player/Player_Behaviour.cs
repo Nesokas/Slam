@@ -628,4 +628,10 @@ public class Player_Behaviour : MonoBehaviour {
 		StartCoroutine(ai.OnWallHit());
 	}
 
+	public void OnCancelAction(NotificationCenter.Notification notification)
+	{
+		AI ai = (AI)hero;
+		StartCoroutine(ai.CancelAction(notification));
+	}
+
 }
