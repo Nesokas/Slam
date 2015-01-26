@@ -93,6 +93,14 @@ public class AIManager : MonoBehaviour {
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
 
+		a1.SetConfidenceThreshold(50);
+		a1.SetHighConfidenceValue(30);
+		a1.SetLowConfidenceValue(15);
+		
+		a2.SetConfidenceThreshold(50);
+		a2.SetHighConfidenceValue(30);
+		a2.SetLowConfidenceValue(15);
+
 		response_1 = false;
 		a1.SetActionGoingToBall();
 		a2.SetActionGoToArea(3);
@@ -126,7 +134,15 @@ public class AIManager : MonoBehaviour {
 	{
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
+
+		a1.SetConfidenceThreshold(50);
+		a1.SetHighConfidenceValue(30);
+		a1.SetLowConfidenceValue(15);
 		
+		a2.SetConfidenceThreshold(50);
+		a2.SetHighConfidenceValue(30);
+		a2.SetLowConfidenceValue(15);
+
 		response_1 = false;
 		a1.SetActionGoingToBall();
 		a2.SetActionGoToArea(3); //a2.SetActionGoToArea(4);
@@ -162,7 +178,15 @@ public class AIManager : MonoBehaviour {
 	{
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
-		
+
+		a1.SetConfidenceThreshold(50);
+		a1.SetHighConfidenceValue(30);
+		a1.SetLowConfidenceValue(15);
+
+		a2.SetConfidenceThreshold(50);
+		a2.SetHighConfidenceValue(30);
+		a2.SetLowConfidenceValue(15);
+
 		response_1 = false;
 		a1.SetActionGoingToBall();
 		a2.SetActionGoToArea(3); //a2.SetActionGoToArea(4);
@@ -198,7 +222,7 @@ public class AIManager : MonoBehaviour {
 			yield return null;
 		}
 
-		a2.SetActionNull();
+		//a2.SetActionNull();
 	}
 
 

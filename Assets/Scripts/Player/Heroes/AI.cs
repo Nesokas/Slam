@@ -147,6 +147,10 @@ public class AI : Hero {
 	int CONFIDENCE_THRESHOLD = 50; // Threshold (%) from which the action may or may not be interrupted
 	int current_confidence = 0;
 
+	int HIGH_CONFIDENCE_VALUE = 15;
+	int LOW_CONFIDENCE_VALUE = 30;
+
+
 	Beliefs beliefs;
 	Expectations expectation;
 	//Expressions expression;
@@ -1349,6 +1353,7 @@ public class AI : Hero {
 	{	
 		hands.gameObject.SetActive(true);
 		hand_animator.Play(Celebrate_state);
+		current_intention.intent = Actions.NULL;
 	}
 
 
@@ -1438,17 +1443,17 @@ public class AI : Hero {
 	private void Appraise(EnvironmentMessages message = EnvironmentMessages.NULL)
 	{
 		if (current_intention.intent == Actions.SCORE && beliefs.teammate_expression == Expressions.OK) {
-			if (current_confidence > 50) {
-				current_confidence += 30;
+			if (current_confidence > CONFIDENCE_THRESHOLD) {
+				current_confidence += HIGH_CONFIDENCE_VALUE;
 			} else {
-				current_confidence += 15;
+				current_confidence += LOW_CONFIDENCE_VALUE;
 			}
-		} else if (current_intention.intent == Actions.SCORE && beliefs.teammate_expression == Expressions.REQUEST_PASS) {
-			GetFrustrated();
-			if (current_confidence > 50) {
-				current_confidence -= 15;
+		} else if (current_intention.intent == Actions.SCORE && beliefs.teammate_expression == Expressions.REQUEST_PASS ) {
+			if (current_confidence > CONFIDENCE_THRESHOLD) {
+				current_confidence -= LOW_CONFIDENCE_VALUE;
 			} else {
-				current_confidence -= 30;
+				GetFrustrated();
+				current_confidence -= HIGH_CONFIDENCE_VALUE;
 			}
 		}
 
@@ -1457,7 +1462,7 @@ public class AI : Hero {
 		} else if (current_expression.expression == Expressions.REQUEST_PASS && beliefs.teammate_expression == Expressions.OK) {
 			OnSignalOK();
 		}
-		
+
 		if (message == EnvironmentMessages.WALL_HIT) {
 			if (current_intention.intent == Actions.SCORE) {
 				Debug.Log("I missed!!");
@@ -1687,4 +1692,23 @@ public class AI : Hero {
 		beliefs.teammate = ai;
 	}
 
+	public void SetConfidenceThreshold(int confidence_threshold)
+	{
+		CONFIDENCE_THRESHOLD = confidence_threshold;		
+	}
+	/*
+	public void SetCurrentConfidence(int confidence)
+	{
+		current_confidence = confidence;
+	}*/
+
+	public void SetHighConfidenceValue(int confidence)
+	{
+		HIGH_CONFIDENCE_VALUE = confidence;
+	}
+
+	public void SetLowConfidenceValue(int confidence)
+	{
+		LOW_CONFIDENCE_VALUE = confidence;
+	}
 }
