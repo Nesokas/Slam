@@ -92,6 +92,7 @@ public class AIManager : MonoBehaviour {
 	{
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
+		AI a3 = blue_list[0];
 
 		a1.SetConfidenceThreshold(50);
 		a1.SetHighConfidenceValue(30);
@@ -104,6 +105,7 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		a1.SetActionGoingToBall();
 		a2.SetActionGoToArea(3);
+		a3.SetActionGoToArea(1);
 		while(response_1 != true){
 			yield return null;
 		}
@@ -116,6 +118,7 @@ public class AIManager : MonoBehaviour {
 
 		response_1 = false;
 		response_2 = false;
+		a3.SetActionGoToArea(2);
 		a1.SetActionPass();
 		a2.SetActionReceivePass();
 		while(response_1 != true || response_2 != true) { 
@@ -124,6 +127,7 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		response_2 = false;
 		a1.SetActionNull();
+		a3.SetActionGoToArea(0);
 		a2.SetActionScore(50);
 		while(response_1 != true || response_2 != true) {
 			yield return null;
@@ -134,7 +138,7 @@ public class AIManager : MonoBehaviour {
 	{
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
-
+		AI a3 = blue_list[0];
 		a1.SetConfidenceThreshold(50);
 		a1.SetHighConfidenceValue(30);
 		a1.SetLowConfidenceValue(15);
@@ -145,7 +149,8 @@ public class AIManager : MonoBehaviour {
 
 		response_1 = false;
 		a1.SetActionGoingToBall();
-		a2.SetActionGoToArea(3); //a2.SetActionGoToArea(4);
+		a2.SetActionGoToArea(3);
+		a3.SetActionGoToArea(1);
 		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;
 		}
@@ -166,6 +171,7 @@ public class AIManager : MonoBehaviour {
 		}
 		response_2 = false;
 		a2.SetActionReceivePass();
+
 		while(response_2 != true) {
 			yield return null;
 		}
@@ -178,6 +184,7 @@ public class AIManager : MonoBehaviour {
 	{
 		AI a1 = red_list[0];
 		AI a2 = red_list[1];
+		AI a3 = blue_list[0];
 
 		a1.SetConfidenceThreshold(50);
 		a1.SetHighConfidenceValue(30);
@@ -190,12 +197,14 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		a1.SetActionGoingToBall();
 		a2.SetActionGoToArea(3); //a2.SetActionGoToArea(4);
+	//	a3.SetActionGoToArea(1);
 		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
 			yield return null;
 		}
 		
 		response_1 = false;
 		a1.SetActionDribbleToArea(5); //a1.SetActionDribbleToArea(5);
+		//a3.SetActionGoToArea(5);
 		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
@@ -326,6 +335,7 @@ public class AIManager : MonoBehaviour {
 			red_list[0].SetTeammate(red_list[1]);
 			red_list[1].SetTeammate(red_list[0]);
 		}
+		
 	}
 
 	public void PrintHeroList()
@@ -354,9 +364,9 @@ public class AIManager : MonoBehaviour {
 		}
 		if (!running_script) {
 			running_script = true;
-			//StartCoroutine (script_1());
+			StartCoroutine (script_1());
 			//StartCoroutine (script_2());
-			StartCoroutine(script_3());
+			//StartCoroutine(script_3());
 		}
 	}
 

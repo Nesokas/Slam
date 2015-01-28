@@ -256,6 +256,10 @@ public class Player_Behaviour : MonoBehaviour {
 				break;
 			case "Sad":
 				player_mesh.animation.CrossFade("Sad", 0.3f);
+				if (hero.GetType() == typeof(AI)) {
+					AI ai = (AI)hero;
+					ai.GoalConceeded();
+				}
 				break;
 		}
 	}

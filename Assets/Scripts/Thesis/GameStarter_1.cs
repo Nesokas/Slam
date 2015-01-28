@@ -82,7 +82,7 @@ public class GameStarter_1 : MonoBehaviour {
 			InstantiateNewLocalPlayer(CalculatePosition(1), 1, "AI", i*(-1)-1, 4, 2); // bots have negative controller to differentiate
 			int x =  i*(-1)-1;
 		}
-		blue_bots = 0;
+		blue_bots = 1;
 		for (int i = 0; i < blue_bots; i++) { // blue
 			
 			InstantiateNewLocalPlayer(CalculatePosition(2), 2, "AI", (2 + i)*(-1)-1, 4, 2);

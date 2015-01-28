@@ -270,7 +270,8 @@ public class AI : Hero {
 		} else if (current_intention.intent == Actions.PASS) {
 			look_target = beliefs.teammate.GetPosition();
 			if(beliefs.teammate_expression == Expressions.OK) {
-				Pass();
+				//Pass();
+				PassTeammate(beliefs.teammate);
 			}
 		} else if (current_intention.intent == Actions.PASS_TO_AREA) {
 			look_target = ai_manager.GetPitchAreaCoords(current_intention.args);
@@ -1356,7 +1357,10 @@ public class AI : Hero {
 		current_intention.intent = Actions.NULL;
 	}
 
-
+	public void GoalConceeded()
+	{
+		GetAngry();
+	}
 
 
 
@@ -1401,6 +1405,7 @@ public class AI : Hero {
 	{
 		Hashtable data = new Hashtable();
 		data["index"] = area;
+		data["team"] = team;
 		current_expression.expression = Expressions.INTEND_TO_PASS;
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"AnticipateToPass", data);
 		Point();
@@ -1410,7 +1415,7 @@ public class AI : Hero {
 
 	public IEnumerator AnticipateToPassReaction(NotificationCenter.Notification notification)
 	{
-		if (!object.ReferenceEquals(this.player, notification.sender)) {
+		if (!object.ReferenceEquals(this.player, notification.sender) && this.player.team == (int)notification.data["team"]) {
 			yield return new WaitForSeconds(0.5f);
 			if (current_intention.intent == Actions.RECEIVE_PASS || current_area == (int)notification.data["index"])
 				Debug.Log("Agent 2 - Yes");
@@ -1463,7 +1468,7 @@ public class AI : Hero {
 			OnSignalOK();
 		}
 
-		if (message == EnvironmentMessages.WALL_HIT) {
+		if (message == EnvironmentMessages.WALL_HIT && team == GlobalConstants.RED) {
 			if (current_intention.intent == Actions.SCORE) {
 				Debug.Log("I missed!!");
 				GetFrustrated();
@@ -1476,13 +1481,18 @@ public class AI : Hero {
 					GetAngry();
 				}
 			}
+		} else if (message == EnvironmentMessages.WALL_HIT && team == GlobalConstants.BLUE) {
+			player.player_mesh.animation.CrossFade("Celebrate", 0.3f);
+			GoalScored();
 		}
 //		Debug.Log(current_confidence);
 	}
 
 	public void OnSignalOK()
 	{
-		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnSignalOK");
+		Hashtable data = new Hashtable();
+		data["team"] = team;
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnSignalOK", data);
 	}
 
 	public IEnumerator SignalOK(NotificationCenter.Notification notification)
@@ -1494,7 +1504,7 @@ public class AI : Hero {
 			ThumbsUp();
 			Debug.Log("Agent 2 - OK");
 		}
-		else {
+		else if (this.player.team == (int)notification.data["team"]) {
 			beliefs.teammate_expression = Expressions.OK;
 		//	Debug.Log("this is receiver");
 		}
@@ -1502,16 +1512,17 @@ public class AI : Hero {
 
 	public void AnticipateToScore()
 	{
-	//	expression = Expressions.INTEND_TO_SCORE;
+		Hashtable data = new Hashtable();
+		data["team"] = team;
 		beliefs.teammate_expression = Expressions.NULL;
 		current_expression.expression = Expressions.INTEND_TO_SCORE;
-		NotificationCenter.DefaultCenter.PostNotification(this.player,"AnticipateToScore");
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"AnticipateToScore", data);
 		Point();
 	}
 	
 	public IEnumerator AnticipateToScoreReaction(NotificationCenter.Notification notification)
 	{
-		if (!object.ReferenceEquals(this.player, notification.sender)) {
+		if (!object.ReferenceEquals(this.player, notification.sender) && this.player.team == (int)notification.data["team"]) {
 			yield return new WaitForSeconds(0.5f);
 			//beliefs.teammate_expression = Expressions.OK;
 			if (current_expression.expression == Expressions.REQUEST_PASS || desire == Desires.RECEIVE_BALL) {
@@ -1606,8 +1617,9 @@ public class AI : Hero {
 
 	public void OnPass()
 	{
-
-		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnPass");
+		Hashtable data = new Hashtable();
+		data["team"] = team;
+		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnPass", data);
 	}
 
 
@@ -1619,8 +1631,8 @@ public class AI : Hero {
 		if (object.ReferenceEquals(this.player, notification.sender)) {
 		//	hands.gameObject.SetActive(false);
 			
-		StopPointing();
-		} else {
+			StopPointing();
+		} else if (this.player.team == (int)notification.data["team"]) {
 			beliefs.teammate_has_passed = true;
 			beliefs.ball_z_prediction = PredictBallZPosition();
 		}
@@ -1681,7 +1693,6 @@ public class AI : Hero {
 			prediction.x += velocity_normalized.x*0.1f;
 			prediction.z += velocity_normalized.z*0.1f;
 			flag = Mathf.Abs(prediction.x - player.transform.position.x);
-//			Debug.Log(prediction);
 		}
 		return prediction.z;
 

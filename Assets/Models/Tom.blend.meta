@@ -60,7 +60,207 @@ ModelImporter:
     animationScaleError: .5
     animationWrapMode: 2
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Default Take
+      takeName: Default Take
+      firstFrame: -1
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Base_0
+        weight: 1
+      - path: Armature/Eyes
+        weight: 1
+      - path: Armature/Eyes_001
+        weight: 1
+      - path: Armature/Nose
+        weight: 1
+      - path: Base
+        weight: 1
+      - path: Cube
+        weight: 1
+      - path: Eye_L
+        weight: 1
+      - path: Eye_R
+        weight: 1
+      - path: Plane_002
+        weight: 1
+      - path: Sphere_002
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Celebrate
+      takeName: Celebrate
+      firstFrame: -1
+      lastFrame: 19
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Base_0
+        weight: 1
+      - path: Armature/Eyes
+        weight: 1
+      - path: Armature/Eyes_001
+        weight: 1
+      - path: Armature/Nose
+        weight: 1
+      - path: Base
+        weight: 1
+      - path: Cube
+        weight: 1
+      - path: Eye_L
+        weight: 1
+      - path: Eye_R
+        weight: 1
+      - path: Plane_002
+        weight: 1
+      - path: Sphere_002
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Idle
+      takeName: Idle
+      firstFrame: -1
+      lastFrame: 39
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Base_0
+        weight: 1
+      - path: Armature/Eyes
+        weight: 1
+      - path: Armature/Eyes_001
+        weight: 1
+      - path: Armature/Nose
+        weight: 1
+      - path: Base
+        weight: 1
+      - path: Cube
+        weight: 1
+      - path: Eye_L
+        weight: 1
+      - path: Eye_R
+        weight: 1
+      - path: Plane_002
+        weight: 1
+      - path: Sphere_002
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Sad
+      takeName: Sad
+      firstFrame: -1
+      lastFrame: 29
+      wrapMode: 1
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Base_0
+        weight: 1
+      - path: Armature/Eyes
+        weight: 1
+      - path: Armature/Eyes_001
+        weight: 1
+      - path: Armature/Nose
+        weight: 1
+      - path: Base
+        weight: 1
+      - path: Cube
+        weight: 1
+      - path: Eye_L
+        weight: 1
+      - path: Eye_R
+        weight: 1
+      - path: Plane_002
+        weight: 1
+      - path: Sphere_002
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
     isReadable: 1
   meshes:
     lODScreenPercentages: []
