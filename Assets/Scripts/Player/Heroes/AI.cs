@@ -535,40 +535,7 @@ public class AI : Hero {
 		}
 	}
 
-	public bool Score()
-	{
-		RotateAroundBall(beliefs.opponent_goal_position);
 
-		int layer_mask = 1 << 29 | 1 << 28 | 1 << 27;
-		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
-	
-		RaycastHit goal_hit;
-		RaycastHit shoot_hit;
-
-		Vector3 goal_pos = new Vector3(beliefs.opponent_goal_position.x, -0.1f, beliefs.opponent_goal_position.z);
-		Ray goal_ray = new Ray(ball_vector, beliefs.opponent_goal_position - ball_vector);
-		Ray shoot_ray = new Ray(ball_vector, -1*(goal_pos - ball_vector));
-
-		if(Physics.Raycast(goal_ray, out goal_hit, Mathf.Infinity, layer_mask)) {
-			if (goal_hit.collider.CompareTag("goal_detection")) {
-				if (player_collider.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
-					AdjustAccordingToQuadrant();	
-					if (colliderAIPossessionRotation.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
-						if (beliefs.has_ball != true) {
-							GoToBall();
-						} else {
-							Shoot();
-
-						}
-						//return true;
-					}
-				}
-			}
-		}
-		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
-		Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
-		return true; // keep trying
-	}
 
 	private void Shoot()
 	{
@@ -627,6 +594,42 @@ public class AI : Hero {
 			}
 		}
 
+	}
+
+
+	public bool Score()
+	{
+		RotateAroundBall(beliefs.opponent_goal_position);
+		
+		int layer_mask = 1 << 29 | 1 << 28 | 1 << 27;
+		Vector3 ball_vector = new Vector3 (ball.transform.position.x, -0.1f, ball.transform.position.z);
+		
+		RaycastHit goal_hit;
+		RaycastHit shoot_hit;
+		
+		Vector3 goal_pos = new Vector3(beliefs.opponent_goal_position.x, -0.1f, beliefs.opponent_goal_position.z);
+		Ray goal_ray = new Ray(ball_vector, beliefs.opponent_goal_position - ball_vector);
+		Ray shoot_ray = new Ray(ball_vector, -1*(goal_pos - ball_vector));
+		
+		if(Physics.Raycast(goal_ray, out goal_hit, Mathf.Infinity, layer_mask)) {
+			if (goal_hit.collider.CompareTag("goal_detection")) {
+				/*if (player_collider.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+					AdjustAccordingToQuadrant();*/	
+					if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+						if (beliefs.has_ball != true) {
+							GoToBall();
+						} else {
+							Shoot();
+							
+						}
+						//return true;
+					}
+				//}
+			}
+		}
+		Debug.DrawRay(ball_vector, goal_pos - ball_vector);
+		Debug.DrawRay(ball_vector, -1*(goal_pos - ball_vector));
+		return true; // keep trying
 	}
 
 	public void PassTeammate(Hero hero)
@@ -1683,7 +1686,7 @@ public class AI : Hero {
 			flag = Mathf.Abs(prediction.x - player.transform.position.x);
 //			Debug.Log(prediction);
 		}
-		return prediction.z;
+		return prediction.z+0.25f;
 
 	}
 

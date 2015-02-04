@@ -216,13 +216,15 @@ public class AIManager : MonoBehaviour {
 			yield return null;
 		}
 		a2.SetActionScore(50);
+		//a2.SetActionPass();
+		//a1.SetActionReceivePass();
 		a1.SetActionNull();
 		response_2 = false;
 		while(response_1 != true || response_2 != true){
 			yield return null;
 		}
 
-		//a2.SetActionNull();
+		a2.SetActionNull();
 	}
 
 
