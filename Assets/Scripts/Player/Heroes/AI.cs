@@ -254,6 +254,10 @@ public class AI : Hero {
 		if (Input.GetKeyDown("5"))
 			key = 5;
 
+		if (Input.GetKeyDown(KeyCode.Return)) {
+			Application.LoadLevel(0);
+		}
+
 		ResetControllers();
 	
 		UpdateBeliefs();
@@ -1686,7 +1690,7 @@ public class AI : Hero {
 			flag = Mathf.Abs(prediction.x - player.transform.position.x);
 //			Debug.Log(prediction);
 		}
-		return prediction.z+0.25f;
+		return prediction.z;
 
 	}
 

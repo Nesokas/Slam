@@ -30,7 +30,7 @@ public class Game_Behaviour : MonoBehaviour {
 	public GameObject crowd_team_2;
 	
 //	float timer = 200f;
-	float ENDGAME_TIMER = 100f;
+	float ENDGAME_TIMER = 300f;
 
 	protected List<GameObject> players_team_1 = new List<GameObject>();
 	protected List<GameObject> players_team_2 = new List<GameObject>();
