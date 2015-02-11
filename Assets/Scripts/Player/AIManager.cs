@@ -202,7 +202,7 @@ public class AIManager : MonoBehaviour {
 		
 		response_1 = false;
 		response_2 = false;
-		a1.SetActionScore(100);
+		a1.SetActionScore(50);
 		//a2.SetActionRequestPass(4);
 		a2.SetDesireReceiveBall();
 		while(response_1 != true) { 
@@ -210,7 +210,7 @@ public class AIManager : MonoBehaviour {
 		}
 		response_1 = false;
 		response_2 = false;
-		/*a1.SetActionPass();
+		a1.SetActionPass();
 		a2.SetActionReceivePass();
 		while(response_1 != true || response_2 != true){
 			yield return null;
@@ -224,7 +224,7 @@ public class AIManager : MonoBehaviour {
 			yield return null;
 		}
 
-		a2.SetActionNull();*/
+		a2.SetActionNull();
 	}
 
 	public IEnumerator script_4()
@@ -264,6 +264,68 @@ public class AIManager : MonoBehaviour {
 		}
 		response_1 = false;
 		response_2 = false;
+		/*a1.SetActionPass();
+		a2.SetActionReceivePass();
+		while(response_1 != true || response_2 != true){
+			yield return null;
+		}
+		a2.SetActionScore(50);
+		//a2.SetActionPass();
+		//a1.SetActionReceivePass();
+		a1.SetActionNull();
+		response_2 = false;
+		while(response_1 != true || response_2 != true){
+			yield return null;
+		}
+
+		a2.SetActionNull();*/
+	}
+
+	public IEnumerator script_5()
+	{
+		AI a1 = red_list[0];
+		AI a2 = red_list[1];
+		
+		a1.SetConfidenceThreshold(50);
+		a1.SetHighConfidenceValue(30);
+		a1.SetLowConfidenceValue(15);
+		
+		a2.SetConfidenceThreshold(50);
+		a2.SetHighConfidenceValue(30);
+		a2.SetLowConfidenceValue(15);
+		
+		response_1 = false;
+		a1.SetActionGoingToBall();
+		a2.SetActionGoToArea(3); //a2.SetActionGoToArea(4);
+		while(response_1 != true){//HACK!! WHY THE FUCK IS THIS || BEHAVING LIKE A &&?????
+			yield return null;
+		}
+		response_1 = false;
+		response_2 = false;
+		a1.SetActionDribbleToArea(5); //a1.SetActionDribbleToArea(5);
+		a2.SetDesireTeammateShoot();
+		while(response_1 != true || response_2 != true) { 
+			yield return null;
+		}
+		
+		response_1 = false;
+		response_2 = false;
+		//a1.SetActionScore(100);
+
+		a1.SetActionPass();
+		//a2.SetActionRequestPass(4);
+
+		while(response_1 != true || response_2 != true) { 
+			yield return null;
+		}
+		response_1 = false;
+		response_2 = false;
+		a1.SetActionScore(100);
+		//a1.SetActionNull();
+		while(response_1 != true) { 
+			yield return null;
+		}
+		//a1.SetActionNull();
 		/*a1.SetActionPass();
 		a2.SetActionReceivePass();
 		while(response_1 != true || response_2 != true){
@@ -410,10 +472,11 @@ public class AIManager : MonoBehaviour {
 		}
 		if (!running_script) {
 			running_script = true;
-			StartCoroutine (script_1());
+			//StartCoroutine (script_1());
 			//StartCoroutine (script_2());
-			//StartCoroutine(script_3());
+			StartCoroutine(script_3());
 			//StartCoroutine(script_4());
+			//StartCoroutine(script_5());
 		}
 	}
 

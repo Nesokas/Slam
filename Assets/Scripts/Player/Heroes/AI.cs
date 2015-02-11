@@ -54,6 +54,10 @@ public class AI : Hero {
 	private int Sad_state;
 	private int AskForBallStart_state;
 	private int AskForBallEnd_state;
+	private int OverThereStart_state;
+	private int OverThereCycle1_state;
+	private int OverThereCycle2_state;
+	private int OverThereEnd_state;
 
 	private enum Actions
 	{
@@ -67,6 +71,7 @@ public class AI : Hero {
 		RECEIVE_PASS,
 		POSITION_TO_SHOOT,
 		HESITATE_SHOOT,
+		HESITATE_PASS,
 		NULL
 	}
 
@@ -108,7 +113,8 @@ public class AI : Hero {
 		TACKLE,
 		MOVE_TO_AREA,
 		TAKE_POSSESSION,
-		RECEIVE_BALL
+		RECEIVE_BALL,
+		TEAMMATE_SHOOT
 	}
 
 	private enum Expectations
@@ -122,6 +128,7 @@ public class AI : Hero {
 	private enum Expressions 
 	{
 		REQUEST_PASS,
+		REJECT_PASS,
 		INTEND_TO_PASS,
 		INTEND_TO_SCORE,
 		OK,
@@ -224,10 +231,13 @@ public class AI : Hero {
 		Hide_state = Animator.StringToHash("Base Layer.Hide");
 		Celebrate_state = Animator.StringToHash("Base Layer.Celebrate");
 		Sad_state = Animator.StringToHash("Base Layer.Sad");
+		OverThereStart_state = Animator.StringToHash("Base Layer.OverThereStart");
+		OverThereEnd_state = Animator.StringToHash("Base Layer.OverThereEnd");
 
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "AnticipateToPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnSignalOK");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRequestPass");
+		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnRejectPass");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "AnticipateToScore");
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnScore"); //When he shoots in fact
 		NotificationCenter.DefaultCenter.AddObserver(this.player, "OnPass");
@@ -264,7 +274,9 @@ public class AI : Hero {
 		UpdatePossession();
 
 		look_target = ball.transform.position;
-
+		if (current_expression.expression == Expressions.REJECT_PASS) {
+			look_target = beliefs.opponent_goal_position;
+		}
 		if (current_intention.intent == Actions.GO_TO_BALL) {
 			GoToBall();
 		} else if(current_intention.intent == Actions.DRIBBLE_TO_AREA) {
@@ -275,6 +287,8 @@ public class AI : Hero {
 			look_target = beliefs.teammate.GetPosition();
 			if(beliefs.teammate_expression == Expressions.OK) {
 				Pass();
+			} else if (beliefs.teammate_expression == Expressions.REJECT_PASS) {
+				OnCancelAction();
 			}
 		} else if (current_intention.intent == Actions.PASS_TO_AREA) {
 			look_target = ai_manager.GetPitchAreaCoords(current_intention.args);
@@ -297,6 +311,8 @@ public class AI : Hero {
 			ThumbsUpEnd();
 		} else if (current_intention.intent == Actions.HESITATE_SHOOT) {
 			look_target = beliefs.opponent_goal_position;
+		} else if (current_intention.intent == Actions.HESITATE_PASS) {
+			look_target = beliefs.teammate.GetPosition();
 		}
 		UpdateLookAt(look_target);
 
@@ -367,7 +383,11 @@ public class AI : Hero {
 	public void OnCancelAction()
 	{
 		GetFrustrated();
-		current_intention.intent = Actions.HESITATE_SHOOT;
+		if (current_intention.intent == Actions.SCORE) {
+			current_intention.intent = Actions.HESITATE_SHOOT;
+		} else if (current_intention.intent == Actions.PASS) {
+			current_intention.intent = Actions.HESITATE_PASS;
+		}
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"OnCancelAction");
 
 
@@ -415,7 +435,6 @@ public class AI : Hero {
 
 	public void SetActionPass()
 	{
-		Debug.Log("SET ACTION PASS");
 		AnticipateToPass(beliefs.teammate.GetCurrentArea());
 		current_intention.intent = Actions.PASS;
 		current_intention.args = -1;
@@ -453,6 +472,11 @@ public class AI : Hero {
 		desire = Desires.RECEIVE_BALL;
 	}
 
+	public void SetDesireTeammateShoot()
+	{
+		desire = Desires.TEAMMATE_SHOOT;
+	}
+
 	public void ReceivePass()
 	{
 //		Debug.Log(beliefs.ball_z_prediction);
@@ -465,7 +489,6 @@ public class AI : Hero {
 			Move(RIGHT);
 		}
 		if (beliefs.distance_to_ball < 2.5) {
-	//		Debug.Log("response");
 			ai_manager.AgentResponse(this);
 		}
 	}
@@ -1412,20 +1435,38 @@ public class AI : Hero {
 		NotificationCenter.DefaultCenter.PostNotification(this.player,"AnticipateToPass", data);
 		Point();
 		current_intention.args = area;
-		ai_manager.AgentResponse(this);
+	//	ai_manager.AgentResponse(this);
 	}
 
 	public IEnumerator AnticipateToPassReaction(NotificationCenter.Notification notification)
 	{
 		if (!object.ReferenceEquals(this.player, notification.sender)) {
 			yield return new WaitForSeconds(0.5f);
-			if (current_intention.intent == Actions.RECEIVE_PASS || current_area == (int)notification.data["index"])
+			if (desire == Desires.TEAMMATE_SHOOT) {
+				current_expression.expression = Expressions.REJECT_PASS;
+				OnRejectPass();
+			}
+			else if (current_intention.intent == Actions.RECEIVE_PASS || current_area == (int)notification.data["index"])
 				Debug.Log("Agent 2 - Yes");
 			else {
 				ThumbsUp();
 				Debug.Log("Agent 2 - Wait");
 			}
 			beliefs.teammate_expression = Expressions.INTEND_TO_PASS;
+		}
+	}
+
+	public void OnRejectPass()
+	{
+		NotificationCenter.DefaultCenter.PostNotification(this.player, "OnRejectPass");
+		OverThere();
+	}
+
+	public IEnumerator RejectPass(NotificationCenter.Notification notification)
+	{
+		if (!object.ReferenceEquals(this.player, notification.sender)) {
+			yield return new WaitForSeconds(0.5f);
+			beliefs.teammate_expression = Expressions.REJECT_PASS;
 		}
 	}
 
@@ -1526,12 +1567,26 @@ public class AI : Hero {
 				Debug.Log("asking for ball");
 				OnRequestPass(current_area);
 				//AskForBall();
+			} else if (current_expression.expression== Expressions.REJECT_PASS) {
+				OnSignalOK();
 			} else {
 				beliefs.teammate.beliefs.teammate_expression = Expressions.OK;
 				Debug.Log("Agent 1 - Go for it!!");
 			}
 		}
 	
+	}
+
+	private void OverThere()
+	{
+		hands.gameObject.SetActive(true);
+		hand_animator.Play(OverThereStart_state);
+		current_expression.expression = Expressions.REJECT_PASS;
+	}
+
+	private void OverThereEnd()
+	{
+		hand_animator.Play(OverThereEnd_state);
 	}
 
 	private void Point()

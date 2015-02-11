@@ -579,6 +579,12 @@ public class Player_Behaviour : MonoBehaviour {
 		
 	}
 
+	public void OnRejectPass(NotificationCenter.Notification notification)
+	{
+		AI ai = (AI)hero;
+		StartCoroutine(ai.RejectPass(notification));
+	}
+
 	public void OnRequestPass(NotificationCenter.Notification notification)
 	{
 		AI ai = (AI)hero;
