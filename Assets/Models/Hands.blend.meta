@@ -75,6 +75,7 @@ ModelImporter:
     7400012: OverThereStart
     7400014: OverThereCycle
     7400016: OverThereCycle_2
+    7400018: OverThere
     9500000: //RootNode
     13700000: Cube_001
   materials:
@@ -696,10 +697,10 @@ ModelImporter:
       maskType: 0
       maskSource: {instanceID: 0}
     - serializedVersion: 16
-      name: OverThereCycle
-      takeName: Default Take
+      name: OverThere
+      takeName: OverThere
       firstFrame: 9
-      lastFrame: 18
+      lastFrame: 19
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

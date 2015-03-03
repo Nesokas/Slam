@@ -88,6 +88,59 @@ public class AIManager : MonoBehaviour {
 		}
 	}
 
+	public IEnumerator random_emotions_script()
+	{
+		AI a1 = red_list[0];
+		AI a2 = red_list[1];
+		
+		a1.SetConfidenceThreshold(50);
+		a1.SetHighConfidenceValue(30);
+		a1.SetLowConfidenceValue(15);
+		
+		a2.SetConfidenceThreshold(50);
+		a2.SetHighConfidenceValue(30);
+		a2.SetLowConfidenceValue(15);
+		
+		response_1 = false;
+		a1.SetActionGoingToBall();
+		a1.SetRandomArea(11);
+		a1.RandomPoint();
+	//	a2.AskForBall();
+		a2.SetActionGoToArea(3);
+		a2.RandomCelebrate();
+		while(response_1 != true){
+			yield return null;
+		}
+		
+		response_1 = false;
+		a1.SetActionDribbleToArea(5);
+		while(response_1 != true || response_2 != true) { 
+			yield return null;
+		}
+		
+		response_1 = false;
+		response_2 = false;
+		a1.StopPointing();
+		a1.SetRandomArea(2);
+		a1.SetActionPass();
+		a2.StopPointing();
+		a2.SetActionReceivePass();
+		a1.GetAngry();
+//		a2.AskForBall();
+		while(response_1 != true || response_2 != true) { 
+			yield return null;
+		}
+		response_1 = false;
+		response_2 = false;
+		a1.SetActionNull();
+		a2.SetRandomArea(5);
+		a2.RandomAskForBall();
+		a2.SetActionScore(50);
+		while(response_1 != true || response_2 != true) {
+			yield return null;
+		}
+	}
+
 	public IEnumerator script_1()
 	{
 		AI a1 = red_list[0];
@@ -202,13 +255,13 @@ public class AIManager : MonoBehaviour {
 		
 		response_1 = false;
 		response_2 = false;
-		a1.SetActionScore(50);
+		a1.SetActionScore(100);
 		//a2.SetActionRequestPass(4);
 		a2.SetDesireReceiveBall();
 		while(response_1 != true) { 
 			yield return null;
 		}
-		response_1 = false;
+	/*	response_1 = false;
 		response_2 = false;
 		a1.SetActionPass();
 		a2.SetActionReceivePass();
@@ -223,7 +276,7 @@ public class AIManager : MonoBehaviour {
 		while(response_1 != true || response_2 != true){
 			yield return null;
 		}
-
+*/
 		a2.SetActionNull();
 	}
 
@@ -311,10 +364,10 @@ public class AIManager : MonoBehaviour {
 		response_1 = false;
 		response_2 = false;
 		//a1.SetActionScore(100);
-
+		
 		a1.SetActionPass();
 		//a2.SetActionRequestPass(4);
-
+		
 		while(response_1 != true || response_2 != true) { 
 			yield return null;
 		}
@@ -472,11 +525,12 @@ public class AIManager : MonoBehaviour {
 		}
 		if (!running_script) {
 			running_script = true;
-			//StartCoroutine (script_1());
-			//StartCoroutine (script_2());
-			StartCoroutine(script_3());
+			//StartCoroutine (script_1()); // Pass OK
+			  //StartCoroutine (script_2());
+			//StartCoroutine(script_3());
 			//StartCoroutine(script_4());
 			//StartCoroutine(script_5());
+			StartCoroutine(random_emotions_script());
 		}
 	}
 

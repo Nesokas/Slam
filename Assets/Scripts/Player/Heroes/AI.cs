@@ -59,6 +59,9 @@ public class AI : Hero {
 	private int OverThereCycle2_state;
 	private int OverThereEnd_state;
 
+	private bool random_state = false;
+	private int random_area;
+
 	private enum Actions
 	{
 		GO_TO_AREA,
@@ -314,7 +317,10 @@ public class AI : Hero {
 		} else if (current_intention.intent == Actions.HESITATE_PASS) {
 			look_target = beliefs.teammate.GetPosition();
 		}
-		UpdateLookAt(look_target);
+		//look_target = ball.transform.position;
+	
+		if (!random_state)
+			UpdateLookAt(look_target);
 
 		if(hand_animator.GetCurrentAnimatorStateInfo(0).nameHash == Hide_state) {
 		
@@ -322,11 +328,13 @@ public class AI : Hero {
 		
 		}
 
-		/*
-		if (current_action.action == Actions.PASS || current_action.action == Actions.PASS_TO_AREA) {
-			if (beliefs.has_ball != true)
-				GoToBall();
-		}*/
+
+		if (random_state) {
+			look_target = ai_manager.GetPitchAreaCoords(random_area);
+			UpdateLookAt(look_target);
+			Point();
+			//Debug.Log(look_target + " - " + random_area);
+		}
 
 
 		
@@ -372,6 +380,12 @@ public class AI : Hero {
 		}
 		*/
 
+	}
+
+	public void SetRandomArea(int area)
+	{
+		random_state = true;
+		random_area = area;
 	}
 
 	public void UpdateLookAt(Vector3 target) 
@@ -1381,12 +1395,17 @@ public class AI : Hero {
 
 	public void GoalScored()
 	{	
-		hands.gameObject.SetActive(true);
-		hand_animator.Play(Celebrate_state);
-		current_intention.intent = Actions.NULL;
+//		hands.gameObject.SetActive(true);
+//		hand_animator.Play(Celebrate_state);
+//		current_intention.intent = Actions.NULL;
 	}
 
-
+	public void RandomCelebrate()
+	{
+		hands.gameObject.SetActive(true);
+		hand_animator.Play(Celebrate_state);
+		//current_intention.intent = Actions.NULL;
+	}
 
 
 
@@ -1589,17 +1608,19 @@ public class AI : Hero {
 		hand_animator.Play(OverThereEnd_state);
 	}
 
-	private void Point()
+	public void RandomPoint()
 	{
 		hands.gameObject.SetActive(true);
 		hand_animator.Play(Point_state);
-		/*hands.gameObject.SetActive(true);
-		hands.animation["Point"].speed = 1f;
-		//hands.animation["Point"].time = hands.animation["Point"].length;
-		hands.animation.Play("Point");*/
 	}
 
-	private void StopPointing()
+	public void Point()
+	{
+	//	hands.gameObject.SetActive(true);
+	//	hand_animator.Play(Point_state);
+	}
+
+	public void StopPointing()
 	{
 		hand_animator.Play(PointEnd_state);
 	}
@@ -1609,11 +1630,17 @@ public class AI : Hero {
 
 	}
 
-	private void AskForBall()
+	public void AskForBall()
 	{
 		hands.gameObject.SetActive(true);
 		hand_animator.Play(AskForBallStart_state);
 		current_expression.expression = Expressions.REQUEST_PASS;
+	}
+
+	public void RandomAskForBall()
+	{
+		hands.gameObject.SetActive(true);
+		hand_animator.Play(AskForBallStart_state);
 	}
 
 	private void StopAskingForBall()
@@ -1621,24 +1648,24 @@ public class AI : Hero {
 		hand_animator.Play(AskForBallEnd_state);
 	}
 
-	private void ThumbsUp()
+	public void ThumbsUp()
 	{
-		hands.gameObject.SetActive(true);
-		hand_animator.Play(OKStart_state);
+	//	hands.gameObject.SetActive(true);
+	//	hand_animator.Play(OKStart_state);
 	}
 
-	private void ThumbsUpEnd()
+	public void ThumbsUpEnd()
 	{
-		hand_animator.Play(OKEnd_state);
+	//	hand_animator.Play(OKEnd_state);
 	}
 
-	private void GetAngry()
+	public void GetAngry()
 	{
 		foreach (Transform child in angry_steam) {
 			child.particleSystem.Play();
 		}
 	}
-	private void GetFrustrated()
+	public void GetFrustrated()
 	{
 		sweat.particleSystem.Play();
 	}
