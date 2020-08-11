@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Custom/LEDScreen" {
 	Properties
 	{
@@ -66,7 +68,7 @@ Shader "Custom/LEDScreen" {
 			fragmentInput vert(vertexInput i)
 			{
 				fragmentInput o;
-				o.pos = mul(UNITY_MATRIX_MVP, i.vertex);
+				o.pos = UnityObjectToClipPos(i.vertex);
 				o.uv = i.texcoord;
 				
 				return o;
@@ -140,7 +142,7 @@ Shader "Custom/LEDScreen" {
 				
 				avgColor = applyLuminanceStepping(avgColor);
 				
-				float2 powers = pow(abs(pixelRegionCoords - 0.5), float2(2.0));
+				float2 powers = pow(abs(pixelRegionCoords - 0.5), 2.0);
 				float radiusSqrd = pow(_PixelRadius, 2.0);
 				float gradient = smoothstep(radiusSqrd - _Tolerance, radiusSqrd + _Tolerance, powers.x + powers.y);
 				

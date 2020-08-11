@@ -17,9 +17,9 @@ public class LED_Screen : MonoBehaviour {
 
 	public void DrawTieMessage()
 	{
-		renderer.material.SetFloat("_PixelSize", INITIAL_PIXEL_SIZE);
-		renderer.material.SetTexture("_MainTex", golden_goal_texture);
-		renderer.material.SetColor("_DrawColor", Color.yellow);
+		GetComponent<Renderer>().material.SetFloat("_PixelSize", INITIAL_PIXEL_SIZE);
+		GetComponent<Renderer>().material.SetTexture("_MainTex", golden_goal_texture);
+		GetComponent<Renderer>().material.SetColor("_DrawColor", Color.yellow);
 		is_animating_tie_message = true;
 		
 	}
@@ -27,11 +27,11 @@ public class LED_Screen : MonoBehaviour {
 	public void DrawGoalScored(int team)
 	{
 		if (team == 1){
-			renderer.material.SetTexture("_MainTex", red_team_scores);
-			renderer.material.SetColor("_DrawColor", Color.red);
+			GetComponent<Renderer>().material.SetTexture("_MainTex", red_team_scores);
+			GetComponent<Renderer>().material.SetColor("_DrawColor", Color.red);
 		} else if (team == 2) {
-			renderer.material.SetTexture("_MainTex", blue_team_scores);
-			renderer.material.SetColor("_DrawColor", Color.blue);
+			GetComponent<Renderer>().material.SetTexture("_MainTex", blue_team_scores);
+			GetComponent<Renderer>().material.SetColor("_DrawColor", Color.blue);
 		}
 
 		is_animating_scored_message = true;
@@ -45,22 +45,22 @@ public class LED_Screen : MonoBehaviour {
 		while(blink_counter <= BLINK_COUNTER_MAX) {
 
 			if((blink_counter % 2) == 0){
-				renderer.material.SetFloat("_Invert", 1f);
+				GetComponent<Renderer>().material.SetFloat("_Invert", 1f);
 			} else {
-				renderer.material.SetFloat("_Invert", 0f);
+				GetComponent<Renderer>().material.SetFloat("_Invert", 0f);
 			}
 
 			blink_counter++;
 			yield return new WaitForSeconds(0.1f);
 		}
-		renderer.material.SetFloat("_Invert", 0f);
-		renderer.material.SetTexture("_MainTex", null);
+		GetComponent<Renderer>().material.SetFloat("_Invert", 0f);
+		GetComponent<Renderer>().material.SetTexture("_MainTex", null);
 	}
 
 	private void AnimateTieMessage()
 	{
-		if (renderer.material.GetFloat("_PixelSize") > DEFAULT_PIXEL_SIZE)
-			renderer.material.SetFloat("_PixelSize", renderer.material.GetFloat("_PixelSize")-1f);
+		if (GetComponent<Renderer>().material.GetFloat("_PixelSize") > DEFAULT_PIXEL_SIZE)
+			GetComponent<Renderer>().material.SetFloat("_PixelSize", GetComponent<Renderer>().material.GetFloat("_PixelSize")-1f);
 		else {
 			is_animating_tie_message = false;
 		}

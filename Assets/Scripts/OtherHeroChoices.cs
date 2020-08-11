@@ -24,8 +24,8 @@ public class OtherHeroChoices : MonoBehaviour {
 			hero.transform.parent = heroes_transform;
 			hero.transform.localPosition = Vector3.zero;
 
-			hero.transform.animation.Play("Idle");
-			hero.transform.animation["Idle"].time = Random.Range(0.0f, hero.transform.animation["Idle"].length);
+			hero.transform.GetComponent<Animation>().Play("Idle");
+			hero.transform.GetComponent<Animation>()["Idle"].time = Random.Range(0.0f, hero.transform.GetComponent<Animation>()["Idle"].length);
 
 			if(i != 0)
 				hero.SetActive(false);
@@ -46,7 +46,7 @@ public class OtherHeroChoices : MonoBehaviour {
 		
 		foreach(Transform hero in heroes_transform) {
 			Transform hero_base = hero.Find("Base");
-			hero_base.renderer.material = team_material;
+			hero_base.GetComponent<Renderer>().material = team_material;
 		}
 
 	}
@@ -58,8 +58,8 @@ public class OtherHeroChoices : MonoBehaviour {
 		}
 
 		hero_instances[hero_index].SetActive(true);
-		hero_instances[hero_index].transform.animation.Play("Idle");
-		hero_instances[hero_index].transform.animation["Idle"].time = Random.Range(0.0f, hero_instances[hero_index].transform.animation["Idle"].length);
+		hero_instances[hero_index].transform.GetComponent<Animation>().Play("Idle");
+		hero_instances[hero_index].transform.GetComponent<Animation>()["Idle"].time = Random.Range(0.0f, hero_instances[hero_index].transform.GetComponent<Animation>()["Idle"].length);
 		this.hero_index = hero_index;
 	}
 }

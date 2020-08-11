@@ -39,9 +39,6 @@ public class Tesla : Hero {
 				is_using_power = true;
 				player.setPowerActivatedTimer(POWER_TIMER);
 				ball_pos = ball.transform.position;
-				if (player.networkView != null)
-					player.networkView.RPC("EmmitPowerFX",RPCMode.All, "power_up");
-				else
 					EmmitPowerFX("power_up");
 			} else if (is_using_power) {
 				StopPower();
@@ -55,7 +52,7 @@ public class Tesla : Hero {
 
 		if (is_using_power && player.IsCollidingWithBall()) {
 			if (!is_velocity_zeroed) {
-				ball.transform.rigidbody.velocity = Vector3.zero;
+				ball.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
 				is_velocity_zeroed = true;
 			}
 			power_displacement = player.transform.position - original_position;
@@ -71,19 +68,16 @@ public class Tesla : Hero {
 	public override void EmmitPowerFX(string type = "none")
 	{
 		if(type == "power_up")
-			magnet.particleSystem.Play();
+			magnet.GetComponent<ParticleSystem>().Play();
 		if(type == "power_down")
-			magnet.particleSystem.Stop();
+			magnet.GetComponent<ParticleSystem>().Stop();
 	}
 
 	private void StopPower()
 	{
 		is_using_power = false;
 		if(player.IsCollidingWithBall())
-			ball.transform.rigidbody.velocity = player.rigidbody.velocity;
-		if (player.networkView != null)
-			player.networkView.RPC("EmmitPowerFX",RPCMode.All, "power_down");
-		else
+			ball.transform.GetComponent<Rigidbody>().velocity = player.GetComponent<Rigidbody>().velocity;
 			EmmitPowerFX("power_down");
 		player.setPowerActivatedTimer(0f);
 		player.resetPowerBar();
@@ -93,7 +87,7 @@ public class Tesla : Hero {
 	{
 		ai_manager.InsertHero(this);
 		magnet = player.transform.Find("Mesh").Find("Base").Find("Magnet");
-		magnet.particleSystem.Stop();
+		magnet.GetComponent<ParticleSystem>().Stop();
 		team = player.team;
 	}
 

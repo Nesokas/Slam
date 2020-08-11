@@ -22,8 +22,6 @@ public class GameLobby : Lobby {
 				Hero_Selection.Player player = game_settings.players_list[i];
 				if(game_settings.IsLocalGame()){
 					AddLocalPlayer(player.controller, player.player_name, player.team);
-				} else {
-					AddNetworkPlayer(player.network_player, player.player_name, player.team);
 				}
 			}
 		}
@@ -32,10 +30,6 @@ public class GameLobby : Lobby {
 	protected override void LobbyMenu()
 	{
 		if(!game_settings.IsLocalGame() && GUILayout.Button("Disconnect", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height))){
-			bool is_server = Network.isServer;
-			Network.Disconnect();
-			if(is_server)
-				MasterServer.UnregisterHost();
 			BackToMainMenu();
 		}
 		if (game_settings.IsLocalGame()) {

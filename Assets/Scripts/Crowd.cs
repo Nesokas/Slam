@@ -43,13 +43,13 @@ public class Crowd : MonoBehaviour {
 			hero.transform.localScale = Vector3.one;
 			hero.transform.localRotation = Quaternion.Euler(0, 180, 0);
 
-			hero.animation.Play("Idle");
-			hero.transform.animation["Idle"].time = Random.Range(0.0f, hero.transform.animation["Idle"].length);
+			hero.GetComponent<Animation>().Play("Idle");
+			hero.transform.GetComponent<Animation>()["Idle"].time = Random.Range(0.0f, hero.transform.GetComponent<Animation>()["Idle"].length);
 
 			Transform hero_object = fan.Find(hero_to_instanciate.name + "(Clone)");
 			Transform hero_base = hero_object.Find("Base");
 
-			hero_base.renderer.material = team_material;
+			hero_base.GetComponent<Renderer>().material = team_material;
 			all_fans.Add(fan.gameObject);
 
 			if(hero_to_instanciate.name == "Tesla") {

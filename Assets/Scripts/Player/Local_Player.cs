@@ -20,7 +20,7 @@ public class Local_Player : Kickoff_Player {
 
 		Transform player_mesh = transform.Find("Mesh");
 		player_base = player_mesh.Find("Base");
-		player_mesh.animation.Play("Idle");
+		player_mesh.GetComponent<Animation>().Play("Idle");
 		initial_position = position;
 		controller_object = (GameObject)Instantiate(player_controller_prefab);
 		player_controller = controller_object.GetComponent<PlayerController>();
@@ -40,9 +40,9 @@ public class Local_Player : Kickoff_Player {
 	{
 		base.FixedUpdate();
 		if(!ball_collision && commands.shoot != 0) {
-			player_base.renderer.material = shoot_material;
+			player_base.GetComponent<Renderer>().material = shoot_material;
 		} else {
-			player_base.renderer.material = normal_material;
+			player_base.GetComponent<Renderer>().material = normal_material;
 		}
 
 		//if (!is_ai)

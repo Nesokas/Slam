@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Forcefield/Forcefield" {
 	Properties {
 		_FieldColor ("Field Color", Color) = (1.0, 1.0, 1.0, 1.0)
@@ -78,7 +80,7 @@ Shader "Forcefield/Forcefield" {
 
 					v.vertex.xyz += v.normal * _Offset;
 
-					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+					o.vertex = UnityObjectToClipPos(v.vertex);
 					o.vPos = v.vertex;
 
 					o.uv = TRANSFORM_TEX ( v.texcoord, _Sampler_A );

@@ -1,4 +1,6 @@
-﻿Shader "Custom/ImageEffects" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/ImageEffects" {
 	Properties 
 	{
 		_MainTex ("Base (RGB)", 2D) = "white" {}
@@ -64,7 +66,7 @@
 		    fragmentInput vert( vertexInput i )
 		    {
 		        fragmentInput o;
-		        o.pos = mul( UNITY_MATRIX_MVP, i.vertex );
+		        o.pos = UnityObjectToClipPos( i.vertex );
 		 
 		//This is a standard defined function in Unity, 
 		//Does exactly the same as the next line of code

@@ -34,82 +34,82 @@ public class Kickoff_Player : Player_Behaviour {
 		if (scored_team == 0){
 			if(team == 1){
 
-				IgnoreCollision(center_circle_right.collider, false);
+				IgnoreCollision(center_circle_right.GetComponent<Collider>(), false);
 //				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider, false);
-				IgnoreCollision(center_circle_left.collider, true);
+				IgnoreCollision(center_circle_left.GetComponent<Collider>(), true);
 
 //				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
 //				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
 //				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider);
 			} else {
 
-				IgnoreCollision(center_circle_left.collider, false);
+				IgnoreCollision(center_circle_left.GetComponent<Collider>(), false);
 //				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider, false);
-				IgnoreCollision(center_circle_right.collider, true);
+				IgnoreCollision(center_circle_right.GetComponent<Collider>(), true);
 //				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
 //				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
 //				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider);
 			}
 		} else if (team == 1) {
 			if (scored_team == 1) {
-				IgnoreCollision(center_circle_left.collider, false);
+				IgnoreCollision(center_circle_left.GetComponent<Collider>(), false);
 //				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider, false);
 
-				IgnoreCollision(center_circle_right.collider, true);
+				IgnoreCollision(center_circle_right.GetComponent<Collider>(), true);
 //				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
 //				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
 //				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider);
 			} else {
-				IgnoreCollision(center_circle_right.collider, false);
+				IgnoreCollision(center_circle_right.GetComponent<Collider>(), false);
 //				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider, false);
-				IgnoreCollision(center_circle_left.collider, true);
+				IgnoreCollision(center_circle_left.GetComponent<Collider>(), true);
 //				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
 //				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
 //				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider);
 			}
 		} else {
 			if (scored_team == 1) {
-				IgnoreCollision(center_circle_left.collider, false);
+				IgnoreCollision(center_circle_left.GetComponent<Collider>(), false);
 //				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider, false);
-				IgnoreCollision(center_circle_right.collider, true);
+				IgnoreCollision(center_circle_right.GetComponent<Collider>(), true);
 //				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
 //				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
 //				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider);
 			} else {
-				IgnoreCollision(center_circle_right.collider, false);
+				IgnoreCollision(center_circle_right.GetComponent<Collider>(), false);
 //				Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider, false);
 //				Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossession.collider, false);
-				IgnoreCollision(center_circle_left.collider, true);
+				IgnoreCollision(center_circle_left.GetComponent<Collider>(), true);
 //				Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
 //				Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
 //				Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossession.collider);
 			}
 		}
 		for(int i = 0; i < center_planes.Length; i++) {
-			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider, false);
-			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider, false);
-			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossessionCenter.collider, false);
+			Physics.IgnoreCollision(center_planes[i].GetComponent<Collider>(), shoot_collider.GetComponent<Collider>(), false);
+			Physics.IgnoreCollision(center_planes[i].GetComponent<Collider>(), base_collider.GetComponent<Collider>(), false);
+			Physics.IgnoreCollision(center_planes[i].GetComponent<Collider>(), colliderAIPossessionCenter.GetComponent<Collider>(), false);
 		}
 	}
 
 	private void IgnoreCollision(Collider circle,  bool value)
 	{
-		Physics.IgnoreCollision(circle, base_collider.collider, value);
-		Physics.IgnoreCollision(circle, shoot_collider.collider, value);
-		Physics.IgnoreCollision(circle, colliderAIPossessionCenter.collider, value);
-		Physics.IgnoreCollision(circle, colliderAIPossessionLeft.collider, value);
-		Physics.IgnoreCollision(circle, colliderAIPossessionRight.collider, value);
+		Physics.IgnoreCollision(circle, base_collider.GetComponent<Collider>(), value);
+		Physics.IgnoreCollision(circle, shoot_collider.GetComponent<Collider>(), value);
+		Physics.IgnoreCollision(circle, colliderAIPossessionCenter.GetComponent<Collider>(), value);
+		Physics.IgnoreCollision(circle, colliderAIPossessionLeft.GetComponent<Collider>(), value);
+		Physics.IgnoreCollision(circle, colliderAIPossessionRight.GetComponent<Collider>(), value);
 	}
 	
 	/* Only one team should kickoff, the other cannot go through the midfield circle or opposing side */
@@ -127,23 +127,23 @@ public class Kickoff_Player : Player_Behaviour {
 //		Transform colliderAIPossession = transform.Find("ColliderAIPossession");
 
 		for (int i = 0; i < center_planes.Length; i++) {
-			Physics.IgnoreCollision(center_planes[i].collider, base_collider.collider);
-			Physics.IgnoreCollision(center_planes[i].collider, shoot_collider.collider);
-			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossessionCenter.collider);
-			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossessionLeft.collider);
-			Physics.IgnoreCollision(center_planes[i].collider, colliderAIPossessionRight.collider);
+			Physics.IgnoreCollision(center_planes[i].GetComponent<Collider>(), base_collider.GetComponent<Collider>());
+			Physics.IgnoreCollision(center_planes[i].GetComponent<Collider>(), shoot_collider.GetComponent<Collider>());
+			Physics.IgnoreCollision(center_planes[i].GetComponent<Collider>(), colliderAIPossessionCenter.GetComponent<Collider>());
+			Physics.IgnoreCollision(center_planes[i].GetComponent<Collider>(), colliderAIPossessionLeft.GetComponent<Collider>());
+			Physics.IgnoreCollision(center_planes[i].GetComponent<Collider>(), colliderAIPossessionRight.GetComponent<Collider>());
 		}
-		Physics.IgnoreCollision(center_circle_left.collider, base_collider.collider);
-		Physics.IgnoreCollision(center_circle_left.collider, shoot_collider.collider);
-		Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossessionCenter.collider);
-		Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossessionLeft.collider);
-		Physics.IgnoreCollision(center_circle_left.collider, colliderAIPossessionRight.collider);
+		Physics.IgnoreCollision(center_circle_left.GetComponent<Collider>(), base_collider.GetComponent<Collider>());
+		Physics.IgnoreCollision(center_circle_left.GetComponent<Collider>(), shoot_collider.GetComponent<Collider>());
+		Physics.IgnoreCollision(center_circle_left.GetComponent<Collider>(), colliderAIPossessionCenter.GetComponent<Collider>());
+		Physics.IgnoreCollision(center_circle_left.GetComponent<Collider>(), colliderAIPossessionLeft.GetComponent<Collider>());
+		Physics.IgnoreCollision(center_circle_left.GetComponent<Collider>(), colliderAIPossessionRight.GetComponent<Collider>());
 
-		Physics.IgnoreCollision(center_circle_right.collider, base_collider.collider);
-		Physics.IgnoreCollision(center_circle_right.collider, shoot_collider.collider);
-		Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossessionCenter.collider);
-		Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossessionLeft.collider);
-		Physics.IgnoreCollision(center_circle_right.collider, colliderAIPossessionRight.collider);
+		Physics.IgnoreCollision(center_circle_right.GetComponent<Collider>(), base_collider.GetComponent<Collider>());
+		Physics.IgnoreCollision(center_circle_right.GetComponent<Collider>(), shoot_collider.GetComponent<Collider>());
+		Physics.IgnoreCollision(center_circle_right.GetComponent<Collider>(), colliderAIPossessionCenter.GetComponent<Collider>());
+		Physics.IgnoreCollision(center_circle_right.GetComponent<Collider>(), colliderAIPossessionLeft.GetComponent<Collider>());
+		Physics.IgnoreCollision(center_circle_right.GetComponent<Collider>(), colliderAIPossessionRight.GetComponent<Collider>());
 	}
 	
 	public void Awake() 
@@ -171,7 +171,7 @@ public class Kickoff_Player : Player_Behaviour {
 			normal_material = normal_team_2_material;
 			shoot_material = shoot_team_2_material;
 		}
-		player_base.renderer.material = normal_material;
+		player_base.GetComponent<Renderer>().material = normal_material;
 	}	
 	
 	public void InitializePosition()

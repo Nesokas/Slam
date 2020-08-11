@@ -25,9 +25,7 @@ public abstract class Lobby : MonoBehaviour {
 	{
 		public string name;
 		public int team;
-		public NetworkPlayer network_player;
 		public int controller;
-		public bool is_network;
 		
 		public int hero;
 		public bool ready;
@@ -81,34 +79,10 @@ public abstract class Lobby : MonoBehaviour {
 		return player;
 	}
 	
-	[RPC]
-	protected void AddNetworkPlayer (NetworkPlayer network_player, string player_name, int team = SPECTATING)
-	{
-		Player player = CreatePlayer((string)player_name, team);
-		player.network_player = network_player;
-		player.is_network = true;
-		
-		switch(team){
-		case SPECTATING:
-			spectating.Add(player);
-			break;
-		case TEAM_1:
-			team_1.Add(player);
-			break;
-		case TEAM_2:
-			team_2.Add(player);
-			break;
-		}
-		
-		if(network_player == Network.player)
-			self_player = player;
-	}
-	
 	protected void AddLocalPlayer(int controller, string player_name, int team=0) 
 	{
 		Player player = CreatePlayer(player_name, team);
 		player.controller = controller;
-		player.is_network = false;
 		switch(team){
 		case SPECTATING:
 			spectating.Add(player);
@@ -122,17 +96,6 @@ public abstract class Lobby : MonoBehaviour {
 		}
 	}
 	
-	void DestroyNetworkPlayer(GameObject[] players, NetworkPlayer network_player)
-	{
-		foreach(GameObject player_object in players) {
-			Network_Player player = player_object.GetComponent<Network_Player>();
-			if(player.owner == network_player) {
-				Network.Destroy(player_object);
-				return;
-			}
-		}
-	}
-
 	void DrawPlayers(List<Player> players, int team)
 	{
 		for(int i = 0; i < players.Count; i++) {
@@ -140,7 +103,7 @@ public abstract class Lobby : MonoBehaviour {
 			int new_team = SPECTATING;
 			
 			GUILayout.BeginHorizontal();
-				if(show_lobby_arrows && (team == TEAM_2 || team == SPECTATING) && (game_settings.IsLocalGame() || Network.isServer)) {
+				if(show_lobby_arrows && (team == TEAM_2 || team == SPECTATING) && (game_settings.IsLocalGame())) {
 					if(GUILayout.Button("<", GUILayout.MaxWidth(0.03f*Screen.width))) {
 						if(team == SPECTATING)
 							new_team = TEAM_1;
@@ -149,11 +112,9 @@ public abstract class Lobby : MonoBehaviour {
 				}
 				GUILayout.FlexibleSpace();
 				GUILayout.Label(players[i].name);
-				if(!game_settings.IsLocalGame() && players[i].network_player != Network.player) {
-					GUILayout.Label("" + Network.GetAveragePing(players[i].network_player));
-				}
+
 				GUILayout.FlexibleSpace();
-				if(show_lobby_arrows && (team == TEAM_1 || team == SPECTATING) && (game_settings.IsLocalGame() || Network.isServer)) {
+				if(show_lobby_arrows && (team == TEAM_1 || team == SPECTATING) && (game_settings.IsLocalGame())) {
 					if(GUILayout.Button(">", GUILayout.MaxWidth(0.03f*Screen.width))) {
 						if(team == SPECTATING)
 							new_team = TEAM_2;
@@ -165,8 +126,6 @@ public abstract class Lobby : MonoBehaviour {
 			if(change_team) {
 				if(game_settings.IsLocalGame())
 					ChangeLocalPlayerTeam(players[i].controller, team, new_team);
-				else
-					networkView.RPC("ChangeNetworkPlayerTeam", RPCMode.All, players[i].network_player, team, new_team);
 			}
 		}
 	}
@@ -191,67 +150,6 @@ public abstract class Lobby : MonoBehaviour {
 			if(old_player_team[i].controller == controller){
 				AddLocalPlayer(controller, old_player_team[i].name, new_team);
 				old_player_team.RemoveAt(i);
-				return;
-			}
-		}
-	}
-	
-	/* When in a lobby the admin moves the player between teams, we use this function*/
-	[RPC]
-	void ChangeNetworkPlayerTeam(NetworkPlayer network_player, int old_team, int new_team)
-	{
-		List<Player> old_player_team = spectating;
-		
-		switch(old_team){
-		case SPECTATING:
-			old_player_team = spectating;
-			break;
-		case TEAM_1:
-			old_player_team = team_1;
-			break;
-		case TEAM_2:
-			old_player_team = team_2;
-			break;
-		}
-		
-		for(int i = 0; i < old_player_team.Count; i++){
-			if(old_player_team[i].network_player == network_player){
-				AddNetworkPlayer(network_player, old_player_team[i].name, new_team);
-				old_player_team.RemoveAt(i);
-				return;
-			}
-		}
-	}
-
-	void OnPlayerDisconnected(NetworkPlayer network_player)
-	{
-		Network.RemoveRPCs(network_player);
-		Network.DestroyPlayerObjects (network_player);
-		
-		networkView.RPC("RemovePlayer", RPCMode.All, network_player);
-		
-		if(Network.isServer)
-			MasterServer.UnregisterHost();
-	}
-	
-	[RPC]
-	void RemovePlayer(NetworkPlayer network_player)
-	{
-		for(int i = 0; i < team_1.Count; i++){
-			if(team_1[i].network_player == network_player){
-				team_1.RemoveAt(i);
-				return;
-			}
-		}
-		for(int i = 0; i < team_2.Count; i++){
-			if(team_2[i].network_player == network_player){
-				team_2.RemoveAt(i);
-				return;
-			}
-		}
-		for(int i = 0; i < spectating.Count; i++){
-			if(spectating[i].network_player == network_player){
-				spectating.RemoveAt(i);
 				return;
 			}
 		}
@@ -317,11 +215,6 @@ public abstract class Lobby : MonoBehaviour {
 	protected abstract void LobbyMenu();
 
 	protected void BackToMainMenu()
-	{
-		Application.LoadLevel(game_settings.main_menu_scene);
-	}
-
-	void OnDisconnectedFromServer(NetworkDisconnection info)
 	{
 		Application.LoadLevel(game_settings.main_menu_scene);
 	}

@@ -75,100 +75,6 @@ public class PreLobby : Lobby
 		}
 	}
 
-	[RPC]
-	void NetworkHeroSelectScreen()
-	{
-		show_lobby = false;
-
-		int total_players_team_1 = team_1.Count;
-		int total_players_team_2 = team_2.Count;
-
-		int team = 1;
-		other_choices_cameras = new Camera[4];
-
-		for(int i = 0; i < 4; i++) {
-
-			GameObject other_hero_choices = (GameObject)Instantiate(other_hero_choices_prefab);
-			Vector3 new_position = new Vector3(other_hero_choices.transform.position.x,
-			                                   other_hero_choices.transform.position.y + 10*i,
-			                                   other_hero_choices.transform.position.z
-			                                  );
-
-			other_hero_choices.transform.position = new_position;
-
-			Camera other_hero_camera = other_hero_choices.transform.Find("Camera").GetComponent<Camera>();
-			other_hero_camera.camera.rect = new Rect(0.2f + ((i%2) * 0.15f) + ((team - 1) * 0.35f), 0.80f, 0.1f, 0.15f);
-
-			other_choices_cameras[i] = other_hero_camera;
-
-			if(team == TEAM_1 && total_players_team_1 != 0) {
-
-				Transform heroes = other_hero_choices.transform.Find("Heroes");
-				foreach(Transform hero in heroes) {
-					Transform hero_base = hero.Find("Base");
-					hero_base.renderer.material = team_1_material;
-				}
-				total_players_team_1--;
-
-				Player temp = team_1[i];
-				temp.hero_choosen = other_hero_choices;
-				team_1[i] = temp;
-
-			} else if(team == TEAM_2 && total_players_team_2 != 0){
-
-				Transform heroes = other_hero_choices.transform.Find("Heroes");
-				foreach(Transform hero in heroes) {
-					Transform hero_base = hero.Find("Base");
-					hero_base.renderer.material = team_2_material;
-				}
-				total_players_team_2--;
-
-				Player temp = team_2[i%2];
-				temp.hero_choosen = other_hero_choices;
-				team_2[i%2] = temp;
-
-			} else {
-				other_hero_camera.cullingMask = 0;
-			}
-
-			team += i % 2;
-		}
-
-		GameObject choose_hero = (GameObject)Instantiate(choose_hero_prefab);
-		Camera choose_hero_camera = choose_hero.transform.Find("Main Camera").GetComponent<Camera>();
-		choose_hero_camera.camera.rect = new Rect(0.2f, 0.1f, 0.6f, 0.6f);
-
-		Hero_Selection hero_script = choose_hero.GetComponent<Hero_Selection>();
-		Material team_color;
-
-		if(self_player.team == 1) {
-			hero_script.InitializeNetworkPlayer(TEAM_1, self_player.name, 0, Network.player, this);
-		} else {
-			hero_script.InitializeNetworkPlayer(TEAM_2, self_player.name, 0, Network.player, this);
-		}
-	}
-
-	public void HeroChanged(int hero_index)
-	{
-		if(!game_settings.IsLocalGame()){
-			networkView.RPC("RPC_HeroChanged", RPCMode.All, hero_index, Network.player);
-		}
-	}
-
-	[RPC]
-	void RPC_HeroChanged(int hero_index, NetworkPlayer network_player)
-	{
-		List<Player> allPlayers = new List<Player>(team_1);
-		allPlayers.AddRange(team_2);
-
-		for(int i = 0; i < allPlayers.Count; i++){
-			if(allPlayers[i].network_player == network_player){
-				OtherHeroChoices other = allPlayers[i].hero_choosen.GetComponent<OtherHeroChoices>();
-				other.ChangeHero(hero_index);
-			}
-		}
-	}
-
 	private void BotActivationGUI()
 	{
 
@@ -213,7 +119,7 @@ public class PreLobby : Lobby
 			                                               choose_hero.transform.position.z
 			                                              );
 			choose_hero.transform.position = new_choose_hero_position;
-			choose_hero_camera.camera.rect = new Rect(0.05f + (0.5f * team), 0.55f - (0.5f * player_number), 0.4f, 0.4f);
+			choose_hero_camera.GetComponent<Camera>().rect = new Rect(0.05f + (0.5f * team), 0.55f - (0.5f * player_number), 0.4f, 0.4f);
 
 			choose_hero.transform.name = "team_" + (team + 1) + "_" + (player_number + 1);
 
@@ -248,61 +154,13 @@ public class PreLobby : Lobby
 			if (players_ready == (team_1.Count + team_2.Count))
 				Application.LoadLevel("Main_Game");
 
-		} else {
-			networkView.RPC("RPC_PlayerReady", RPCMode.All, Network.player, player.texture_id);
 		}
-	}
-
-	[RPC]
-	void RPC_PlayerReady(NetworkPlayer network_player, int texture_id) {
-
-		players_ready++;
-
-		List<Player> allPlayers = new List<Player>(team_1);
-		allPlayers.AddRange(team_2);
-		
-		for(int i = 0; i < allPlayers.Count; i++){
-			if(allPlayers[i].network_player == network_player){
-				Hero_Selection.Player player = new Hero_Selection.Player();
-				OtherHeroChoices other = allPlayers[i].hero_choosen.GetComponent<OtherHeroChoices>();
-
-				player.hero_index = other.hero_index;
-				player.player_name = allPlayers[i].name;
-				player.team = allPlayers[i].team;
-				player.texture_id = texture_id;
-				player.network_player = allPlayers[i].network_player;
-
-				if(Network.isServer) {
-					game_settings.AddPlayer(player);
-				}
-				break;
-			}
-		}
-	
-		if (Network.isServer && players_ready == (team_1.Count + team_2.Count)) {
-			Network.Instantiate(network_loading_prefab, 
-			                    network_loading_prefab.transform.position,
-			                    network_loading_prefab.transform.rotation,
-			                    0);
-			networkView.RPC("StartGame", RPCMode.All);
-		}
-
-	}
-
-	[RPC]
-	void StartGame()
-	{
-		Application.LoadLevel("Network_Loading");
 	}
 
 	protected override void LobbyMenu()
 	{
 
 		if(!game_settings.IsLocalGame() && GUILayout.Button("Disconnect", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height))){
-			bool is_server = Network.isServer;
-			Network.Disconnect();
-			if(is_server)
-				MasterServer.UnregisterHost();
 			BackToMainMenu();
 		} else if(game_settings.IsLocalGame() && GUILayout.Button("Back", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height))) {
 			Application.LoadLevel(game_settings.main_menu_scene);
@@ -315,15 +173,12 @@ public class PreLobby : Lobby
 			}
 			GUILayout.FlexibleSpace();
 		}
-		if(Network.isServer || game_settings.IsLocalGame()){
+		if(game_settings.IsLocalGame()){
 			if(!game_settings.IsLocalGame())
 				GUILayout.FlexibleSpace();
 			if(GUILayout.Button("Start", GUILayout.MinWidth(0.15f*Screen.width), GUILayout.MinHeight(0.06f*Screen.height))) {
 				if(game_settings.IsLocalGame())
 					LocalHeroSelectScreen();
-				else
-					networkView.RPC("NetworkHeroSelectScreen", RPCMode.All);
-
 				lobby_state = (int)lobby_states.hero_selection;
 				HeroScreen();
 			}

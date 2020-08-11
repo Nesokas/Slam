@@ -195,7 +195,7 @@ public class Game_Behaviour : MonoBehaviour {
 		GameObject led_screen = GameObject.FindGameObjectWithTag("LedScreen");
 		led_screen_script = led_screen.GetComponent<LED_Screen>();
 		
-		m_camera = GameObject.FindGameObjectWithTag("MainCamera").camera;
+		m_camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 		is_game_going = false;
 		MovePlayersToStartPositions();
 		

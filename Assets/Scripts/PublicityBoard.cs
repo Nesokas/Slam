@@ -5,9 +5,9 @@ public class PublicityBoard : MonoBehaviour {
 
 	void Update() {
 
-		Vector2 texture = renderer.material.mainTextureOffset;
+		Vector2 texture = GetComponent<Renderer>().material.mainTextureOffset;
 		texture.x += 0.001f;
-		renderer.material.mainTextureOffset = texture;
+		GetComponent<Renderer>().material.mainTextureOffset = texture;
 	}
 	
 }

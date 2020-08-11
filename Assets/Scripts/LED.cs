@@ -21,12 +21,12 @@ public class LED : MonoBehaviour {
 			numbers[i] = Resources.Load<Material>(resource_folder + "Number_" + i);
 		}
 
-		gameObject.renderer.material = numbers[0];
+		gameObject.GetComponent<Renderer>().material = numbers[0];
 	}
 	
 	public void SetCurrentNumber(int number)
 	{
-		gameObject.renderer.material = numbers[number];
+		gameObject.GetComponent<Renderer>().material = numbers[number];
 	}
 	
 	

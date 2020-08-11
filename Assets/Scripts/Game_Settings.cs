@@ -9,7 +9,7 @@ public class Game_Settings : MonoBehaviour {
 	public bool local_game = true;
 	public string player_name;
 	public bool connected;
-	public HostData connect_to;
+	//public HostData connect_to;
 
 	public string main_menu_scene;
 

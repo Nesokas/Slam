@@ -29,13 +29,11 @@ public class Sam : Hero {
 	{
 		if (commands.dash != 0 && player.IsCooldownOver() && (commands.horizontal_direction != 0 || commands.vertical_direction != 0)) {
 //			power_cooldown =  DASH_COOLDOWN + Time.time;
-			player.transform.rigidbody.velocity *= DASH_STRENGTH;
+			player.transform.GetComponent<Rigidbody>().velocity *= DASH_STRENGTH;
 			player.resetPowerBar();
 			
 			// if networkView == null means localplay so we can't make an RPC
-			if (player.networkView != null)
-				player.networkView.RPC("EmmitPowerFX",RPCMode.All, "none");
-			else
+
 				EmmitPowerFX();	
 		}
 
@@ -45,7 +43,7 @@ public class Sam : Hero {
 
 	public override void EmmitPowerFX(string type ="none")
 	{
-		dash_smoke.particleSystem.Play();
+		dash_smoke.GetComponent<ParticleSystem>().Play();
 	}
 
 	public override void Update ()

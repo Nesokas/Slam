@@ -57,9 +57,9 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 		TextMesh scoreText2 = team_score_2.GetComponent<TextMesh>();;
 		
 		scoreText1.text = text;
-		scoreText1.renderer.material.color = color;
+		scoreText1.GetComponent<Renderer>().material.color = color;
 		scoreText2.text = text;
-		scoreText2.renderer.material.color = color;
+		scoreText2.GetComponent<Renderer>().material.color = color;
 		
 		text_in = true;
 	}
@@ -86,8 +86,8 @@ public class Screen_Text_Behaviour : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		score_red.renderer.material.color = team1_color.color;
-		score_blue.renderer.material.color = team2_color.color;
+		score_red.GetComponent<Renderer>().material.color = team1_color.color;
+		score_blue.GetComponent<Renderer>().material.color = team2_color.color;
 		game_behaviour = main_game_object.GetComponent<Game_Behaviour>();
 	}
 	

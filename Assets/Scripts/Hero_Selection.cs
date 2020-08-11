@@ -36,7 +36,6 @@ public class Hero_Selection : MonoBehaviour {
 		public int team;
 
 		public int controller; // used for local games
-		public NetworkPlayer network_player; // used for network games
 	}
 
 	int team;
@@ -71,8 +70,10 @@ public class Hero_Selection : MonoBehaviour {
 			GameObject hero = (GameObject)Instantiate(heroes[i], Vector3.zero, transform.rotation);
 			hero.transform.parent = transform.Find("Heroes");
 			hero.transform.localPosition = CirclePosition(i, num_heroes);
-			hero.transform.animation.Play("Idle");
-			hero.transform.animation["Idle"].time = Random.Range(0.0f, hero.transform.animation["Idle"].length);
+			hero.transform.GetComponent<Animation>().Play("Idle");
+			hero.transform.GetComponent<Animation>()["Idle"].time = Random.Range(0.0f, hero.transform.GetComponent<Animation>()["Idle"].length);
+			//hero.transform.animation.Play("Idle");
+			//hero.transform.animation["Idle"].time = Random.Range(0.0f, hero.transform.animation["Idle"].length);
 			hero_instances[i] = hero;
 		}
 
@@ -91,15 +92,6 @@ public class Hero_Selection : MonoBehaviour {
 		player_controller.setInputNum(input_num);
 	}
 
-	public void InitializeNetworkPlayer(int team, string name, int texture_id, NetworkPlayer network_player, PreLobby lobby)
-	{
-		player = InitializePlayer(team, name, texture_id, lobby);
-		player.network_player = network_player;
-
-		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
-		player_controller.setInputNum(0);
-	}
-
 	public Player InitializePlayer(int team, string name, int texture_id, PreLobby lobby)
 	{
 		Player new_player = new Player();
@@ -112,7 +104,8 @@ public class Hero_Selection : MonoBehaviour {
 		PlayerController player_controller = controller_object.GetComponent<PlayerController>();
 
 		commands = player_controller.GetCommands();
-		transform.Find("ready_led").Find("Light").renderer.material.color = Color.red;
+		transform.Find("ready_led").Find("Light").GetComponent<Renderer>().material.color = Color.red;
+		//transform.Find("ready_led").Find("Light").renderer.material.color = Color.red;
 		this.lobby = lobby;
 
 		change_color = true;
@@ -190,11 +183,14 @@ public class Hero_Selection : MonoBehaviour {
 			foreach(Transform hero in heroes) {
 				
 				Transform hero_base = hero.Find("Base");
-				
-				if(player.team == 1)
-					hero_base.renderer.material = team_1_material;
+
+				if (player.team == 1)
+					hero_base.GetComponent<Renderer>().material = team_1_material;
+
+				//hero_base.renderer.material = team_1_material;
 				else
-					hero_base.renderer.material = team_2_material;
+					hero_base.GetComponent<Renderer>().material = team_2_material;
+					//hero_base.renderer.material = team_2_material;
 			}
 
 			change_color = false;
@@ -204,15 +200,16 @@ public class Hero_Selection : MonoBehaviour {
 			if(commands.horizontal_direction < 0 && heroes_positions[1] == 1) {
 				rotations++;
 				ShiftLeft();
-				lobby.HeroChanged(rotations);
+				//lobby.HeroChanged(rotations);
 				InvokeRepeating("Rotate", 0, 0.01f);
 			} else if (commands.horizontal_direction > 0 && heroes_positions[heroes_positions.Length - 1] == 1) {
 				rotations--;
 				ShiftRight();
-				lobby.HeroChanged(rotations);
+				//lobby.HeroChanged(rotations);
 				InvokeRepeating("Rotate", 0, 0.01f);
 			} else if (commands.enter == 1) {
-				ready_light.renderer.material.color = Color.green;
+				ready_light.GetComponent<Renderer>().material.color = Color.green;
+				//ready_light.renderer.material.color = Color.green;
 				((Light)ready_light.parent.Find("Halo").GetComponent<Light>()).color = Color.green;
 
 				player.hero_index = rotations;

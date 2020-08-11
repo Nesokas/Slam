@@ -283,7 +283,7 @@ public class AI : Hero {
 		
 		if(Physics.Raycast(goal_ray, out goal_hit, Mathf.Infinity, layer_mask)) {
 			if (goal_hit.collider.CompareTag("goal_detection")) {
-				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+				if (colliderAIPossessionCenter.GetComponent<Collider>().Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
 					Shoot();
 					return true;
 				}
@@ -358,7 +358,7 @@ public class AI : Hero {
 
 		if(Physics.Raycast(teammate_ray, out teammate_hit, Mathf.Infinity, layer_mask)) {
 			if (teammate_hit.collider.CompareTag("colliderShoot")) {
-				if (colliderAIPossessionCenter.collider.Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
+				if (colliderAIPossessionCenter.GetComponent<Collider>().Raycast(shoot_ray, out shoot_hit, Mathf.Infinity)) {
 					Shoot();
 					//Debug.Log("PASS!!!");
 
@@ -701,8 +701,8 @@ public class AI : Hero {
 			int below_or_above = IsAboveOrBellow(ball_behaviour.transform.position, ai_manager.GetPitchAreaCoords(index));
 			int left_or_right = IsLeftOrRight(ball_behaviour.transform.position, ai_manager.GetPitchAreaCoords(index));
 
-			if (player_collider.collider.Raycast(ray, out hit, Mathf.Infinity)) {
-				if (colliderAIPossessionCenter.collider.Raycast(ray, out hit, Mathf.Infinity)) {
+			if (player_collider.GetComponent<Collider>().Raycast(ray, out hit, Mathf.Infinity)) {
+				if (colliderAIPossessionCenter.GetComponent<Collider>().Raycast(ray, out hit, Mathf.Infinity)) {
 				//	Debug.Log("HIT");
 					if (below_or_above == ABOVE) //if ball's index is above the target's, that means player is above the ball so he must move down
 						local_player.player_controller.commands.vertical_direction = MOVE_DOWN;
@@ -718,12 +718,12 @@ public class AI : Hero {
 					else
 						local_player.player_controller.commands.horizontal_direction = 0;
 				
-				} else if (colliderAIPossessionLeft.collider.Raycast(ray, out hit, Mathf.Infinity)) {
+				} else if (colliderAIPossessionLeft.GetComponent<Collider>().Raycast(ray, out hit, Mathf.Infinity)) {
 				//	Debug.Log("LEFT");
 					ResetControllers();
 					AdjustAccordingToQuadrant(LEFT);
 				
-				} else if (colliderAIPossessionRight.collider.Raycast(ray, out hit, Mathf.Infinity)) {
+				} else if (colliderAIPossessionRight.GetComponent<Collider>().Raycast(ray, out hit, Mathf.Infinity)) {
 				//	Debug.Log("RIGHT");
 					ResetControllers();
 					AdjustAccordingToQuadrant(RIGHT);

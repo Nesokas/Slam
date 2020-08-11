@@ -52,8 +52,6 @@ public class GameStarter : MonoBehaviour {
 
 		if(game_settings.IsLocalGame())
 			StartLocalGame();
-		else if(Network.isServer)
-			StartNetworkGame();
 		
 		GameObject AIManager_object = GameObject.Find("AIManager");
 		AIManager = AIManager_object.GetComponent<AIManager>();
@@ -89,48 +87,6 @@ public class GameStarter : MonoBehaviour {
 			Debug.Log("BLUE" + x);
 		}
 
-	}
-
-	public void StartNetworkGame()
-	{		
-		int texture_id = 0;
-		int team_1_total = team_1_count;
-		int team_2_total = team_2_count;
-
-		game_manager_object = (GameObject)Network.Instantiate(net_game_prefab, Vector3.zero, transform.rotation, 0);
-		
-		foreach (Hero_Selection.Player player in game_settings.players_list) {
-			Vector3 start_position = new Vector3(0,0,0);
-			if(player.team == 1){
-				start_position = court_start_position_team_1.transform.position;
-				start_position.x = start_position.x + distance_team_1*team_1_total;
-				team_1_total--;
-			} else {
-				start_position = court_start_position_team_2.transform.position;
-				start_position.x = start_position.x + distance_team_2*team_2_total;
-				team_2_total--;
-			}
-
-			InstantiateNewNetworkPlayer(start_position, player.network_player, player.team, player.player_name, texture_id, player.hero_index);
-			
-			texture_id++;
-		}
-	}
-
-	void InstantiateNewNetworkPlayer(Vector3 start_position, NetworkPlayer network_player, int team, string name, int texture_id, int hero_index) 
-	{
-		GameObject player = (GameObject)Network.Instantiate(net_player_prefab, start_position, transform.rotation, 0);
-		
-		Network_Player np = (Network_Player)player.GetComponent<Network_Player>();
-		np.InitializePlayerInfo(network_player, team, name, start_position, texture_id, hero_index);
-		np.Start();
-		
-		Network_Game net_game = game_manager_object.GetComponent<Network_Game>();
-		if(net_game.is_game_going) {
-			np.ReleasePlayer();
-		} else {
-			np.UpdateCollisions(net_game.scored_team);
-		}
 	}
 
 	private Vector3 CalculatePosition(int team)

@@ -15,7 +15,7 @@ public class Forcefield : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        mats = forceField.gameObject.renderer.materials;
+        mats = forceField.gameObject.GetComponent<Renderer>().materials;
         mesh = forceField.gameObject.GetComponent<MeshFilter>();    
 		ball = GameObject.FindGameObjectWithTag("ball");
 	}

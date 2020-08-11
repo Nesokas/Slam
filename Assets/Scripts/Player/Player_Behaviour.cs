@@ -95,12 +95,12 @@ public class Player_Behaviour : MonoBehaviour {
 
 			if((!gamepad && commands.shoot != 0)){
 
-				ball_collider.rigidbody.velocity += direction * SHOOT_VELOCITY;
+				ball_collider.GetComponent<Rigidbody>().velocity += direction * SHOOT_VELOCITY;
 				ball_collision = true;
 				colliding_with_ball = false;
 				debug_hit_remaining_time = debug_hit_time;
 				AudioSource.PlayClipAtPoint(ball_sound, transform.position);
-				shoot_effect.particleSystem.Play();
+				shoot_effect.GetComponent<ParticleSystem>().Play();
 				Ball_Behaviour bb = ball.GetComponent<Ball_Behaviour>();
 				bb.ReleasePlayers();
 				bb.SetLastPlayerTouched(this.gameObject);
@@ -209,7 +209,7 @@ public class Player_Behaviour : MonoBehaviour {
 			else
 				is_adding_speed = true;
 	
-			rigidbody.velocity += direction*ACCELERATION;
+			GetComponent<Rigidbody>().velocity += direction*ACCELERATION;
 		}
 	}
 
@@ -235,17 +235,17 @@ public class Player_Behaviour : MonoBehaviour {
 				animation_speed = 1f;
 		}
 		
-		animation["Idle"].speed = animation_speed;
+		GetComponent<Animation>()["Idle"].speed = animation_speed;
 	}
 	
 	public void ChangeAnimation(string animation_to_play)
 	{
 		switch (animation_to_play){
 			case "Idle":
-				player_mesh.animation.CrossFade("Idle", 0.3f);
+				player_mesh.GetComponent<Animation>().CrossFade("Idle", 0.3f);
 				break;
 			case "Celebrate":
-				player_mesh.animation.CrossFade("Celebrate", 0.3f);
+				player_mesh.GetComponent<Animation>().CrossFade("Celebrate", 0.3f);
 				if (hero.GetType() == typeof(AI)) {
 					AI ai = (AI)hero;
 					ai.GoalScored();
@@ -253,7 +253,7 @@ public class Player_Behaviour : MonoBehaviour {
 					
 				break;
 			case "Sad":
-				player_mesh.animation.CrossFade("Sad", 0.3f);
+				player_mesh.GetComponent<Animation>().CrossFade("Sad", 0.3f);
 				break;
 		}
 	}
@@ -280,30 +280,30 @@ public class Player_Behaviour : MonoBehaviour {
 		Transform colliderAIPossessionLeft = transform.Find("ColliderAIPossession/ColliderAIPossessionLeft");
 		Transform colliderAIPossessionRight = transform.Find("ColliderAIPossession/ColliderAIPossessionRight");
 		Transform court_collider = court_walls.transform.Find("forcefield");
-		Physics.IgnoreCollision(court_collider.collider, base_collider.collider);
-		Physics.IgnoreCollision(court_collider.collider, shoot_collider.collider);
-		Physics.IgnoreCollision(court_collider.collider, colliderAIPossessionCenter.collider);
-		Physics.IgnoreCollision(court_collider.collider, colliderAIPossessionLeft.collider);
-		Physics.IgnoreCollision(court_collider.collider, colliderAIPossessionRight.collider);
+		Physics.IgnoreCollision(court_collider.GetComponent<Collider>(), base_collider.GetComponent<Collider>());
+		Physics.IgnoreCollision(court_collider.GetComponent<Collider>(), shoot_collider.GetComponent<Collider>());
+		Physics.IgnoreCollision(court_collider.GetComponent<Collider>(), colliderAIPossessionCenter.GetComponent<Collider>());
+		Physics.IgnoreCollision(court_collider.GetComponent<Collider>(), colliderAIPossessionLeft.GetComponent<Collider>());
+		Physics.IgnoreCollision(court_collider.GetComponent<Collider>(), colliderAIPossessionRight.GetComponent<Collider>());
 
 		for(int i = 0; i < goal_detection.Length; i++) {
-			Physics.IgnoreCollision(goal_detection[i].collider, base_collider.collider);
+			Physics.IgnoreCollision(goal_detection[i].GetComponent<Collider>(), base_collider.GetComponent<Collider>());
 		}
 
 		for (int i = 0; i < players.Length; i++) {
 			Transform other_player_mesh = players[i].transform.Find("Mesh");
 			Transform other_player_base = other_player_mesh.Find("Base");
 			Transform other_player_shoot_collider = players[i].transform.Find("ColliderShoot");
-			if(other_player_shoot_collider.collider != shoot_collider.collider) {
-				Physics.IgnoreCollision(other_player_shoot_collider.collider, shoot_collider.collider);
-				Physics.IgnoreCollision(other_player_shoot_collider.collider, base_collider.collider);
+			if(other_player_shoot_collider.GetComponent<Collider>() != shoot_collider.GetComponent<Collider>()) {
+				Physics.IgnoreCollision(other_player_shoot_collider.GetComponent<Collider>(), shoot_collider.GetComponent<Collider>());
+				Physics.IgnoreCollision(other_player_shoot_collider.GetComponent<Collider>(), base_collider.GetComponent<Collider>());
 			}
 		}
 		
 		normal_material = normal_team_1_material;
 		shoot_material = shoot_team_1_material;
 
-		animation["Idle"].time = Random.Range(0.0f, animation["Idle"].length);
+		GetComponent<Animation>()["Idle"].time = Random.Range(0.0f, GetComponent<Animation>()["Idle"].length);
 	}
 	
 	protected 
@@ -536,9 +536,9 @@ public class Player_Behaviour : MonoBehaviour {
 		
 		if(move) {
 			if(!ball_collision && commands.shoot != 0)
-				player_base.renderer.material = shoot_material;
+				player_base.GetComponent<Renderer>().material = shoot_material;
 			else
-				player_base.renderer.material = normal_material;
+				player_base.GetComponent<Renderer>().material = normal_material;
 		}
 		
 		IncreaseSpeed();
